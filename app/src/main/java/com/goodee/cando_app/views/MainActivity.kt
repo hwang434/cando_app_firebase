@@ -1,8 +1,9 @@
-package com.goodee.cando_app
+package com.goodee.cando_app.views
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
+import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
