@@ -2,4 +2,6 @@
     <string name="app_name">cando_app</string>
     <string name="login_button">로그인</string>
     <string name="register_button">회원가입</string>
+    <string name="main_header1">Can</string>
+    <string name="main_header2">Do</string>
 </resources>

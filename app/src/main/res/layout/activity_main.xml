@@ -7,14 +7,15 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity"
         android:background="#26AE9A">
-
         <TextView
             android:id="@+id/main_header1"
             style="@style/main_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="72dp"
-            android:text="Can"
+            android:text="@string/main_header1"
+
+            android:shadowColor="#000000"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.463"
             app:layout_constraintStart_toStartOf="parent"
@@ -26,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="136dp"
-            android:text="Do"
+            android:text="@string/main_header2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.597"
             app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +45,6 @@
             style="@style/main_button"
             android:text="@string/login_button"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/button"
             android:layout_margin="15dp"/>
