@@ -8,7 +8,7 @@
         android:background="@color/common_background">
         >
         <!-- 메인 로그인 화면에 공통으로 들어갈 헤더 -->
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/main_header"
             android:name="com.goodee.cando_app.views.HeaderFragment"
             android:layout_width="match_parent"
