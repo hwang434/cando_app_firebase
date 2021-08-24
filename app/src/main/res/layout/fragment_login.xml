@@ -4,7 +4,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/common_background">
+        <!-- 메인 로그인 화면에 공통으로 들어갈 헤더 -->
+        <fragment
+            android:id="@+id/main_header"
+            android:name="com.goodee.cando_app.views.HeaderFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout="@layout/fragment_header" />
+        <TextView
+            android:id="@+id/id">
 
+        </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
