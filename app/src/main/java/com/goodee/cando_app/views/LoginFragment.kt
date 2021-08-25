@@ -27,18 +27,6 @@ private const val ARG_PARAM2 = "param2"
 class LoginFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var binding: FragmentLoginBinding
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(TAG,"LoginFragment - onCreate() called")
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,9 +40,12 @@ class LoginFragment : Fragment() {
             Log.d(TAG,"LoginFragment - loginButton is activated")
             var imm: InputMethodManager?
 
+            // 아이디가 비었거나 Blank거나 null일 때
             if (binding.idInput.text.isNullOrBlank() || binding.idInput.text.isEmpty()) {
                 Toast.makeText(requireActivity(),"아이디를 확인해주세요.",Toast.LENGTH_SHORT).show()
 
+                // 포커스가 되어 있는 키보드와 showSoftInput 메소드의 view가 일치해야 기보드가 뜹니다.
+                // 포커스가 되어 있지 않으면 키보드가 뜨지 않습니다.
                 binding.idInput.requestFocus()
                 imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.idInput,0)
@@ -73,6 +64,7 @@ class LoginFragment : Fragment() {
             }
         }
 
+        // 패스워트창에서 키보드에 엔터 누르면 실행되는 이벤트
         binding.passwordInput.setOnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
                 binding.loginButton.callOnClick()
@@ -82,17 +74,5 @@ class LoginFragment : Fragment() {
         }
 
         return binding.root
-    }
-
-    companion object {
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            LoginFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }
