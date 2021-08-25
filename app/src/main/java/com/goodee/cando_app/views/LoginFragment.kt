@@ -1,11 +1,14 @@
 package com.goodee.cando_app.views
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
+import com.goodee.cando_app.databinding.FragmentLoginBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -18,11 +21,14 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class LoginFragment : Fragment() {
+    private val TAG: String = "로그"
+    private lateinit var binding: FragmentLoginBinding
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG,"LoginFragment - onCreate() called")
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
@@ -34,8 +40,10 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false)
+        Log.d(TAG,"LoginFragment - onCreateView() called")
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
+
+        return binding.root
     }
 
     companion object {
