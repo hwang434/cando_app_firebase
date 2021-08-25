@@ -1,11 +1,15 @@
 package com.goodee.cando_app.views
 
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentLoginBinding
@@ -43,18 +47,44 @@ class LoginFragment : Fragment() {
         Log.d(TAG,"LoginFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
 
+        // 이벤트 처리
+        binding.loginButton.setOnClickListener {
+            Log.d(TAG,"LoginFragment - loginButton is activated")
+            var imm: InputMethodManager?
+
+            if (binding.idInput.text.isNullOrBlank() || binding.idInput.text.isEmpty()) {
+                Toast.makeText(requireActivity(),"아이디를 확인해주세요.",Toast.LENGTH_SHORT).show()
+
+                binding.idInput.requestFocus()
+                imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(binding.idInput,0)
+                false
+            } else if (binding.passwordInput.text.isNullOrBlank() || binding.passwordInput.text.isEmpty()) {
+                Toast.makeText(requireActivity(),"비밀번호를 확인해주세요.",Toast.LENGTH_SHORT).show()
+
+                binding.passwordInput.requestFocus()
+                imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(binding.passwordInput,0)
+                false
+            } else {
+                // 로그인 로직을 처리할 공간.
+                Toast.makeText(requireActivity(),"아이디와 비밀번호가 모두 존재합니다.",Toast.LENGTH_SHORT).show()
+                true
+            }
+        }
+
+        binding.passwordInput.setOnKeyListener { v, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
+                binding.loginButton.callOnClick()
+                true
+            }
+            false
+        }
+
         return binding.root
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment LoginFragment.
-         */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
