@@ -37,6 +37,7 @@
                 android:layout_height="match_parent"
                 style="@style/register_input"
                 android:inputType="textWebEditText"
+                android:textSize="18sp"
                 android:hint="@string/register_idhint"
                 android:autofillHints="username"/>
             <Button
