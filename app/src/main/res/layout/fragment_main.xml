@@ -9,7 +9,7 @@
         >
         <!-- 메인 로그인 화면에 공통으로 들어갈 헤더 -->
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentcontainerview_login_header"
+            android:id="@+id/fragmentcontainerview_main_header"
             android:name="com.goodee.cando_app.views.HeaderFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -19,13 +19,13 @@
             tools:layout="@layout/fragment_header" />
 
         <Button
-            android:id="@+id/button_login_loginbutton"
+            android:id="@+id/button_main_loginbutton"
             style="@style/main_button"
             android:layout_margin="15dp"
             android:text="@string/login_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_login_header" />
+            app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_main_header" />
         <Button
             android:id="@+id/button_main_registerbutton"
             style="@style/main_button"
@@ -33,6 +33,6 @@
             android:text="@string/register_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_login_loginbutton" />
+            app:layout_constraintTop_toBottomOf="@+id/button_main_loginbutton" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

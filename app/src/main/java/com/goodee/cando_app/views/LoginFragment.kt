@@ -35,27 +35,27 @@ class LoginFragment : Fragment() {
         Log.d(TAG,"LoginFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
 
-        // 이벤트 처리
-        binding.loginButton.setOnClickListener {
+        // 로그인 버튼 이벤트처리
+        binding.buttonLoginLoginbutton.setOnClickListener {
             Log.d(TAG,"LoginFragment - loginButton is activated")
             var imm: InputMethodManager?
 
             // 아이디가 비었거나 Blank거나 null일 때
-            if (binding.idInput.text.isNullOrBlank() || binding.idInput.text.isEmpty()) {
+            if (binding.textviewLoginIdinput.text.isNullOrBlank() || binding.textviewLoginIdinput.text.isEmpty()) {
                 Toast.makeText(requireActivity(),"아이디를 확인해주세요.",Toast.LENGTH_SHORT).show()
 
                 // 포커스가 되어 있는 키보드와 showSoftInput 메소드의 view가 일치해야 기보드가 뜹니다.
                 // 포커스가 되어 있지 않으면 키보드가 뜨지 않습니다.
-                binding.idInput.requestFocus()
+                binding.textviewLoginIdinput.requestFocus()
                 imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(binding.idInput,0)
+                imm.showSoftInput(binding.textviewLoginIdinput,0)
                 false
-            } else if (binding.passwordInput.text.isNullOrBlank() || binding.passwordInput.text.isEmpty()) {
+            } else if (binding.edittextLoginPasswordinput.text.isNullOrBlank() || binding.edittextLoginPasswordinput.text.isEmpty()) {
                 Toast.makeText(requireActivity(),"비밀번호를 확인해주세요.",Toast.LENGTH_SHORT).show()
 
-                binding.passwordInput.requestFocus()
+                binding.edittextLoginPasswordinput.requestFocus()
                 imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(binding.passwordInput,0)
+                imm.showSoftInput(binding.edittextLoginPasswordinput,0)
                 false
             } else {
                 // 로그인 로직을 처리할 공간.
@@ -65,9 +65,9 @@ class LoginFragment : Fragment() {
         }
 
         // 패스워트창에서 키보드에 엔터 누르면 실행되는 이벤트
-        binding.passwordInput.setOnKeyListener { v, keyCode, event ->
+        binding.edittextLoginPasswordinput.setOnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-                binding.loginButton.callOnClick()
+                binding.edittextLoginPasswordinput.callOnClick()
                 true
             }
             false
