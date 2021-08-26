@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentLoginBinding
 
@@ -63,7 +64,6 @@ class LoginFragment : Fragment() {
                 true
             }
         }
-
         // 패스워트창에서 키보드에 엔터 누르면 실행되는 이벤트
         binding.edittextLoginPasswordinput.setOnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
@@ -71,6 +71,10 @@ class LoginFragment : Fragment() {
                 true
             }
             false
+        }
+        // 회원가입 버튼 누르면 회원 가입 프래그먼트로 이동
+        binding.buttonLoginRegisterbutton.setOnClickListener {
+            view?.findNavController()?.navigate(R.id.action_loginFragment_to_registerFragment)
         }
 
         return binding.root
