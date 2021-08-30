@@ -49,5 +49,6 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.7.1'
-
+    // okhttp
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
 }
