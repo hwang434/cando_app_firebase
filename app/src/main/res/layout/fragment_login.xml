@@ -37,20 +37,20 @@
                 android:textSize="24sp"
                 app:layout_constraintEnd_toStartOf="@+id/textview_login_idinput"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_login_header"></TextView>
+                app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_login_header"/>
 
             <EditText
                 android:id="@+id/textview_login_idinput"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:background="@color/white"
                 android:inputType="textWebEditText"
                 android:minHeight="48dp"
                 android:textSize="30sp"
                 app:layout_constraintHorizontal_weight=".70"
                 app:layout_constraintStart_toEndOf="@+id/textview_login_idpointer"
-                app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_login_header" />
+                app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_login_header"
+                android:autofillHints="username"/>
         </androidx.appcompat.widget.LinearLayoutCompat>
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linearlayout_login_passwordform"
@@ -72,7 +72,6 @@
                 android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textview_login_idpointer" />
-
             <EditText
                 android:id="@+id/edittext_login_passwordinput"
                 android:layout_width="200dp"
@@ -82,7 +81,8 @@
                 android:minHeight="48dp"
                 android:textSize="30sp"
                 app:layout_constraintBottom_toBottomOf="@+id/textview_login_passwordpointer"
-                app:layout_constraintStart_toEndOf="@+id/textview_login_passwordpointer" />
+                app:layout_constraintStart_toEndOf="@+id/textview_login_passwordpointer"
+                android:autofillHints="password"/>
         </androidx.appcompat.widget.LinearLayoutCompat>
         <Button
             android:id="@+id/button_login_loginbutton"
