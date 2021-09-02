@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -49,6 +50,13 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.7.1'
+    // Gson
+    implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
     // okhttp
-    implementation("com.squareup.okhttp3:okhttp:4.9.0")
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
+    // gilde : 로딩 라이브러리
+    implementation "com.github.bumptech.gilde:glide:4.11.0"
+    // kapt
+    kapt "com.github.bumptech.glide.complier:4.11.0"
+
 }
