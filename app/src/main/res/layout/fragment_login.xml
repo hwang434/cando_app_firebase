@@ -2,9 +2,116 @@
 <layout xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/common_background">
+        <!-- 메인 로그인 화면에 공통으로 들어갈 헤더 -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentcontainerview_login_header"
+            android:name="com.goodee.cando_app.views.HeaderFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout="@layout/fragment_header" />
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linearlayout_login_idform"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_login_header"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
 
+            <TextView
+                android:id="@+id/textview_login_idpointer"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/textview_login_idinput"
+                android:text="@string/login_idpointer"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toStartOf="@+id/textview_login_idinput"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_login_header"/>
+
+            <EditText
+                android:id="@+id/textview_login_idinput"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:inputType="textWebEditText"
+                android:minHeight="48dp"
+                android:textSize="30sp"
+                app:layout_constraintHorizontal_weight=".70"
+                app:layout_constraintStart_toEndOf="@+id/textview_login_idpointer"
+                app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_login_header"
+                android:autofillHints="username"/>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linearlayout_login_passwordform"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout_login_idform"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+            <TextView
+                android:id="@+id/textview_login_passwordpointer"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@id/edittext_login_passwordinput"
+                android:text="@string/login_passwordpointer"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textview_login_idpointer" />
+            <EditText
+                android:id="@+id/edittext_login_passwordinput"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:inputType="textPassword"
+                android:minHeight="48dp"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="@+id/textview_login_passwordpointer"
+                app:layout_constraintStart_toEndOf="@+id/textview_login_passwordpointer"
+                android:autofillHints="password"/>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+        <Button
+            android:id="@+id/button_login_loginbutton"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="@string/login_login"
+            style="@style/main_button"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout_login_passwordform" />
+        <Button
+            android:id="@+id/button_login_findmember"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:text="@string/login_findmember"
+            style="@style/main_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_login_loginbutton" />
+        <Button
+            android:id="@+id/button_login_registerbutton"
+            style="@style/main_button"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="@string/login_register"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_login_findmember" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

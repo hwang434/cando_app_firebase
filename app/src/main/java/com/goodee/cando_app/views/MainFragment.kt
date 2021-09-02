@@ -33,10 +33,10 @@ class MainFragment : Fragment() {
         val binding = DataBindingUtil.inflate<FragmentMainBinding>(inflater,R.layout.fragment_main,container,false)
 
         // 이벤트 등록
-        binding.registerButton.setOnClickListener { view ->
+        binding.buttonMainRegisterbutton.setOnClickListener { view ->
             view.findNavController().navigate(R.id.action_mainFragment_to_registerFragment)
         }
-        binding.loginButton.setOnClickListener { view ->
+        binding.buttonMainLoginbutton.setOnClickListener { view ->
             view.findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
         }
 

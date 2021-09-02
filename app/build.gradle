@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -15,7 +16,6 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildFeatures {
         dataBinding true
     }
@@ -47,4 +47,14 @@ dependencies {
     // navigation dependency
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.7.1'
+    // Gson
+    implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
+    // okhttp
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
+    // kapt
+    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+    // gilde : 로딩 라이브러리
+    implementation "com.github.bumptech.glide:glide:4.11.0"
 }

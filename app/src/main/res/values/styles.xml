@@ -14,10 +14,20 @@
 
     <style name="main_button">
         <item name="android:layout_width">150dp</item>
-        <item name="android:layout_height">52dp</item>
+        <item name="android:layout_height">50dp</item>
         <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">24sp</item>
-        <item name="android:layout_margin">15dp</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:layout_margin">10dp</item>
         <item name="android:background">@drawable/main_radius_button</item>
+    </style>
+
+    <style name="register_pointer">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="register_input">
+        <item name="android:background">@color/white</item>
+        <item name="android:textSize">22sp</item>
     </style>
 </resources>
