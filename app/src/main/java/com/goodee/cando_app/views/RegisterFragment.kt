@@ -11,18 +11,12 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
+import com.goodee.cando_app.api.DuplicateCheckService
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [registerFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class registerFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var binding: FragmentRegisterBinding
@@ -64,15 +58,45 @@ class registerFragment : Fragment() {
                 binding.edittextRegisterEmailinput.requestFocus()
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edittextRegisterEmailinput, 0)
+            } else {
+                if (checkId() == true) {
+                    Toast.makeText(requireActivity(), "이미 존재하는 아이디입니다.",Toast.LENGTH_LONG).show()
+                } else {
+                    // 회원 가입 시키기
+                }
             }
-            // 중복 체크됐는지 확인하는 기능 추가해줘야함.
         }
 
         // DuplicateCheckService로 해당하는 id를 가진 멤버 존재하는지 확인
         binding.buttonRegisterDuplicatecheck.setOnClickListener {
+            var isExistId: Boolean? = checkId()
 
+            if (isExistId == true) {
+                Toast.makeText(requireActivity(), "이미 존재하는 아이디입니다.",Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(requireActivity(), "사용하셔도 좋은 아이디입니다.", Toast.LENGTH_SHORT).show()
+                // 중복 체크 완료됐다는 로직이 들어가야함.
+            }
         }
 
         return binding.root
+    }
+
+    fun checkId(): Boolean? {
+        val retrofit = DuplicateCheckService.create()
+        val duplicateCheckService = retrofit.create(DuplicateCheckService::class.java)
+        var isExist: Boolean? = null
+
+        duplicateCheckService.isUserExist(binding.edittextRegisterIdinput.text.toString()).enqueue(object: Callback<Boolean> {
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                Log.d(TAG,"registerFragment - onResponse() called")
+                isExist = response.body()
+            }
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                Log.d(TAG,"registerFragment - onFailure() called")
+            }
+        })
+
+        return isExist
     }
 }
