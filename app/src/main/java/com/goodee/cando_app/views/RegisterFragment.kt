@@ -70,12 +70,18 @@ class registerFragment : Fragment() {
         // DuplicateCheckService로 해당하는 id를 가진 멤버 존재하는지 확인
         binding.buttonRegisterDuplicatecheck.setOnClickListener {
             var isExistId: Boolean? = checkId()
-
-            if (isExistId == true) {
-                Toast.makeText(requireActivity(), "이미 존재하는 아이디입니다.",Toast.LENGTH_LONG).show()
+            if (binding.edittextRegisterIdinput.text.isNullOrBlank() || binding.edittextRegisterIdinput.text.isNullOrEmpty()) {
+                Toast.makeText(requireActivity(),"아이디를 확인해주세요",Toast.LENGTH_SHORT).show()
+                binding.edittextRegisterIdinput.requestFocus()
+                val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(binding.edittextRegisterIdinput,0)
             } else {
-                Toast.makeText(requireActivity(), "사용하셔도 좋은 아이디입니다.", Toast.LENGTH_SHORT).show()
-                // 중복 체크 완료됐다는 로직이 들어가야함.
+                if (isExistId == true) {
+                    Toast.makeText(requireActivity(), "이미 존재하는 아이디입니다.",Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(requireActivity(), "사용하셔도 좋은 아이디입니다.", Toast.LENGTH_SHORT).show()
+                    // 중복 체크 완료됐다는 로직이 들어가야함.
+                }
             }
         }
 
