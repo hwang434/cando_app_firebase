@@ -1,10 +1,13 @@
-package com.goodee.cando_app.viewmodel
+package com.goodee.cando_app.dto
 
-import java.util.*
+import androidx.lifecycle.ViewModel
 
 data class Diary(
-    var diaryTitle: String,
-    var diaryWriter: String,
-    var diaryWriteDate: Date,
-    var diaryUpdateDate: Date
-    )
+    val num: String,
+    val title: String,
+    val writer: String,
+    val writedDate: Long,
+    val updatedDate: Long,
+    val readCnt: Int): ViewModel() {
+
+}
