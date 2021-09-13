@@ -37,6 +37,9 @@ class LoginFragment : Fragment() {
         Log.d(TAG,"LoginFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
 
+        binding.buttonLoginFindmember.setOnClickListener {
+            view?.findNavController()?.navigate(R.id.action_loginFragment_to_findMember)
+        }
         // 로그인 버튼 이벤트처리
         binding.buttonLoginLoginbutton.setOnClickListener {
             Log.d(TAG,"LoginFragment - loginButton is activated")
