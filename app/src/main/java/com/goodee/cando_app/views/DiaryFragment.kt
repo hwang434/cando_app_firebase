@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryBinding
@@ -21,18 +22,21 @@ class DiaryFragment : Fragment() {
     ): View? {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         diaryBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        val data = test()
+
         var adapter = DiaryRecyclerViewAdapter()
-        adapter.list = data
+        adapter.list = test()
         diaryBinding.recyclerviewDiaryDiarylist.adapter = adapter
         diaryBinding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
 
+        diaryBinding.floatingDiaryWritediary.setOnClickListener {
+            Toast.makeText(requireActivity(), "diary add button is clicked", Toast.LENGTH_SHORT).show()
+        }
         return diaryBinding.root
     }
 
     fun test(): MutableList<Diary> {
         val data = mutableListOf<Diary>()
-        for (number in 1..100) {
+        for (number in 1..20) {
             data.add(Diary(number.toString(),"제목 : ${number}번째 글", "${number}번째 유저",System.currentTimeMillis(), System.currentTimeMillis(),number))
         }
 

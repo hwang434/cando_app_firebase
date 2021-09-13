@@ -33,7 +33,6 @@ class DiaryRecyclerViewAdapter() : RecyclerView.Adapter<DiaryRecyclerViewAdapter
 
     inner class ViewHolder(val binding: FragmentDiaryListBinding) : RecyclerView.ViewHolder(binding.root) {
         fun setDiary(diary: Diary) {
-            binding.textviewDiarylistNo.text = diary.num
             binding.textviewDiarylistTitle.text = diary.title
             binding.textviewDiarylistViewcount.text = diary.readCnt.toString()
             binding.textviewDiarylistWriter.text = diary.writer

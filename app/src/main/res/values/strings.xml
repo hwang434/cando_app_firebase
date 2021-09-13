@@ -19,4 +19,6 @@
     <string name="register_passwordcheckinput">비밀번호를 확인해주세요</string>
     <string name="register_nameinput">이름을 입력해주세요</string>
     <string name="register_emailinput">이메일을 입력해주세요</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
