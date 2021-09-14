@@ -43,7 +43,7 @@
         tools:layout="@layout/fragment_diary_list" />
     <fragment
         android:id="@+id/findMember"
-        android:name="com.goodee.cando_app.views.FindMember"
+        android:name="com.goodee.cando_app.views.FindMemberFragment"
         android:label="FindMember"
         tools:layout="@layout/fragment_find_member"/>
 </navigation>
