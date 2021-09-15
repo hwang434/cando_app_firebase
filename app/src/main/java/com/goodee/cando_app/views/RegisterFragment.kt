@@ -70,12 +70,20 @@ class registerFragment : Fragment() {
         // DuplicateCheckService로 해당하는 id를 가진 멤버 존재하는지 확인
         binding.buttonRegisterDuplicatecheck.setOnClickListener {
             var isExistId: Boolean? = checkId()
-
-            if (isExistId == true) {
-                Toast.makeText(requireActivity(), "이미 존재하는 아이디입니다.",Toast.LENGTH_LONG).show()
+            if (binding.edittextRegisterIdinput.text.isNullOrBlank() || binding.edittextRegisterIdinput.text.isNullOrEmpty()) {
+                Toast.makeText(requireActivity(),"아이디를 확인해주세요",Toast.LENGTH_SHORT).show()
+                binding.edittextRegisterIdinput.requestFocus()
+                val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(binding.edittextRegisterIdinput,0)
             } else {
-                Toast.makeText(requireActivity(), "사용하셔도 좋은 아이디입니다.", Toast.LENGTH_SHORT).show()
-                // 중복 체크 완료됐다는 로직이 들어가야함.
+                if (isExistId == true) {
+                    Toast.makeText(requireActivity(), "이미 존재하는 아이디입니다.",Toast.LENGTH_LONG).show()
+                } else if (isExistId == false) {
+                    Toast.makeText(requireActivity(), "사용하셔도 좋은 아이디입니다.", Toast.LENGTH_SHORT).show()
+                    // 중복 체크 완료됐다는 로직이 들어가야함.
+                } else {
+                    Toast.makeText(requireActivity(), "인터넷 연결이 안됐습니다.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -85,18 +93,21 @@ class registerFragment : Fragment() {
     fun checkId(): Boolean? {
         val retrofit = DuplicateCheckService.create()
         val duplicateCheckService = retrofit.create(DuplicateCheckService::class.java)
+        val id = binding.edittextRegisterIdinput.text.toString()
         var isExist: Boolean? = null
 
-        duplicateCheckService.isUserExist(binding.edittextRegisterIdinput.text.toString()).enqueue(object: Callback<Boolean> {
+        duplicateCheckService.isUserExist().enqueue(object: Callback<Boolean> {
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
                 Log.d(TAG,"registerFragment - onResponse() called")
-                isExist = response.body()
+                Log.d(TAG,"${response.body()}")
             }
             override fun onFailure(call: Call<Boolean>, t: Throwable) {
                 Log.d(TAG,"registerFragment - onFailure() called")
+                Log.d(TAG,"${t.stackTrace}")
             }
         })
 
+        Log.d(TAG,"registerFragment - isExist : $isExist")
         return isExist
     }
 }

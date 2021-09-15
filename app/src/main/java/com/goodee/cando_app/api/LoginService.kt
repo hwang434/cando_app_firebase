@@ -4,10 +4,10 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Path
+import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface DuplicateCheckService {
+interface LoginService {
     companion object {
         val BASE_URL = "http://localhost:8080/"
         fun create(): Retrofit {
@@ -19,8 +19,6 @@ interface DuplicateCheckService {
             return retrofit
         }
     }
-//    @GET("/members")
-//    fun isUserExist(@Query("id") id: String): Call<Boolean>
-    @GET("/")
-    fun isUserExist() : Call<Boolean>
+    @POST("/members/login")
+    fun login(@Query("id") id: String, @Query("passwrod") password: String): Call<Boolean>
 }

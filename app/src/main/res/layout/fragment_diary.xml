@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintlayout_diary_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:background="@color/common_background">
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tablayout_diary_tabmenu"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            app:layout_constraintStart_toStartOf="@id/constraintlayout_diary_container"
+            app:layout_constraintEnd_toEndOf="@id/constraintlayout_diary_container"
+            app:layout_constraintTop_toTopOf="@id/constraintlayout_diary_container">
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="new diary"/>
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="hot diary"/>
+        </com.google.android.material.tabs.TabLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_diary_diarylist"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tablayout_diary_tabmenu" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floating_diary_writediary"
+            android:layout_width="90dp"
+            android:layout_height="0dp"
+            android:layout_margin="20dp"
+            android:contentDescription="write diary"
+            android:background="@color/white"
+            android:src="@android:drawable/ic_input_add"
+            app:layout_constraintBottom_toBottomOf="@id/constraintlayout_diary_container"
+            app:layout_constraintEnd_toEndOf="@id/constraintlayout_diary_container" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

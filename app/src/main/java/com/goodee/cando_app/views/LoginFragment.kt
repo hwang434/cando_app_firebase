@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentLoginBinding
 
@@ -36,6 +37,9 @@ class LoginFragment : Fragment() {
         Log.d(TAG,"LoginFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
 
+        binding.buttonLoginFindmember.setOnClickListener {
+            view?.findNavController()?.navigate(R.id.action_loginFragment_to_findMember)
+        }
         // 로그인 버튼 이벤트처리
         binding.buttonLoginLoginbutton.setOnClickListener {
             Log.d(TAG,"LoginFragment - loginButton is activated")
@@ -61,6 +65,7 @@ class LoginFragment : Fragment() {
             } else {
                 // 로그인 로직을 처리할 공간.
                 Toast.makeText(requireActivity(),"아이디와 비밀번호가 모두 존재합니다.",Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
                 true
             }
         }
