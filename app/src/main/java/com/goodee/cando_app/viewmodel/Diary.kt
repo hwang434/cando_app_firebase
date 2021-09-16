@@ -1,4 +1,4 @@
-package com.goodee.cando_app.dto
+package com.goodee.cando_app.viewmodel
 
 import androidx.lifecycle.ViewModel
 
