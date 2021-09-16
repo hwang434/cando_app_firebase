@@ -22,4 +22,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="findpassword_header">비밀번호 찾기</string>
     <string name="findid_header">아이디 찾기</string>
+    <string name="findid_namelabel">이름</string>
+    <string name="findid_nameinput">이름 입력란</string>
+    <string name="findid_emaillabel">이메일</string>
+    <string name="findid_submit">확인</string>
 </resources>
