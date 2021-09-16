@@ -10,8 +10,18 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
+import com.goodee.cando_app.api.DiaryApi
+import com.goodee.cando_app.api.DiaryService
 import com.goodee.cando_app.databinding.FragmentDiaryBinding
 import com.goodee.cando_app.dto.Diary
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class DiaryFragment : Fragment() {
     private val TAG: String = "로그"
@@ -24,7 +34,8 @@ class DiaryFragment : Fragment() {
         diaryBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
 
         var adapter = DiaryRecyclerViewAdapter()
-        adapter.list = test()
+        test()
+//        adapter.list = test()
         diaryBinding.recyclerviewDiaryDiarylist.adapter = adapter
         diaryBinding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
 
@@ -34,11 +45,39 @@ class DiaryFragment : Fragment() {
         return diaryBinding.root
     }
 
-    fun test(): MutableList<Diary> {
-        val data = mutableListOf<Diary>()
-        for (number in 1..20) {
-            data.add(Diary(number.toString(),"제목 : ${number}번째 글", "${number}번째 유저",System.currentTimeMillis(), System.currentTimeMillis(),number))
-        }
+    fun test(): String? {
+        var data: String? = null
+        DiaryApi.retrofitService.get("디인코딩 키값"
+            ,1
+            ,10
+            ,"json"
+            ,108).enqueue(object: Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                Log.d(TAG,"DiaryFragment - onResponse() called")
+                data = response.body()
+                Log.d(TAG,"DiaryFragment - ${data}")
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d(TAG,"DiaryFragment - onFailure() called")
+                Log.d(TAG,"DiaryFragment - ${t.message}")
+            }
+
+        })
+
+//        diaryRetrofit.create(DiaryService::class.java).get()
+//            .enqueue(object: retrofit2.Callback<String> {
+//                override fun onResponse(call: Call<String>, response: Response<String>) {
+//                    Log.d(TAG,"DiaryFragment - onResponse() called")
+//                }
+//
+//                override fun onFailure(call: Call<String>, t: Throwable) {
+//                    Log.d(TAG,"DiaryFragment - onFailure() called")
+//                    Log.d(TAG,"call : ${call}\n$t : ${t.message}")
+//                }
+//
+//
+//            })
 
         return data
     }
