@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/common_background">
+        >
+        <!-- 메인 로그인 화면에 공통으로 들어갈 헤더 -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentcontainerview_main_header"
+            android:name="com.goodee.cando_app.views.HeaderFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout="@layout/fragment_header" />
+
+        <Button
+            android:id="@+id/button_main_loginbutton"
+            style="@style/main_button"
+            android:layout_margin="15dp"
+            android:text="@string/login_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_main_header" />
+        <Button
+            android:id="@+id/button_main_registerbutton"
+            style="@style/main_button"
+            android:layout_marginTop="16dp"
+            android:text="@string/register_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_main_loginbutton" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
