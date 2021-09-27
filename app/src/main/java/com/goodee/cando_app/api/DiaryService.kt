@@ -1,7 +1,6 @@
 package com.goodee.cando_app.api
 
 import com.goodee.cando_app.api.DiaryService.Companion.retrofit
-import com.goodee.cando_app.data.Weather
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Call
@@ -20,17 +19,16 @@ interface DiaryService {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .baseUrl(BASE_URL)
             .build()
-//            .addConverterFactory(ScalarsConverterFactory.create())
 
     }
 
-    @GET("getWthrSituation")
-    fun get(
-        @Query("serviceKey") serviceKey: String,
-        @Query("numOfRows") numOfRows: Int,
-        @Query("pageNo") pageNo: Int,
-        @Query("stnId") stnId: Int,
-        @Query("dataType") dataType: String = "json"): Call<Weather>
+//    @GET("getWthrSituation")
+//    fun get(
+//        @Query("serviceKey") serviceKey: String,
+//        @Query("numOfRows") numOfRows: Int,
+//        @Query("pageNo") pageNo: Int,
+//        @Query("stnId") stnId: Int,
+//        @Query("dataType") dataType: String = "json"): Call<Weather>
 }
 
 object DiaryApi {

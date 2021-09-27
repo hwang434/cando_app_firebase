@@ -96,16 +96,16 @@ class registerFragment : Fragment() {
         val id = binding.edittextRegisterIdinput.text.toString()
         var isExist: Boolean? = null
 
-        duplicateCheckService.isUserExist().enqueue(object: Callback<Boolean> {
-            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
-                Log.d(TAG,"registerFragment - onResponse() called")
-                Log.d(TAG,"${response.body()}")
-            }
-            override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                Log.d(TAG,"registerFragment - onFailure() called")
-                Log.d(TAG,"${t.stackTrace}")
-            }
-        })
+//        duplicateCheckService.isUserExist().enqueue(object: Callback<Boolean> {
+//            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+//                Log.d(TAG,"registerFragment - onResponse() called")
+//                Log.d(TAG,"${response.body()}")
+//            }
+//            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+//                Log.d(TAG,"registerFragment - onFailure() called")
+//                Log.d(TAG,"${t.stackTrace}")
+//            }
+//        })
 
         Log.d(TAG,"registerFragment - isExist : $isExist")
         return isExist
