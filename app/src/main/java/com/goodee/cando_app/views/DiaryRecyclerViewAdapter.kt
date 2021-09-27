@@ -5,11 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
-import com.goodee.cando_app.databinding.FragmentDiaryBinding
 import com.goodee.cando_app.databinding.FragmentDiaryListBinding
-import com.goodee.cando_app.dto.Diary
-
-import com.goodee.cando_app.views.placeholder.PlaceholderContent.PlaceholderItem
+import com.goodee.cando_app.viewmodel.Diary
 import java.text.SimpleDateFormat
 
 class DiaryRecyclerViewAdapter() : RecyclerView.Adapter<DiaryRecyclerViewAdapter.ViewHolder>() {
@@ -37,7 +34,7 @@ class DiaryRecyclerViewAdapter() : RecyclerView.Adapter<DiaryRecyclerViewAdapter
             binding.textviewDiarylistViewcount.text = diary.readCnt.toString()
             binding.textviewDiarylistWriter.text = diary.writer
 
-            var sdf = SimpleDateFormat("yyyy/MM/dd")
+            val sdf = SimpleDateFormat("yyyy/MM/dd")
             binding.textviewDiarylistDate.text = sdf.format(diary.writedDate)
         }
     }
