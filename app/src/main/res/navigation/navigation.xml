@@ -40,10 +40,23 @@
         android:id="@+id/diaryFragment"
         android:name="com.goodee.cando_app.views.DiaryFragment"
         android:label="fragment_diary_list"
-        tools:layout="@layout/fragment_diary_list" />
+        tools:layout="@layout/fragment_diary_list" >
+        <action
+            android:id="@+id/action_diaryFragment_to_diaryWriteFragment"
+            app:destination="@id/diaryWriteFragment" />
+    </fragment>
     <fragment
         android:id="@+id/findMember"
         android:name="com.goodee.cando_app.views.FindMemberFragment"
         android:label="FindMember"
         tools:layout="@layout/fragment_find_member"/>
+    <fragment
+        android:id="@+id/diaryWriteFragment"
+        android:name="com.goodee.cando_app.views.DiaryWriteFragment"
+        android:label="fragment_diary_write"
+        tools:layout="@layout/fragment_diary_write" >
+        <action
+            android:id="@+id/action_diaryWriteFragment_to_diaryFragment"
+            app:destination="@id/diaryFragment" />
+    </fragment>
 </navigation>

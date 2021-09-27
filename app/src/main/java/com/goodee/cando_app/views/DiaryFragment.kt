@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.api.DiaryApi
 import com.goodee.cando_app.data.Weather
@@ -28,20 +29,20 @@ class DiaryFragment : Fragment() {
     ): View? {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         diaryBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-
-        val adapter = DiaryRecyclerViewAdapter()
-        diaryBinding.recyclerviewDiaryDiarylist.adapter = adapter
-        diaryBinding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
-
-        diaryBinding.floatingDiaryWritediary.setOnClickListener {
-            Toast.makeText(requireActivity(), "diary add button is clicked", Toast.LENGTH_SHORT).show()
-        }
-        test(adapter)
+        setRecyclerView()
+        setClickListener()
+//        test(adapter)
 
         return diaryBinding.root
     }
 
-    fun test(adapter: DiaryRecyclerViewAdapter) {
+    private fun setRecyclerView() {
+        val adapter = DiaryRecyclerViewAdapter()
+        diaryBinding.recyclerviewDiaryDiarylist.adapter = adapter
+        diaryBinding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
+    }
+
+    private fun test(adapter: DiaryRecyclerViewAdapter) {
         var data: Weather? = null
         var titleList: MutableList<Diary>? = null
         DiaryApi.retrofitService.get(
@@ -71,5 +72,12 @@ class DiaryFragment : Fragment() {
                 Log.d(TAG,"DiaryFragment - ${t.message}")
             }
         })
+    }
+
+    private fun setClickListener() {
+        diaryBinding.floatingDiaryWritediary.setOnClickListener {
+            Toast.makeText(requireActivity(), "diary add button is clicked", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_diaryFragment_to_diaryWriteFragment)
+        }
     }
 }
