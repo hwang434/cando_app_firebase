@@ -23,17 +23,10 @@ class FindIdFragment : Fragment() {
                 Toast.makeText(requireActivity(), "아이디를 입력해주세요", Toast.LENGTH_SHORT).show()
             } else if (binding.edittextFindidEmailinput.text.isNullOrEmpty() || binding.edittextFindidEmailinput.text.isBlank()) {
                 Toast.makeText(requireActivity(), "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
+            } else {
+                // if 입력한 회원이 존재 -> 아이디 인증 시작
+                // else 입력한 회원이 존재하지 않음 -> 그런 회원 없다.
             }
-            // 아이디랑 이메일 입력을 했고,
-//            else {
-//                if (이름과 이메일이 일치하는 회원이 존재) {
-//                     아이디를 리턴
-//                }
-//                이름과 이메일이 일치하는 회원이 존재하지 않음.
-//                else {
-//                    리턴할 거 없음.
-//                }
-//            }
         }
 
         return binding.root
