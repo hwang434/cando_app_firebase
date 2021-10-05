@@ -16,16 +16,6 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentLoginBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [LoginFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class LoginFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var binding: FragmentLoginBinding
@@ -64,6 +54,8 @@ class LoginFragment : Fragment() {
                 false
             } else {
                 // 로그인 로직을 처리할 공간.
+                // if 아이디와 비밀번호가 일치 -> 로그인
+                // else -> 존재하지 않는 회원입니다.
                 Toast.makeText(requireActivity(),"아이디와 비밀번호가 모두 존재합니다.",Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
                 true
