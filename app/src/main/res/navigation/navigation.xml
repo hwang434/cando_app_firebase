@@ -26,7 +26,9 @@
             app:destination="@id/registerFragment" />
         <action
             android:id="@+id/action_loginFragment_to_diaryFragment"
-            app:destination="@id/diaryFragment" />
+            app:destination="@id/diaryFragment"
+            app:popUpTo="@id/mainFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_loginFragment_to_findMember"
             app:destination="@id/findMember" />

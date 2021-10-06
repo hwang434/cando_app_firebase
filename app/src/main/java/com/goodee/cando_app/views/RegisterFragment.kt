@@ -28,17 +28,17 @@ class registerFragment : Fragment() {
 
         // 회원 가입 버튼 눌렀을 시.
         binding.buttonRegisterRegisterbutton.setOnClickListener {
-            if (binding.edittextRegisterIdinput.text.isNullOrEmpty() || binding.edittextRegisterIdinput.text.isNullOrEmpty()) {
+            if (binding.edittextRegisterIdinput.text.isNullOrEmpty() || binding.edittextRegisterIdinput.text.isBlank()) {
                 Toast.makeText(requireActivity(),"아이디를 확인해주세요",Toast.LENGTH_SHORT).show()
                 binding.edittextRegisterIdinput.requestFocus()
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edittextRegisterIdinput,0)
-            } else if (binding.edittextRegisterPasswordinput.text.isNullOrEmpty() || binding.edittextRegisterPasswordinput.text.isNullOrEmpty()) {
+            } else if (binding.edittextRegisterPasswordinput.text.isNullOrEmpty() || binding.edittextRegisterPasswordinput.text.isEmpty()) {
                 Toast.makeText(requireActivity(),"비밀번호를 확인해주세요",Toast.LENGTH_SHORT).show()
                 binding.edittextRegisterPasswordinput.requestFocus()
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edittextRegisterPasswordinput,0)
-            } else if (binding.edittextRegisterPasswordcheckinput.text.isNullOrEmpty() || binding.edittextRegisterPasswordcheckinput.text.isNullOrBlank()) {
+            } else if (binding.edittextRegisterPasswordcheckinput.text.isNullOrEmpty() || binding.edittextRegisterPasswordcheckinput.text.isEmpty()) {
                 Toast.makeText(requireActivity(),"비밀번호 확인 칸을 확인해주세요",Toast.LENGTH_SHORT).show()
                 binding.edittextRegisterPasswordcheckinput.requestFocus()
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -48,12 +48,12 @@ class registerFragment : Fragment() {
                 binding.edittextRegisterPasswordinput.requestFocus()
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edittextRegisterPasswordinput,0)
-            } else if (binding.edittextRegisterNameinput.text.isNullOrEmpty() || binding.edittextRegisterNameinput.text.isNullOrBlank()) {
+            } else if (binding.edittextRegisterNameinput.text.isNullOrEmpty() || binding.edittextRegisterNameinput.text.isEmpty()) {
                 Toast.makeText(requireActivity(),"이름을 확인해주세요",Toast.LENGTH_SHORT).show()
                 binding.edittextRegisterNameinput.requestFocus()
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edittextRegisterNameinput,0)
-            } else if (binding.edittextRegisterEmailinput.text.isNullOrEmpty() || binding.edittextRegisterEmailinput.text.isNullOrBlank()) {
+            } else if (binding.edittextRegisterEmailinput.text.isNullOrEmpty() || binding.edittextRegisterEmailinput.text.isEmpty()) {
                 Toast.makeText(requireActivity(),"이메일을 확인해주세요",Toast.LENGTH_SHORT).show()
                 binding.edittextRegisterEmailinput.requestFocus()
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
