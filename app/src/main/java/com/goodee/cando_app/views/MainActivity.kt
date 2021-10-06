@@ -17,9 +17,6 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG,"MainActivity - onCreate() called")
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
-
-        val database = FirebaseDatabase.getInstance()
-        val myRef = database.getReference("message")
     }
 
     override fun onStart() {
