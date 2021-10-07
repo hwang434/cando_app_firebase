@@ -30,6 +30,10 @@ class LoginFragment : Fragment() {
         Log.d(TAG,"LoginFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
 
+        return binding.root
+    }
+
+    private fun setEvent() {
         binding.buttonLoginFindmember.setOnClickListener {
             view?.findNavController()?.navigate(R.id.action_loginFragment_to_findMember)
         }
@@ -37,6 +41,7 @@ class LoginFragment : Fragment() {
         binding.buttonLoginLoginbutton.setOnClickListener {
             Log.d(TAG,"LoginFragment - loginButton is activated")
             val imm: InputMethodManager?
+            binding.progressbarLoginLoading.visibility = View.VISIBLE
 
             // 아이디가 비었거나 Blank거나 null일 때
             if (binding.textviewLoginIdinput.text.isNullOrBlank() || binding.textviewLoginIdinput.text.isEmpty()) {
@@ -73,10 +78,13 @@ class LoginFragment : Fragment() {
                         } else {
                             Toast.makeText(requireContext(), "존재하지 않는 회원입니다..",Toast.LENGTH_SHORT).show()
                         }
+
+                        binding.progressbarLoginLoading.visibility = View.INVISIBLE
                     }
             }
         }
-        // 패스워트창에서 키보드에 엔터 누르면 실행되는 이벤트
+
+        // 키보드 엔터 누르면 클릭 이벤트 실행
         binding.edittextLoginPasswordinput.setOnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
                 binding.edittextLoginPasswordinput.callOnClick()
@@ -84,11 +92,10 @@ class LoginFragment : Fragment() {
             }
             false
         }
-        // 회원가입 버튼 누르면 회원 가입 프래그먼트로 이동
+
+        // 회원가입 페이지 이동
         binding.buttonLoginRegisterbutton.setOnClickListener {
             view?.findNavController()?.navigate(R.id.action_loginFragment_to_registerFragment)
         }
-
-        return binding.root
     }
 }
