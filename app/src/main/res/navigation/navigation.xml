@@ -37,7 +37,14 @@
         android:id="@+id/registerFragment"
         android:name="com.goodee.cando_app.views.registerFragment"
         android:label="fragment_register"
-        tools:layout="@layout/fragment_register" />
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_diaryWriteFragment"
+            app:destination="@id/diaryWriteFragment" />
+        <action
+            android:id="@+id/action_registerFragment_to_diaryFragment"
+            app:destination="@id/diaryFragment" />
+    </fragment>
     <fragment
         android:id="@+id/diaryFragment"
         android:name="com.goodee.cando_app.views.DiaryFragment"

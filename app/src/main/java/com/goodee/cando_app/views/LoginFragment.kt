@@ -14,11 +14,21 @@ import com.goodee.cando_app.R
 import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.databinding.FragmentLoginBinding
 import com.goodee.cando_app.listener.SingleClickListner
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class LoginFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var binding: FragmentLoginBinding
+    private lateinit var auth: FirebaseAuth
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Authenticate with Firebase
+        auth = Firebase.auth
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -28,6 +38,19 @@ class LoginFragment : Fragment() {
         setEvent()
 
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = auth.currentUser
+        // if current user is signed in update UI
+        updateUI(currentUser)
+    }
+
+    private fun updateUI(currentUser: FirebaseUser?) {
+        if (currentUser != null) {
+            findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
+        }
     }
 
     private fun setEvent() {
