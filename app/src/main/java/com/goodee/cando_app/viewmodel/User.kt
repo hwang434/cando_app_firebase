@@ -28,4 +28,9 @@ class User(application: Application): AndroidViewModel(application) {
         Log.d(TAG,"User - register() called")
         appRepository.register(email, password)
     }
+
+    fun login(email: String, password: String) {
+        Log.d(TAG,"User - login() called")
+        appRepository.login(email, password)
+    }
 }

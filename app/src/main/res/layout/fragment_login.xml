@@ -29,17 +29,17 @@
                 android:id="@+id/textview_login_idpointer"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:labelFor="@id/textview_login_idinput"
+                android:labelFor="@id/edittext_login_emailinput"
                 android:text="@string/login_idpointer"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="24sp"
-                app:layout_constraintEnd_toStartOf="@+id/textview_login_idinput"
+                app:layout_constraintEnd_toStartOf="@+id/edittext_login_emailinput"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/fragmentcontainerview_login_header"/>
 
             <EditText
-                android:id="@+id/textview_login_idinput"
+                android:id="@+id/edittext_login_emailinput"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:background="@color/white"

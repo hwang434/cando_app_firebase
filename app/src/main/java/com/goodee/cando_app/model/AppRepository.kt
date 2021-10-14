@@ -27,4 +27,12 @@ class AppRepository(val application: Application) {
             else Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
         }
     }
+
+    fun login(email: String, password: String) {
+        Log.d(TAG,"AppRepository - login() called")
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
+            if (task.isSuccessful) _userLiveData.postValue(firebaseAuth.currentUser)
+            else Toast.makeText(application, "Login Fail.", Toast.LENGTH_SHORT).show()
+        }
+    }
 }
