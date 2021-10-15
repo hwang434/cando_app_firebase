@@ -6,32 +6,40 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentMainBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [MainFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MainFragment : Fragment() {
     private val TAG: String = "로그"
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        Log.d(TAG,"MainFragment - onCreateView() called")
-        val binding = DataBindingUtil.inflate<FragmentMainBinding>(inflater,R.layout.fragment_main,container,false)
+    private lateinit var auth: FirebaseAuth
+    private lateinit var binding: FragmentMainBinding
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        auth = Firebase.auth
+
+        if (auth.currentUser != null) {
+            Toast.makeText(requireActivity(), "${auth.currentUser!!.email}님 환영합니다.",Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_mainFragment_to_diaryFragment)
+        }
+    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
+        Log.d(TAG,"MainFragment - onCreateView() called")
+        binding = DataBindingUtil.inflate<FragmentMainBinding>(inflater,R.layout.fragment_main,container,false)
+
+        setEvent()
+        return binding.root
+    }
+
+    private fun setEvent() {
         // 이벤트 등록
         binding.buttonMainRegisterbutton.setOnClickListener { view ->
             view.findNavController().navigate(R.id.action_mainFragment_to_registerFragment)
@@ -39,7 +47,5 @@ class MainFragment : Fragment() {
         binding.buttonMainLoginbutton.setOnClickListener { view ->
             view.findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
         }
-
-        return binding.root
     }
 }

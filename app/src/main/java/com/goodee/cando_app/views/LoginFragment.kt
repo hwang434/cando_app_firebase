@@ -8,12 +8,13 @@ import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
-import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.databinding.FragmentLoginBinding
 import com.goodee.cando_app.listener.SingleClickListner
+import com.goodee.cando_app.viewmodel.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -22,6 +23,7 @@ import com.google.firebase.ktx.Firebase
 class LoginFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var binding: FragmentLoginBinding
+    private lateinit var userViewModel: User
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,12 +31,19 @@ class LoginFragment : Fragment() {
         // Authenticate with Firebase
         auth = Firebase.auth
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         Log.d(TAG,"LoginFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
+        userViewModel = User(requireActivity().application)
+        userViewModel.userLiveData.observe(viewLifecycleOwner, Observer { firebaseUser ->
+            if (firebaseUser == null) Toast.makeText(requireContext(), "로그인 실패", Toast.LENGTH_SHORT).show()
+            else findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
+            binding.progressbarLoginLoading.visibility = View.INVISIBLE
+        })
         setEvent()
 
         return binding.root
@@ -64,12 +73,12 @@ class LoginFragment : Fragment() {
                 val imm: InputMethodManager?
 
                 // 아이디가 비었거나 Blank거나 null일 때
-                if (binding.textviewLoginIdinput.text.isNullOrBlank() || binding.textviewLoginIdinput.text.isEmpty()) {
+                if (binding.edittextLoginEmailinput.text.isNullOrBlank() || binding.edittextLoginEmailinput.text.isEmpty()) {
                     Toast.makeText(requireActivity(),"아이디를 확인해주세요.",Toast.LENGTH_SHORT).show()
 
-                    binding.textviewLoginIdinput.requestFocus()
+                    binding.edittextLoginEmailinput.requestFocus()
                     imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.showSoftInput(binding.textviewLoginIdinput,0)
+                    imm.showSoftInput(binding.edittextLoginEmailinput,0)
                 } else if (binding.edittextLoginPasswordinput.text.isNullOrBlank() || binding.edittextLoginPasswordinput.text.isEmpty()) {
                     Toast.makeText(requireActivity(),"비밀번호를 확인해주세요.",Toast.LENGTH_SHORT).show()
 
@@ -79,27 +88,10 @@ class LoginFragment : Fragment() {
                 } else {
                     // 정규식을 만족했으므로 존재하는 데이터인지 확인.
                     binding.progressbarLoginLoading.visibility = View.VISIBLE
-                    val database = RealTimeDatabase.getDatabase()
-                    database.child("users")
-                        .child(binding.textviewLoginIdinput.text.toString())
-                        .get()
-                        .addOnSuccessListener { info ->
-                            Log.i(TAG, "onCreateView:${info.child("password").value} ")
-                            val password = info.child("password").value
+                    val email = binding.edittextLoginEmailinput.text.toString()
+                    val password = binding.edittextLoginPasswordinput.text.toString()
 
-                            if (password != null) {
-                                if (password.equals(binding.edittextLoginPasswordinput.text.toString())) {
-                                    Toast.makeText(requireContext(), "${binding.textviewLoginIdinput.text.toString()}님 환영합니다.",Toast.LENGTH_SHORT).show()
-                                    findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
-                                } else {
-                                    Toast.makeText(requireContext(), "비밀번호가 틀렸습니다.",Toast.LENGTH_SHORT).show()
-                                }
-                            } else {
-                                Toast.makeText(requireContext(), "존재하지 않는 회원입니다..",Toast.LENGTH_SHORT).show()
-                            }
-
-                            binding.progressbarLoginLoading.visibility = View.INVISIBLE
-                        }
+                    userViewModel.login(email, password)
                 }
             }
         })
