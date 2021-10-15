@@ -24,15 +24,22 @@ class AppRepository(val application: Application) {
         Log.d(TAG,"AppRepository - register() called")
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
             if (task.isSuccessful) _userLiveData.postValue(firebaseAuth.currentUser)
-            else Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
+
+            // 지워야할 거
+            else {
+                Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     fun login(email: String, password: String) {
         Log.d(TAG,"AppRepository - login() called")
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
-            if (task.isSuccessful) _userLiveData.postValue(firebaseAuth.currentUser)
-            else Toast.makeText(application, "Login Fail.", Toast.LENGTH_SHORT).show()
+//            if (task.isSuccessful) _userLiveData.postValue(firebaseAuth.currentUser)
+//            else {
+//                Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
+//            }
+            _userLiveData.postValue(firebaseAuth.currentUser)
         }
     }
 }

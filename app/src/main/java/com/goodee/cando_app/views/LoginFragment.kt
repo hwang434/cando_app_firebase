@@ -30,8 +30,8 @@ class LoginFragment : Fragment() {
         super.onCreate(savedInstanceState)
         // Authenticate with Firebase
         auth = Firebase.auth
-
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,7 +41,8 @@ class LoginFragment : Fragment() {
         userViewModel = User(requireActivity().application)
         userViewModel.userLiveData.observe(viewLifecycleOwner, Observer { firebaseUser ->
             if (firebaseUser == null) Toast.makeText(requireContext(), "로그인 실패", Toast.LENGTH_SHORT).show()
-            else findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
+            else findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
+            binding.progressbarLoginLoading.visibility = View.INVISIBLE
         })
         setEvent()
 

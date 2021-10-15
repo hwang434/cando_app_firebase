@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintlayout_diary_container"
         android:layout_width="match_parent"
@@ -40,8 +41,13 @@
             android:contentDescription="write diary"
             android:background="@color/white"
             android:src="@android:drawable/ic_input_add"
-            app:layout_constraintBottom_toBottomOf="@id/constraintlayout_diary_container"
+            app:layout_constraintBottom_toTopOf="@id/bottomnavigation_diary_bottommenu"
             app:layout_constraintEnd_toEndOf="@id/constraintlayout_diary_container" />
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomnavigation_diary_bottommenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:menu="@menu/member_layout"
+            app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </layout>

@@ -56,6 +56,11 @@
         <action
             android:id="@+id/action_diaryFragment_to_diaryWriteFragment"
             app:destination="@id/diaryWriteFragment" />
+        <action
+            android:id="@+id/action_diaryFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/mainFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
     <fragment
         android:id="@+id/findMember"
