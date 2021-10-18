@@ -15,7 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryBinding
 import com.goodee.cando_app.dto.DiaryDto
-import com.goodee.cando_app.viewmodel.Diary
+import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -25,7 +25,12 @@ class DiaryFragment : Fragment() {
     private lateinit var diaryBinding: FragmentDiaryBinding
     private lateinit var callback: OnBackPressedCallback
     private var backPressedTime: Long? = null
-    private lateinit var diaryViewModel: Diary
+    private val diaryViewModelViewModel: DiaryViewModel by lazy {DiaryViewModel(requireActivity().application)}
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        diaryViewModelViewModel.getDiaryList()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,18 +38,14 @@ class DiaryFragment : Fragment() {
     ): View? {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         diaryBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        diaryViewModel = Diary(requireActivity().application)
-        diaryViewModel.getDiaryList()
-        diaryViewModel.diaryLiveData.observe(viewLifecycleOwner, Observer { it ->
+        diaryViewModelViewModel.diaryLiveData.observe(viewLifecycleOwner, Observer { it ->
             Log.d(TAG,"DiaryFragment - Data is changed.")
             if (it != null) {
-                setRecyclerView(diaryViewModel.diaryLiveData)
+                setRecyclerView(diaryViewModelViewModel.diaryLiveData)
             }
         })
-
-        setClickListener()
+        setEvent()
         setHasOptionsMenu(true)
-
 
         return diaryBinding.root
     }
@@ -78,13 +79,14 @@ class DiaryFragment : Fragment() {
         diaryBinding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
     }
 
-    private fun setClickListener() {
+    private fun setEvent() {
         diaryBinding.floatingDiaryWritediary.setOnClickListener {
-            Toast.makeText(requireActivity(), "diary add button is clicked", Toast.LENGTH_SHORT)
-                .show()
+            Log.d(TAG,"DiaryFragment - floating button is clicked.")
             findNavController().navigate(R.id.action_diaryFragment_to_diaryWriteFragment)
         }
+
         diaryBinding.bottomnavigationDiaryBottommenu.setOnItemSelectedListener { item ->
+            Log.d(TAG,"DiaryFragment - bottom navigationbar is clicked.")
             when (item.itemId) {
                 R.id.item_menu_myinfo -> {
                     Log.d(TAG, "DiaryFragment - setClickListener() called")

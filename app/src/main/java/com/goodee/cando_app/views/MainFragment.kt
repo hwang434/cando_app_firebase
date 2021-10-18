@@ -34,13 +34,12 @@ class MainFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
         Log.d(TAG,"MainFragment - onCreateView() called")
         binding = DataBindingUtil.inflate<FragmentMainBinding>(inflater,R.layout.fragment_main,container,false)
-
         setEvent()
+
         return binding.root
     }
 
     private fun setEvent() {
-        // 이벤트 등록
         binding.buttonMainRegisterbutton.setOnClickListener { view ->
             view.findNavController().navigate(R.id.action_mainFragment_to_registerFragment)
         }

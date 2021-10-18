@@ -14,7 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentLoginBinding
 import com.goodee.cando_app.listener.SingleClickListner
-import com.goodee.cando_app.viewmodel.User
+import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -23,7 +23,7 @@ import com.google.firebase.ktx.Firebase
 class LoginFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var binding: FragmentLoginBinding
-    private lateinit var userViewModel: User
+    private lateinit var userViewModelViewModel: UserViewModel
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,8 +38,8 @@ class LoginFragment : Fragment() {
     ): View? {
         Log.d(TAG,"LoginFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
-        userViewModel = User(requireActivity().application)
-        userViewModel.userLiveData.observe(viewLifecycleOwner, Observer { firebaseUser ->
+        userViewModelViewModel = UserViewModel(requireActivity().application)
+        userViewModelViewModel.userLiveData.observe(viewLifecycleOwner, Observer { firebaseUser ->
             if (firebaseUser == null) Toast.makeText(requireContext(), "로그인 실패", Toast.LENGTH_SHORT).show()
             else findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
             binding.progressbarLoginLoading.visibility = View.INVISIBLE
@@ -52,11 +52,8 @@ class LoginFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         val currentUser = auth.currentUser
-        // if current user is signed in update UI
-        updateUI(currentUser)
-    }
 
-    private fun updateUI(currentUser: FirebaseUser?) {
+        // if current user is signed in update UI
         if (currentUser != null) {
             findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
         }
@@ -91,7 +88,7 @@ class LoginFragment : Fragment() {
                     val email = binding.edittextLoginEmailinput.text.toString()
                     val password = binding.edittextLoginPasswordinput.text.toString()
 
-                    userViewModel.login(email, password)
+                    userViewModelViewModel.login(email, password)
                 }
             }
         })

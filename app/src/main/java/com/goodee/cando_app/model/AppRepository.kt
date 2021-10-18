@@ -1,24 +1,15 @@
 package com.goodee.cando_app.model
 
 import android.app.Application
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.Navigation
-import com.goodee.cando_app.R
 import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
-import com.goodee.cando_app.viewmodel.Diary
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.FirebaseDatabase
-import com.google.gson.Gson
-import kotlinx.coroutines.coroutineScope
-import org.json.JSONObject
 
 class AppRepository(val application: Application) {
     private val TAG: String = "로그"

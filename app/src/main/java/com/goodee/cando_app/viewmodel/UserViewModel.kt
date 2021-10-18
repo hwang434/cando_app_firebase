@@ -12,7 +12,7 @@ import com.goodee.cando_app.model.AppRepository
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
-class User(application: Application): AndroidViewModel(application) {
+class UserViewModel(application: Application): AndroidViewModel(application) {
     private val TAG: String = "로그"
     private var appRepository: AppRepository
     private val _userLiveData: MutableLiveData<FirebaseUser>
@@ -24,11 +24,13 @@ class User(application: Application): AndroidViewModel(application) {
         _userLiveData = appRepository.userLiveData as MutableLiveData<FirebaseUser>
     }
 
+    // 회원가입
     fun register(email: String, password: String) {
         Log.d(TAG,"User - register() called")
         appRepository.register(email, password)
     }
 
+    // 로그인
     fun login(email: String, password: String) {
         Log.d(TAG,"User - login() called")
         appRepository.login(email, password)
