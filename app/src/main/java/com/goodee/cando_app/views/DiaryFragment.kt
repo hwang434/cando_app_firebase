@@ -9,10 +9,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.goodee.cando_app.dto.DiaryDto
+import com.goodee.cando_app.viewmodel.Diary
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -22,6 +25,7 @@ class DiaryFragment : Fragment() {
     private lateinit var diaryBinding: FragmentDiaryBinding
     private lateinit var callback: OnBackPressedCallback
     private var backPressedTime: Long? = null
+    private lateinit var diaryViewModel: Diary
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,9 +33,18 @@ class DiaryFragment : Fragment() {
     ): View? {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         diaryBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        setRecyclerView()
+        diaryViewModel = Diary(requireActivity().application)
+        diaryViewModel.getDiaryList()
+        diaryViewModel.diaryLiveData.observe(viewLifecycleOwner, Observer { it ->
+            Log.d(TAG,"DiaryFragment - Data is changed.")
+            if (it != null) {
+                setRecyclerView(diaryViewModel.diaryLiveData)
+            }
+        })
+
         setClickListener()
         setHasOptionsMenu(true)
+
 
         return diaryBinding.root
     }
@@ -59,8 +72,8 @@ class DiaryFragment : Fragment() {
         callback.remove()
     }
 
-    private fun setRecyclerView() {
-        val adapter = DiaryRecyclerViewAdapter()
+    private fun setRecyclerView(diaryLiveData: LiveData<List<DiaryDto>>) {
+        val adapter = DiaryRecyclerViewAdapter(diaryLiveData)
         diaryBinding.recyclerviewDiaryDiarylist.adapter = adapter
         diaryBinding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
     }
