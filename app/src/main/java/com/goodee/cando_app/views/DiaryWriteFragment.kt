@@ -14,6 +14,7 @@ import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.lang.Exception
+import java.text.SimpleDateFormat
 
 class DiaryWriteFragment : Fragment() {
     private val TAG: String = "로그"
@@ -46,8 +47,13 @@ class DiaryWriteFragment : Fragment() {
         Log.d(TAG,"DiaryWriteFragment - setEvent() called")
         writeButton?.setOnClickListener {
             Log.d(TAG,"DiaryWriteFragment - writeButton is clicked.")
-            val diaryDto = DiaryDto(titleInputView.text.toString(), contentView.text.toString(), FirebaseAuth.getInstance().currentUser?.email.toString())
+            val title = titleInputView.text.toString()
+            val content = contentView.text.toString()
+            val userEmail = FirebaseAuth.getInstance().currentUser?.email.toString()
+            val time = System.currentTimeMillis()
+            val diaryDto = DiaryDto(title, content, userEmail, time)
             diaryViewModel.writeDiary(diaryDto)
+
             findNavController().navigate(R.id.action_diaryWriteFragment_to_diaryFragment)
         }
     }

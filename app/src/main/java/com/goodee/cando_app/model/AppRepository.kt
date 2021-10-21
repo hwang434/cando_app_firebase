@@ -10,6 +10,11 @@ import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat
 
 class AppRepository(val application: Application) {
     private val TAG: String = "로그"
@@ -25,25 +30,31 @@ class AppRepository(val application: Application) {
 
     fun getDiaryList() {
         Log.d(TAG,"AppRepository - getDiaryList() called")
-
-        RealTimeDatabase.getDatabase().child("Diary").get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val map = task.result?.value as Map<String, Map<String, String>>        // Map<식별자, 글<>>
-                val list = map.values                                                   // 글 모음
+        val rootRef = RealTimeDatabase.getDatabase().ref
+        val diaryRef = rootRef.child("Diary")
+        val query = diaryRef.orderByChild("date")
+        val valueEventListner = object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.d(TAG,"AppRepository - onDataChange() called")
                 val diaryList = mutableListOf<DiaryDto>()
+                snapshot.children.forEach { it ->
+                    val author = it.child("author").value.toString()
+                    val title = it.child("title").value.toString()
+                    val content = it.child("content").value.toString()
+                    val date = it.child("date").getValue()
 
-                list.forEach { it ->
-                    val author = it.get("author")
-                    val title = it.get("title")
-                    val content = it.get("content")
-                    if (title != null && content != null && author != null) {
-                        diaryList.add(DiaryDto(title, content, author))
+                    if (title != null && content != null && author != null && date != null) {
+                        diaryList.add(DiaryDto(title, content, author, date as Long))
                     }
                 }
-
+                diaryList.reverse()
                 _diaryLivedata.postValue(diaryList)
             }
+            override fun onCancelled(error: DatabaseError) {
+                Log.d(TAG,"AppRepository - onCancelled() called")
+            }
         }
+        query.addListenerForSingleValueEvent(valueEventListner)
     }
 
     fun register(email: String, password: String) {

@@ -21,10 +21,10 @@
     <style name="register_pointer">
         <item name="android:gravity">center</item>
         <item name="android:textSize">24sp</item>
-        <item name="android:background">#76918E</item>
+        <item name="android:background">#5E706E</item>
     </style>
     <style name="register_input">
         <item name="android:textSize">22sp</item>
-        <item name="android:background">#C2D8D6</item>
+        <item name="android:background">#FFFFFF</item>
     </style>
 </resources>

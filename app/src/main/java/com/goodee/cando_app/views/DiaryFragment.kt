@@ -28,6 +28,7 @@ class DiaryFragment : Fragment() {
     private val diaryViewModelViewModel: DiaryViewModel by lazy {DiaryViewModel(requireActivity().application)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG,"DiaryFragment - onCreate() called")
         super.onCreate(savedInstanceState)
         diaryViewModelViewModel.getDiaryList()
     }
@@ -51,8 +52,8 @@ class DiaryFragment : Fragment() {
     }
 
     override fun onAttach(context: Context) {
+        Log.d(TAG,"DiaryFragment - onAttach() called")
         super.onAttach(context)
-
         // 2초 내에 두번 뒤로가기 버튼 누르면 앱 종료
         callback = object: OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -69,6 +70,7 @@ class DiaryFragment : Fragment() {
     }
 
     override fun onDetach() {
+        Log.d(TAG,"DiaryFragment - onDetach() called")
         super.onDetach()
         callback.remove()
     }
@@ -81,15 +83,12 @@ class DiaryFragment : Fragment() {
 
     private fun setEvent() {
         diaryBinding.floatingDiaryWritediary.setOnClickListener {
-            Log.d(TAG,"DiaryFragment - floating button is clicked.")
             findNavController().navigate(R.id.action_diaryFragment_to_diaryWriteFragment)
         }
 
         diaryBinding.bottomnavigationDiaryBottommenu.setOnItemSelectedListener { item ->
-            Log.d(TAG,"DiaryFragment - bottom navigationbar is clicked.")
             when (item.itemId) {
                 R.id.item_menu_myinfo -> {
-                    Log.d(TAG, "DiaryFragment - setClickListener() called")
                     true
                 }
                 R.id.item_menu_signout -> {
@@ -103,7 +102,6 @@ class DiaryFragment : Fragment() {
                     true
                 }
                 else -> {
-                    Log.d(TAG, "DiaryFragment - wrong id is selected.")
                     false
                 }
             }
