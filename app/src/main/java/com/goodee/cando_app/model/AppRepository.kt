@@ -10,11 +10,7 @@ import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import java.text.SimpleDateFormat
+import com.google.firebase.database.*
 
 class AppRepository(val application: Application) {
     private val TAG: String = "로그"
@@ -83,6 +79,34 @@ class AppRepository(val application: Application) {
         firebaseDatabase.child("Diary/${key}").setValue(diaryDto).addOnCompleteListener { task ->       // Diary/${key}에 글 저장하기
             if (task.isSuccessful) Toast.makeText(application, "글 작성에 성공했습니다.", Toast.LENGTH_SHORT).show()
             else Toast.makeText(application, "글 작성에 실패했습니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun findUserId(name: String, email: String) {
+        Log.d(TAG,"AppRepository - findUserId() called")
+        val firebaseDatabase = RealTimeDatabase.getDatabase().child("Users")
+        firebaseDatabase.orderByChild("name").equalTo(name).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val snapshot = task.result
+                var userName: String? = null
+                var userEmail: String? = null
+                var userId: String? = null
+
+                snapshot?.children?.forEach { it ->
+                    it.children.forEach { children ->
+                        if (children.key.equals("name")) userName = children.getValue(String::class.java)
+                        else if (children.key.equals("email")) userEmail = children.getValue(String::class.java)
+                        else if (children.key.equals("id")) userId = children.getValue(String::class.java)
+                    }
+                }
+                Log.d(TAG, "findUserId: name : $name email : ${email}\n$userName : $userName userEmail : $userEmail")
+                if (userName.equals(name) && userEmail.equals(email)) {
+                    Log.d(TAG,"AppRepository - $name $email")
+                    Toast.makeText(application.applicationContext, "찾으시는 아이디는 ${userId}입니다.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(application.applicationContext, "일치하는 회원이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 }

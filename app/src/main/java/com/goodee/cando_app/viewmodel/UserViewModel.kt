@@ -35,4 +35,15 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
         Log.d(TAG,"User - login() called")
         appRepository.login(email, password)
     }
+
+    // 아이디 찾기
+    fun findUserId(name: String, email: String) {
+        Log.d(TAG,"UserViewModel - findUserId() called")
+        appRepository.findUserId(name, email)
+    }
+    
+    // 비밀번호 찾기
+    fun findUserPassword(id: String, email: String) {
+        Log.d(TAG,"UserViewModel - findUserPassword() called")
+    }
 }
