@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
+import com.goodee.cando_app.dto.UserDto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
@@ -53,10 +54,15 @@ class AppRepository(val application: Application) {
         query.addListenerForSingleValueEvent(valueEventListner)
     }
 
-    fun register(email: String, password: String) {
+    fun register(userDto: UserDto) {
         Log.d(TAG,"AppRepository - register() called")
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
-            if (task.isSuccessful) _userLiveData.postValue(firebaseAuth.currentUser)
+
+        firebaseAuth.createUserWithEmailAndPassword(userDto.email, userDto.password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
+            if (task.isSuccessful) {
+                val key = RealTimeDatabase.getDatabase().child("Users").push().key
+                RealTimeDatabase.getDatabase().child("Users/${key}").setValue(userDto)
+                _userLiveData.postValue(firebaseAuth.currentUser)
+            }
             else Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
         }
     }
