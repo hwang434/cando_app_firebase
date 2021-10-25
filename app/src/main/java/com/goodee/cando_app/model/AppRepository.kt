@@ -99,18 +99,17 @@ class AppRepository(val application: Application) {
         firebaseDatabase.orderByChild("name").equalTo(name).get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val snapshot = task.result
-                var userName: String? = null
-                var userEmail: String? = null
-                var userId: String? = null
-
+                val map = mutableMapOf<String, String>()
                 snapshot?.children?.forEach { it ->
                     it.children.forEach { children ->
-                        if (children.key.equals("name")) userName = children.getValue(String::class.java)
-                        else if (children.key.equals("email")) userEmail = children.getValue(String::class.java)
-                        else if (children.key.equals("id")) userId = children.getValue(String::class.java)
+                        map.put(children.key!!, children.value.toString())
                     }
                 }
-                Log.d(TAG, "findUserId: name : $name email : ${email}\n$userName : $userName userEmail : $userEmail")
+                val userName = map.get("name")
+                val userEmail = map.get("email")
+                val userId = map.get("id")
+                Log.d(TAG,"AppRepository - userName : $userName\nuserEmail : $userEmail\nuserId : $userId")
+
                 if (userName.equals(name) && userEmail.equals(email)) {
                     Log.d(TAG,"AppRepository - $name $email")
                     Toast.makeText(application.applicationContext, "찾으시는 아이디는 ${userId}입니다.", Toast.LENGTH_SHORT).show()

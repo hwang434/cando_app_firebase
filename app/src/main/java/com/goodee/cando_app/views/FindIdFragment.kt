@@ -17,7 +17,7 @@ class FindIdFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = DataBindingUtil.inflate<FragmentFindIdBinding>(inflater, R.layout.fragment_find_id, container, false)
+        binding = DataBindingUtil.inflate<FragmentFindIdBinding>(inflater, R.layout.fragment_find_id, container, false)
         setEvent()
 
         return binding.root
