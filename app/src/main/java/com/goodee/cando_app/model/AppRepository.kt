@@ -29,6 +29,30 @@ class AppRepository(val application: Application) {
     val diaryLiveData: LiveData<DiaryDto>
         get() = _diaryLiveData
 
+    // 게시글 조회
+    fun getDiary(dno: String) {
+        Log.d(TAG,"AppRepository - getDiary() called")
+        RealTimeDatabase.getDatabase().child("Diary/${dno}").get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val map = mutableMapOf<String, String>()
+                task.result?.children?.forEach { child ->
+                    Log.d(TAG,"AppRepository - key : ${child.key} value : ${child.value}")
+                    map.put(child.key.toString(), child.value.toString())
+                }
+
+                val title = map.get("title")
+                val content = map.get("content")
+                val author = map.get("author")
+                val date = map.get("date")
+                if (dno != null && title != null && content != null && author != null && date != null) {
+                    val diaryDto = DiaryDto(dno = dno, title = title, content = content, author = author, date = date.toLong())
+                    _diaryLiveData.postValue(diaryDto)
+                }
+            }
+        }
+    }
+
+    // 게시글 목록 가져오기
     fun getDiaryList() {
         Log.d(TAG,"AppRepository - getDiaryList() called")
         val rootRef = RealTimeDatabase.getDatabase().ref
@@ -59,26 +83,7 @@ class AppRepository(val application: Application) {
         query.addListenerForSingleValueEvent(valueEventListner)
     }
 
-    fun register(userDto: UserDto) {
-        Log.d(TAG,"AppRepository - register() called")
-
-        firebaseAuth.createUserWithEmailAndPassword(userDto.email, userDto.password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
-            if (task.isSuccessful) {
-                val key = RealTimeDatabase.getDatabase().child("Users").push().key
-                RealTimeDatabase.getDatabase().child("Users/${key}").setValue(userDto)
-                _userLiveData.postValue(firebaseAuth.currentUser)
-            }
-            else Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun login(email: String, password: String) {
-        Log.d(TAG,"AppRepository - login() called")
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
-            _userLiveData.postValue(firebaseAuth.currentUser)
-        }
-    }
-
+    // 게시글 작성
     fun writeDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"AppRepository - writeDiary() called")
         val key = RealTimeDatabase.getDatabase().child("Diary").push().key  // 주식별자 뽑기
@@ -93,6 +98,29 @@ class AppRepository(val application: Application) {
         }
     }
 
+    // 회원가입
+    fun register(userDto: UserDto) {
+        Log.d(TAG,"AppRepository - register() called")
+
+        firebaseAuth.createUserWithEmailAndPassword(userDto.email, userDto.password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
+            if (task.isSuccessful) {
+                val key = RealTimeDatabase.getDatabase().child("Users").push().key
+                RealTimeDatabase.getDatabase().child("Users/${key}").setValue(userDto)
+                _userLiveData.postValue(firebaseAuth.currentUser)
+            }
+            else Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Firebase Authentication 로그인
+    fun login(email: String, password: String) {
+        Log.d(TAG,"AppRepository - login() called")
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
+            _userLiveData.postValue(firebaseAuth.currentUser)
+        }
+    }
+
+    // 유저 아이디 찾기
     fun findUserId(name: String, email: String) {
         Log.d(TAG,"AppRepository - findUserId() called")
         val firebaseDatabase = RealTimeDatabase.getDatabase().child("Users")
@@ -115,29 +143,6 @@ class AppRepository(val application: Application) {
                     Toast.makeText(application.applicationContext, "찾으시는 아이디는 ${userId}입니다.", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(application.applicationContext, "일치하는 회원이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-
-    fun getDiary(dno: String) {
-        Log.d(TAG,"AppRepository - getDiary() called")
-        RealTimeDatabase.getDatabase().child("Diary/${dno}").get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val map = mutableMapOf<String, String>()
-                task.result?.children?.forEach { child ->
-                    Log.d(TAG,"AppRepository - key : ${child.key}")
-                    Log.d(TAG,"AppRepository - value : ${child.value}")
-                    map.put(child.key.toString(), child.value.toString())
-                }
-
-                val title = map.get("title")
-                val content = map.get("content")
-                val author = map.get("author")
-                val date = map.get("date")
-                if (dno != null && title != null && content != null && author != null && date != null) {
-                    val diaryDto = DiaryDto(dno = dno, title = title, content = content, author = author, date = date.toLong())
-                    _diaryLiveData.postValue(diaryDto)
                 }
             }
         }

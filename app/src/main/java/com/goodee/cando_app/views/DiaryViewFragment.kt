@@ -21,8 +21,7 @@ class DiaryViewFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG,"DiaryViewFragment - onCreate() called")
-        Log.d(TAG,"DiaryViewFragment - arguments : ${arguments.toString()}")
+        Log.d(TAG,"DiaryViewFragment - onCreate() called\n arguments : ${arguments.toString()}")
         diaryViewModel = DiaryViewModel(requireActivity().application)
         dno = arguments?.get("dno").toString()
         diaryViewModel.getDiary(dno)
