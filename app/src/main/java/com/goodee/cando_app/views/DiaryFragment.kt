@@ -15,7 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryBinding
 import com.goodee.cando_app.dto.DiaryDto
-import com.goodee.cando_app.viewmodel.Diary
+import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -25,7 +25,13 @@ class DiaryFragment : Fragment() {
     private lateinit var diaryBinding: FragmentDiaryBinding
     private lateinit var callback: OnBackPressedCallback
     private var backPressedTime: Long? = null
-    private lateinit var diaryViewModel: Diary
+    private val diaryViewModelViewModel: DiaryViewModel by lazy {DiaryViewModel(requireActivity().application)}
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG,"DiaryFragment - onCreate() called")
+        super.onCreate(savedInstanceState)
+        diaryViewModelViewModel.getDiaryList()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,25 +39,21 @@ class DiaryFragment : Fragment() {
     ): View? {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         diaryBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        diaryViewModel = Diary(requireActivity().application)
-        diaryViewModel.getDiaryList()
-        diaryViewModel.diaryLiveData.observe(viewLifecycleOwner, Observer { it ->
+        diaryViewModelViewModel.diaryLiveData.observe(viewLifecycleOwner, Observer { it ->
             Log.d(TAG,"DiaryFragment - Data is changed.")
             if (it != null) {
-                setRecyclerView(diaryViewModel.diaryLiveData)
+                setRecyclerView(diaryViewModelViewModel.diaryLiveData)
             }
         })
-
-        setClickListener()
+        setEvent()
         setHasOptionsMenu(true)
-
 
         return diaryBinding.root
     }
 
     override fun onAttach(context: Context) {
+        Log.d(TAG,"DiaryFragment - onAttach() called")
         super.onAttach(context)
-
         // 2초 내에 두번 뒤로가기 버튼 누르면 앱 종료
         callback = object: OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -68,6 +70,7 @@ class DiaryFragment : Fragment() {
     }
 
     override fun onDetach() {
+        Log.d(TAG,"DiaryFragment - onDetach() called")
         super.onDetach()
         callback.remove()
     }
@@ -78,16 +81,14 @@ class DiaryFragment : Fragment() {
         diaryBinding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
     }
 
-    private fun setClickListener() {
+    private fun setEvent() {
         diaryBinding.floatingDiaryWritediary.setOnClickListener {
-            Toast.makeText(requireActivity(), "diary add button is clicked", Toast.LENGTH_SHORT)
-                .show()
             findNavController().navigate(R.id.action_diaryFragment_to_diaryWriteFragment)
         }
+
         diaryBinding.bottomnavigationDiaryBottommenu.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.item_menu_myinfo -> {
-                    Log.d(TAG, "DiaryFragment - setClickListener() called")
                     true
                 }
                 R.id.item_menu_signout -> {
@@ -101,7 +102,6 @@ class DiaryFragment : Fragment() {
                     true
                 }
                 else -> {
-                    Log.d(TAG, "DiaryFragment - wrong id is selected.")
                     false
                 }
             }

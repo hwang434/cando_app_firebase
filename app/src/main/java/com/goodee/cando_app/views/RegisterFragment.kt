@@ -11,30 +11,27 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
-import com.goodee.cando_app.api.DuplicateCheckService
 import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
-import com.goodee.cando_app.viewmodel.User
+import com.goodee.cando_app.dto.UserDto
+import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class registerFragment : Fragment() {
     private val TAG: String = "로그"
     private var isExistId = false
+    private val database: DatabaseReference by lazy { RealTimeDatabase.getDatabase() }
     private lateinit var binding: FragmentRegisterBinding
     private lateinit var auth: FirebaseAuth
-    private lateinit var userViewModel: User
+    private lateinit var userViewModelViewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG,"registerFragment - onCreate() called")
         super.onCreate(savedInstanceState)
         // Initialize firebase auth
         auth = Firebase.auth
@@ -44,14 +41,20 @@ class registerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG,"registerFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        userViewModel = User(requireActivity().application)
-        userViewModel.userLiveData.observe(viewLifecycleOwner, Observer { firebaseUser ->
+        userViewModelViewModel = UserViewModel(requireActivity().application)
+        userViewModelViewModel.userLiveData.observe(viewLifecycleOwner, Observer { firebaseUser ->
             if (firebaseUser == null) Toast.makeText(requireContext(), "회원가입 실패", Toast.LENGTH_SHORT).show()
             else findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
         })
+        setEvent()
 
+        return binding.root
+    }
+
+    private fun setEvent() {
         // 회원 가입 버튼 눌렀을 시.
         binding.buttonRegisterRegisterbutton.setOnClickListener {
             if (binding.edittextRegisterIdinput.text.isNullOrEmpty() || binding.edittextRegisterIdinput.text.isBlank()) {
@@ -90,25 +93,24 @@ class registerFragment : Fragment() {
                 } else {
                     // 회원 가입 시키기
                     val email = binding.edittextRegisterEmailinput.text.toString()
-                    val name = binding.edittextRegisterNameinput.text.toString()
                     val password = binding.edittextRegisterPasswordinput.text.toString()
+                    val name = binding.edittextRegisterNameinput.text.toString()
                     val phone = binding.edittextPhonePhoneinput.text.toString()
-                    userViewModel.register(email, password)
+                    val id = binding.edittextRegisterIdinput.text.toString()
+                    val userDto = UserDto(name = name, password = password, email = email, phone = phone, id = id)
+                    userViewModelViewModel.register(userDto)
                 }
             }
         }
 
         // DuplicateCheckService로 해당하는 id를 가진 멤버 존재하는지 확인
         binding.buttonRegisterDuplicatecheck.setOnClickListener {
-            val database = RealTimeDatabase.getDatabase()
-
             if (binding.edittextRegisterIdinput.text.isNullOrBlank() || binding.edittextRegisterIdinput.text.isNullOrEmpty()) {
                 Toast.makeText(requireActivity(),"아이디를 확인해주세요",Toast.LENGTH_SHORT).show()
                 binding.edittextRegisterIdinput.requestFocus()
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edittextRegisterIdinput,0)
             } else {
-                
                 if (isExistId == true) {
                     Toast.makeText(requireActivity(), "이미 존재하는 아이디입니다.",Toast.LENGTH_LONG).show()
                 } else if (isExistId == false) {
@@ -117,7 +119,6 @@ class registerFragment : Fragment() {
                 }
             }
         }
-
-        return binding.root
     }
+
 }

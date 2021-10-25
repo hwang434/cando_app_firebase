@@ -11,20 +11,22 @@ import android.widget.EditText
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.dto.DiaryDto
-import com.goodee.cando_app.viewmodel.Diary
+import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.google.firebase.auth.FirebaseAuth
+import java.lang.Exception
+import java.text.SimpleDateFormat
 
 class DiaryWriteFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var writeButton: Button
     private lateinit var contentView: EditText
     private lateinit var titleInputView: EditText
-    private lateinit var diary: Diary
+    private lateinit var diaryViewModel: DiaryViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"DiaryWriteFragment - onCreate() called")
         super.onCreate(savedInstanceState)
-        diary = Diary(requireActivity().application)
+        diaryViewModel = DiaryViewModel(requireActivity().application)
     }
 
     override fun onCreateView(
@@ -43,10 +45,15 @@ class DiaryWriteFragment : Fragment() {
 
     private fun setEvent() {
         Log.d(TAG,"DiaryWriteFragment - setEvent() called")
-        writeButton!!.setOnClickListener {
+        writeButton?.setOnClickListener {
             Log.d(TAG,"DiaryWriteFragment - writeButton is clicked.")
-            val diaryDto = DiaryDto(titleInputView?.text.toString(), contentView?.text.toString(), FirebaseAuth.getInstance().currentUser?.email.toString())
-            diary.writeDiary(diaryDto)
+            val title = titleInputView.text.toString()
+            val content = contentView.text.toString()
+            val userEmail = FirebaseAuth.getInstance().currentUser?.email.toString()
+            val time = System.currentTimeMillis()
+            val diaryDto = DiaryDto(title, content, userEmail, time)
+            diaryViewModel.writeDiary(diaryDto)
+
             findNavController().navigate(R.id.action_diaryWriteFragment_to_diaryFragment)
         }
     }

@@ -11,158 +11,155 @@
             android:name="com.goodee.cando_app.views.HeaderFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout="@layout/fragment_header" />
         <!--아이디 입력창-->
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linearlayout_register_idform"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/white"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/fragmentcontainerview_register_header">
-            <TextView
-                android:id="@+id/textview_register_idpointer"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2.5"
-                style="@style/register_pointer"
-                android:text="@string/register_idpointer" />
-            <EditText
-                android:id="@+id/edittext_register_idinput"
-                android:layout_width="0dp"
-                android:layout_weight="5.5"
-                android:layout_height="match_parent"
-                style="@style/register_input"
-                android:inputType="textWebEditText"
-                android:textSize="18sp"
-                android:hint="@string/register_idhint"
-                android:autofillHints="username"/>
-            <Button
-                android:id="@+id/button_register_duplicatecheck"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:text="중복확인"/>
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        <TextView
+            android:id="@+id/textview_register_idpointer"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="2"
+            android:layout_height="50dp"
+            style="@style/register_pointer"
+            android:text="@string/register_idpointer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/edittext_register_idinput"
+            app:layout_constraintTop_toBottomOf="@id/fragmentcontainerview_register_header"/>
+        <EditText
+            android:id="@+id/edittext_register_idinput"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="5"
+            android:layout_height="50dp"
+            style="@style/register_input"
+            android:inputType="textWebEditText"
+            android:textSize="18sp"
+            android:hint="@string/register_idhint"
+            android:autofillHints="username"
+            app:layout_constraintStart_toEndOf="@id/textview_register_idpointer"
+            app:layout_constraintEnd_toStartOf="@id/button_register_duplicatecheck"
+            app:layout_constraintTop_toBottomOf="@id/fragmentcontainerview_register_header"/>
+        <Button
+            android:id="@+id/button_register_duplicatecheck"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            app:layout_constraintHorizontal_weight="2"
+            android:text="@string/register_duplicatecheckbutton"
+            app:layout_constraintStart_toEndOf="@id/edittext_register_idinput"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fragmentcontainerview_register_header" />
         <!--비밀번호 입력창-->
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linearlayout_register_passwordform"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/white"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/linearlayout_register_idform">
-            <TextView
-                android:id="@+id/textview_register_passwordpointer"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2.5"
-                style="@style/register_pointer"
-                android:text="@string/register_passwordpointer"/>
-            <EditText
-                android:id="@+id/edittext_register_passwordinput"
-                android:layout_width="0dp"
-                android:layout_weight="7.5"
-                android:layout_height="match_parent"
-                style="@style/register_input"
-                android:inputType="textWebEditText"
-                android:hint="@string/register_passwordhint"
-                android:autofillHints="password" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        <TextView
+            android:id="@+id/textview_register_passwordpointer"
+            style="@style/register_pointer"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:text="@string/register_passwordpointer"
+            android:textSize="20sp"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/edittext_register_passwordinput"
+            app:layout_constraintTop_toBottomOf="@id/textview_register_idpointer" />
+        <EditText
+            android:id="@+id/edittext_register_passwordinput"
+            style="@style/register_input"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:autofillHints="password"
+            android:hint="@string/register_passwordhint"
+            android:inputType="textPassword"
+            app:layout_constraintHorizontal_weight="7"
+            app:layout_constraintStart_toEndOf="@id/textview_register_passwordpointer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edittext_register_idinput" />
         <!--비밀번호 확인 입력창-->
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linearlayout_register_passwordcheckform"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/white"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/linearlayout_register_passwordform">
-            <TextView
-                android:id="@+id/textview_register_passwordcheckpointer"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2.5"
-                style="@style/register_pointer"
-                android:textSize="18sp"
-                android:text="@string/register_passwordcheck"/>
-            <EditText
-                android:id="@+id/edittext_register_passwordcheckinput"
-                android:layout_width="0dp"
-                android:layout_weight="7.5"
-                android:layout_height="match_parent"
-                android:inputType="textWebEditText"
-                android:hint="@string/register_passwordcheckinput"
-                style="@style/register_input"
-                android:autofillHints="username" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-        <!--이름 입력창-->
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linearlayout_register_nameform"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/white"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/linearlayout_register_passwordcheckform">
-            <TextView
-                android:id="@+id/textview_register_namepointer"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2.5"
-                style="@style/register_pointer"
-                android:text="@string/register_pointer"/>
-            <EditText
-                android:id="@+id/edittext_register_nameinput"
-                android:layout_width="0dp"
-                android:layout_weight="7.5"
-                android:layout_height="match_parent"
-                android:inputType="textWebEditText"
-                style="@style/register_input"
-                android:hint="@string/register_nameinput"
-                android:autofillHints="username" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-        <!--이메일 입력창-->
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linearlayout_register_emailform"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/white"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/linearlayout_register_nameform">
-            <TextView
-                android:id="@+id/textview_register_emailpointer"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2.5"
-                style="@style/register_pointer"
-                android:text="이메일"/>
-            <EditText
-                android:id="@+id/edittext_register_emailinput"
-                android:layout_width="0dp"
-                android:layout_weight="7.5"
-                android:layout_height="match_parent"
-                android:inputType="textEmailAddress"
-                style="@style/register_input"
-                android:hint="@string/register_emailinput"
-                android:autofillHints="emailAddress" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        <TextView
+            android:id="@+id/textview_register_passwordcheckpointer"
+            style="@style/register_pointer"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:text="@string/register_passwordcheck"
+            android:textSize="16sp"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/edittext_register_passwordcheckinput"
+            app:layout_constraintTop_toBottomOf="@+id/textview_register_passwordpointer" />
+        <EditText
+            android:id="@+id/edittext_register_passwordcheckinput"
+            style="@style/register_input"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:autofillHints="username"
+            android:hint="@string/register_passwordcheckinput"
+            android:inputType="textPassword"
+            app:layout_constraintHorizontal_weight="7"
+            app:layout_constraintStart_toEndOf="@+id/textview_register_passwordcheckpointer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edittext_register_passwordinput" />
+        <!-- 이름 입력창 -->
+        <TextView
+            android:id="@+id/textview_register_namepointer"
+            style="@style/register_pointer"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:text="@string/register_pointer"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/edittext_register_nameinput"
+            app:layout_constraintTop_toBottomOf="@+id/textview_register_passwordcheckpointer" />
+        <EditText
+            android:id="@+id/edittext_register_nameinput"
+            style="@style/register_input"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:autofillHints="username"
+            android:hint="@string/register_nameinput"
+            android:inputType="textWebEditText"
+            app:layout_constraintHorizontal_weight="7"
+            app:layout_constraintStart_toEndOf="@id/textview_register_namepointer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edittext_register_passwordcheckinput" />
+        <!-- 이메일 입력창 -->
+        <TextView
+            android:id="@+id/textview_register_emailpointer"
+            style="@style/register_pointer"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:text="@string/register_emailpointer"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/edittext_register_emailinput"
+            app:layout_constraintTop_toBottomOf="@+id/textview_register_namepointer" />
+
+        <EditText
+            android:id="@+id/edittext_register_emailinput"
+            style="@style/register_input"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:autofillHints="emailAddress"
+            android:hint="@string/register_emailinput"
+            android:inputType="textEmailAddress"
+            app:layout_constraintHorizontal_weight="7"
+            app:layout_constraintStart_toEndOf="@id/textview_register_emailpointer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edittext_register_nameinput" />
+        <!-- 휴대폰 입력창 -->
         <EditText
             android:id="@+id/edittext_phone_phoneinput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:hint="@string/register_phonehint"
             android:inputType="phone"
-            android:hint="휴대폰 번호"
-            app:layout_constraintTop_toBottomOf="@id/linearlayout_register_emailform"
+            android:autofillHints="phone"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/edittext_register_emailinput" />
         <Button
             android:id="@+id/button_register_registerbutton"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            app:layout_constraintTop_toBottomOf="@id/edittext_phone_phoneinput"
-            android:text="회원가입"/>
+            android:text="@string/register_registerbutton"
+            app:layout_constraintTop_toBottomOf="@+id/edittext_phone_phoneinput" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

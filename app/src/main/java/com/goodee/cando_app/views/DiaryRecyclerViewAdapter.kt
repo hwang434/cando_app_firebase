@@ -8,13 +8,10 @@ import androidx.lifecycle.LiveData
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryListBinding
 import com.goodee.cando_app.dto.DiaryDto
-import com.goodee.cando_app.viewmodel.Diary
 import java.text.SimpleDateFormat
 
 class DiaryRecyclerViewAdapter(val list: LiveData<List<DiaryDto>>) : RecyclerView.Adapter<DiaryRecyclerViewAdapter.ViewHolder>() {
-//    var list = mutableListOf<Diary>()
-
-
+    private val sdf = SimpleDateFormat("yyyy-MM-dd a HH:mm")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = DataBindingUtil.inflate<FragmentDiaryListBinding>(LayoutInflater.from(parent.context),
             R.layout.fragment_diary_list, parent, false)
@@ -33,12 +30,11 @@ class DiaryRecyclerViewAdapter(val list: LiveData<List<DiaryDto>>) : RecyclerVie
 
     inner class ViewHolder(val binding: FragmentDiaryListBinding) : RecyclerView.ViewHolder(binding.root) {
         fun setDiary(diary: DiaryDto) {
+            val date = sdf.format(diary.date)
             binding.textviewDiarylistTitle.text = diary.title
-//            binding.textviewDiarylistViewcount.text = diary.readCnt.toString()
             binding.textviewDiarylistWriter.text = diary.author
-
-//            val sdf = SimpleDateFormat("yyyy/MM/dd")
-//            binding.textviewDiarylistDate.text = sdf.format(diary.writedDate)
+            binding.textviewDiarylistDate.text = date.toString()
+            binding.textviewDiarylistWriter.text = diary.author
         }
     }
 }

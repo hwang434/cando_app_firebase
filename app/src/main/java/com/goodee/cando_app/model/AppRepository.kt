@@ -1,24 +1,17 @@
 package com.goodee.cando_app.model
 
 import android.app.Application
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.Navigation
-import com.goodee.cando_app.R
 import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
-import com.goodee.cando_app.viewmodel.Diary
+import com.goodee.cando_app.dto.UserDto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.FirebaseDatabase
-import com.google.gson.Gson
-import kotlinx.coroutines.coroutineScope
-import org.json.JSONObject
+import com.google.firebase.database.*
 
 class AppRepository(val application: Application) {
     private val TAG: String = "로그"
@@ -34,31 +27,42 @@ class AppRepository(val application: Application) {
 
     fun getDiaryList() {
         Log.d(TAG,"AppRepository - getDiaryList() called")
-
-        RealTimeDatabase.getDatabase().child("Diary").get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val map = task.result?.value as Map<String, Map<String, String>>        // Map<식별자, 글<>>
-                val list = map.values                                                   // 글 모음
+        val rootRef = RealTimeDatabase.getDatabase().ref
+        val diaryRef = rootRef.child("Diary")
+        val query = diaryRef.orderByChild("date")
+        val valueEventListner = object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.d(TAG,"AppRepository - onDataChange() called")
                 val diaryList = mutableListOf<DiaryDto>()
+                snapshot.children.forEach { it ->
+                    val author = it.child("author").value.toString()
+                    val title = it.child("title").value.toString()
+                    val content = it.child("content").value.toString()
+                    val date = it.child("date").getValue()
 
-                list.forEach { it ->
-                    val author = it.get("author")
-                    val title = it.get("title")
-                    val content = it.get("content")
-                    if (title != null && content != null && author != null) {
-                        diaryList.add(DiaryDto(title, content, author))
+                    if (title != null && content != null && author != null && date != null) {
+                        diaryList.add(DiaryDto(title, content, author, date as Long))
                     }
                 }
-
+                diaryList.reverse()
                 _diaryLivedata.postValue(diaryList)
             }
+            override fun onCancelled(error: DatabaseError) {
+                Log.d(TAG,"AppRepository - onCancelled() called")
+            }
         }
+        query.addListenerForSingleValueEvent(valueEventListner)
     }
 
-    fun register(email: String, password: String) {
+    fun register(userDto: UserDto) {
         Log.d(TAG,"AppRepository - register() called")
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
-            if (task.isSuccessful) _userLiveData.postValue(firebaseAuth.currentUser)
+
+        firebaseAuth.createUserWithEmailAndPassword(userDto.email, userDto.password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
+            if (task.isSuccessful) {
+                val key = RealTimeDatabase.getDatabase().child("Users").push().key
+                RealTimeDatabase.getDatabase().child("Users/${key}").setValue(userDto)
+                _userLiveData.postValue(firebaseAuth.currentUser)
+            }
             else Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
         }
     }
@@ -81,6 +85,34 @@ class AppRepository(val application: Application) {
         firebaseDatabase.child("Diary/${key}").setValue(diaryDto).addOnCompleteListener { task ->       // Diary/${key}에 글 저장하기
             if (task.isSuccessful) Toast.makeText(application, "글 작성에 성공했습니다.", Toast.LENGTH_SHORT).show()
             else Toast.makeText(application, "글 작성에 실패했습니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun findUserId(name: String, email: String) {
+        Log.d(TAG,"AppRepository - findUserId() called")
+        val firebaseDatabase = RealTimeDatabase.getDatabase().child("Users")
+        firebaseDatabase.orderByChild("name").equalTo(name).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val snapshot = task.result
+                var userName: String? = null
+                var userEmail: String? = null
+                var userId: String? = null
+
+                snapshot?.children?.forEach { it ->
+                    it.children.forEach { children ->
+                        if (children.key.equals("name")) userName = children.getValue(String::class.java)
+                        else if (children.key.equals("email")) userEmail = children.getValue(String::class.java)
+                        else if (children.key.equals("id")) userId = children.getValue(String::class.java)
+                    }
+                }
+                Log.d(TAG, "findUserId: name : $name email : ${email}\n$userName : $userName userEmail : $userEmail")
+                if (userName.equals(name) && userEmail.equals(email)) {
+                    Log.d(TAG,"AppRepository - $name $email")
+                    Toast.makeText(application.applicationContext, "찾으시는 아이디는 ${userId}입니다.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(application.applicationContext, "일치하는 회원이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 }
