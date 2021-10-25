@@ -39,10 +39,10 @@ class DiaryFragment : Fragment() {
     ): View? {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         diaryBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        diaryViewModelViewModel.diaryLiveData.observe(viewLifecycleOwner, Observer { it ->
+        diaryViewModelViewModel.diaryListLiveData.observe(viewLifecycleOwner, Observer { it ->
             Log.d(TAG,"DiaryFragment - Data is changed.")
             if (it != null) {
-                setRecyclerView(diaryViewModelViewModel.diaryLiveData)
+                setRecyclerView(diaryViewModelViewModel.diaryListLiveData)
             }
         })
         setEvent()

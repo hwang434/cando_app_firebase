@@ -21,9 +21,13 @@ class AppRepository(val application: Application) {
     val userLiveData: LiveData<FirebaseUser>
         get() = _userLiveData
 
-    private val _diaryLivedata: MutableLiveData<List<DiaryDto>> = MutableLiveData()
-    val diaryLiveData: LiveData<List<DiaryDto>>
-        get() = _diaryLivedata
+    private val _diaryListLiveData: MutableLiveData<List<DiaryDto>> = MutableLiveData()
+    val diaryListLiveData: LiveData<List<DiaryDto>>
+        get() = _diaryListLiveData
+
+    private val _diaryLiveData: MutableLiveData<DiaryDto> = MutableLiveData()
+    val diaryLiveData: LiveData<DiaryDto>
+        get() = _diaryLiveData
 
     fun getDiaryList() {
         Log.d(TAG,"AppRepository - getDiaryList() called")
@@ -35,17 +39,18 @@ class AppRepository(val application: Application) {
                 Log.d(TAG,"AppRepository - onDataChange() called")
                 val diaryList = mutableListOf<DiaryDto>()
                 snapshot.children.forEach { it ->
+                    val dno = it.key
                     val author = it.child("author").value.toString()
                     val title = it.child("title").value.toString()
                     val content = it.child("content").value.toString()
                     val date = it.child("date").getValue()
 
-                    if (title != null && content != null && author != null && date != null) {
-                        diaryList.add(DiaryDto(title, content, author, date as Long))
+                    if (dno != null && title != null && content != null && author != null && date != null) {
+                        diaryList.add(DiaryDto(dno = dno, title = title, content = content, author = author, date = date as Long))
                     }
                 }
                 diaryList.reverse()
-                _diaryLivedata.postValue(diaryList)
+                _diaryListLiveData.postValue(diaryList)
             }
             override fun onCancelled(error: DatabaseError) {
                 Log.d(TAG,"AppRepository - onCancelled() called")
@@ -111,6 +116,29 @@ class AppRepository(val application: Application) {
                     Toast.makeText(application.applicationContext, "찾으시는 아이디는 ${userId}입니다.", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(application.applicationContext, "일치하는 회원이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    fun getDiary(dno: String) {
+        Log.d(TAG,"AppRepository - getDiary() called")
+        RealTimeDatabase.getDatabase().child("Diary/${dno}").get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val map = mutableMapOf<String, String>()
+                task.result?.children?.forEach { child ->
+                    Log.d(TAG,"AppRepository - key : ${child.key}")
+                    Log.d(TAG,"AppRepository - value : ${child.value}")
+                    map.put(child.key.toString(), child.value.toString())
+                }
+
+                val title = map.get("title")
+                val content = map.get("content")
+                val author = map.get("author")
+                val date = map.get("date")
+                if (dno != null && title != null && content != null && author != null && date != null) {
+                    val diaryDto = DiaryDto(dno = dno, title = title, content = content, author = author, date = date.toLong())
+                    _diaryLiveData.postValue(diaryDto)
                 }
             }
         }
