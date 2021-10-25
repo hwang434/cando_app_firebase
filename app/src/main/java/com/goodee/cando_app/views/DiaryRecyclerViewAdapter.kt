@@ -3,8 +3,10 @@ package com.goodee.cando_app.views
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
+import androidx.navigation.Navigation
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryListBinding
 import com.goodee.cando_app.dto.DiaryDto
@@ -35,6 +37,9 @@ class DiaryRecyclerViewAdapter(val list: LiveData<List<DiaryDto>>) : RecyclerVie
             binding.textviewDiarylistWriter.text = diary.author
             binding.textviewDiarylistDate.text = date.toString()
             binding.textviewDiarylistWriter.text = diary.author
+            binding.root.setOnClickListener {
+                Navigation.findNavController(binding.root).navigate(DiaryFragmentDirections.actionDiaryFragmentToDiaryViewFragment(diary.dno))
+            }
         }
     }
 }

@@ -51,7 +51,7 @@ class DiaryWriteFragment : Fragment() {
             val content = contentView.text.toString()
             val userEmail = FirebaseAuth.getInstance().currentUser?.email.toString()
             val time = System.currentTimeMillis()
-            val diaryDto = DiaryDto(title, content, userEmail, time)
+            val diaryDto = DiaryDto(dno = "", title = title, content = content, author = userEmail, date = time)
             diaryViewModel.writeDiary(diaryDto)
 
             findNavController().navigate(R.id.action_diaryWriteFragment_to_diaryFragment)
