@@ -21,11 +21,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.ktx.Firebase
+import java.lang.StringBuilder
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 
 class registerFragment : Fragment() {
     private val TAG: String = "로그"
     private var isExistId = false
-    private val database: DatabaseReference by lazy { RealTimeDatabase.getDatabase() }
     private lateinit var binding: FragmentRegisterBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var userViewModelViewModel: UserViewModel
@@ -55,7 +57,7 @@ class registerFragment : Fragment() {
     }
 
     private fun setEvent() {
-        // 회원 가입 버튼 눌렀을 시.
+        // 회원가입과 정규식 처리
         binding.buttonRegisterRegisterbutton.setOnClickListener {
             if (binding.edittextRegisterIdinput.text.isNullOrEmpty() || binding.edittextRegisterIdinput.text.isBlank()) {
                 Toast.makeText(requireActivity(),"아이디를 확인해주세요",Toast.LENGTH_SHORT).show()
@@ -103,7 +105,7 @@ class registerFragment : Fragment() {
             }
         }
 
-        // DuplicateCheckService로 해당하는 id를 가진 멤버 존재하는지 확인
+        // 아이디 중복 확인
         binding.buttonRegisterDuplicatecheck.setOnClickListener {
             if (binding.edittextRegisterIdinput.text.isNullOrBlank() || binding.edittextRegisterIdinput.text.isNullOrEmpty()) {
                 Toast.makeText(requireActivity(),"아이디를 확인해주세요",Toast.LENGTH_SHORT).show()
@@ -120,5 +122,4 @@ class registerFragment : Fragment() {
             }
         }
     }
-
 }

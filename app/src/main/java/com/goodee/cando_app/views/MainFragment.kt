@@ -19,13 +19,14 @@ import com.google.firebase.ktx.Firebase
 
 class MainFragment : Fragment() {
     private val TAG: String = "로그"
-    private lateinit var auth: FirebaseAuth
     private lateinit var binding: FragmentMainBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
 
+        // 로그인 상태면 바로 다이어리 화면으로 이동
         if (auth.currentUser != null) {
             Toast.makeText(requireActivity(), "${auth.currentUser!!.email}님 환영합니다.",Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_mainFragment_to_diaryFragment)
@@ -40,9 +41,11 @@ class MainFragment : Fragment() {
     }
 
     private fun setEvent() {
+        // 회원가입 페이지 이동
         binding.buttonMainRegisterbutton.setOnClickListener { view ->
             view.findNavController().navigate(R.id.action_mainFragment_to_registerFragment)
         }
+        // 로그인 페이지 이동
         binding.buttonMainLoginbutton.setOnClickListener { view ->
             view.findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
         }

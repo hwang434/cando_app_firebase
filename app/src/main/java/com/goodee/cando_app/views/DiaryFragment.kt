@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
+import com.goodee.cando_app.adapter.DiaryRecyclerViewAdapter
 import com.goodee.cando_app.databinding.FragmentDiaryBinding
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.viewmodel.DiaryViewModel
@@ -22,7 +23,7 @@ import com.google.firebase.ktx.Firebase
 
 class DiaryFragment : Fragment() {
     private val TAG: String = "로그"
-    private lateinit var diaryBinding: FragmentDiaryBinding
+    private lateinit var binding: FragmentDiaryBinding
     private lateinit var callback: OnBackPressedCallback
     private var backPressedTime: Long? = null
     private val diaryViewModelViewModel: DiaryViewModel by lazy {DiaryViewModel(requireActivity().application)}
@@ -38,17 +39,17 @@ class DiaryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
-        diaryBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        diaryViewModelViewModel.diaryLiveData.observe(viewLifecycleOwner, Observer { it ->
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
+        diaryViewModelViewModel.diaryListLiveData.observe(viewLifecycleOwner, Observer { it ->
             Log.d(TAG,"DiaryFragment - Data is changed.")
             if (it != null) {
-                setRecyclerView(diaryViewModelViewModel.diaryLiveData)
+                setRecyclerView(diaryViewModelViewModel.diaryListLiveData)
             }
         })
         setEvent()
         setHasOptionsMenu(true)
 
-        return diaryBinding.root
+        return binding.root
     }
 
     override fun onAttach(context: Context) {
@@ -77,16 +78,16 @@ class DiaryFragment : Fragment() {
 
     private fun setRecyclerView(diaryLiveData: LiveData<List<DiaryDto>>) {
         val adapter = DiaryRecyclerViewAdapter(diaryLiveData)
-        diaryBinding.recyclerviewDiaryDiarylist.adapter = adapter
-        diaryBinding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
+        binding.recyclerviewDiaryDiarylist.adapter = adapter
+        binding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
     }
 
     private fun setEvent() {
-        diaryBinding.floatingDiaryWritediary.setOnClickListener {
+        binding.floatingDiaryWritediary.setOnClickListener {
             findNavController().navigate(R.id.action_diaryFragment_to_diaryWriteFragment)
         }
 
-        diaryBinding.bottomnavigationDiaryBottommenu.setOnItemSelectedListener { item ->
+        binding.bottomnavigationDiaryBottommenu.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.item_menu_myinfo -> {
                     true

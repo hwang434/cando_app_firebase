@@ -60,10 +60,17 @@ class LoginFragment : Fragment() {
     }
 
     private fun setEvent() {
+        // 회원 찾기 페이지 이동
         binding.buttonLoginFindmember.setOnClickListener {
             view?.findNavController()?.navigate(R.id.action_loginFragment_to_findMember)
         }
-        // 로그인 버튼 이벤트처리
+
+        // 회원가입 페이지 이동
+        binding.buttonLoginRegisterbutton.setOnClickListener {
+            view?.findNavController()?.navigate(R.id.action_loginFragment_to_registerFragment)
+        }
+
+        // 정규식과 로그인 처리
         binding.buttonLoginLoginbutton.setOnClickListener(object: SingleClickListner() {
             override fun onSingleClick(view: View?) {
                 Log.d(TAG,"LoginFragment - loginButton is activated")
@@ -100,11 +107,6 @@ class LoginFragment : Fragment() {
                 true
             }
             false
-        }
-
-        // 회원가입 페이지 이동
-        binding.buttonLoginRegisterbutton.setOnClickListener {
-            view?.findNavController()?.navigate(R.id.action_loginFragment_to_registerFragment)
         }
     }
 }
