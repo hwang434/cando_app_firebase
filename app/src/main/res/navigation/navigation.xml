@@ -78,6 +78,10 @@
         <action
             android:id="@+id/action_diaryWriteFragment_to_diaryFragment"
             app:destination="@id/diaryFragment" />
+        <argument
+            android:name="dno"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/diaryViewFragment"
@@ -87,5 +91,8 @@
         <argument
             android:name="dno"
             app:argType="string" />
+        <action
+            android:id="@+id/action_diaryViewFragment_to_diaryWriteFragment"
+            app:destination="@id/diaryWriteFragment" />
     </fragment>
 </navigation>

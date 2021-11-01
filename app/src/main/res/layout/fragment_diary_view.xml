@@ -17,16 +17,46 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:text="제목"/>
         <TextView
+            android:id="@+id/textview_diaryview_authorview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:padding="15dp"
+            tools:text="작성자"
+            app:layout_constraintTop_toBottomOf="@id/textview_diaryview_titleview"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/textview_diaryview_contentview"/>
+        <TextView
             android:id="@+id/textview_diaryview_contentview"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:textSize="22sp"
             android:scrollbars="vertical"
             android:padding="15dp"
-            app:layout_constraintTop_toBottomOf="@id/textview_diaryview_titleview"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textview_diaryview_authorview"
+            app:layout_constraintBottom_toTopOf="@id/button_diaryview_editbutton"
             tools:text="내용"/>
+        <Button
+            android:id="@+id/button_diaryview_editbutton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/diaryview_editbutton"
+            android:textSize="25sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/button_diaryview_deletebutton"
+            app:layout_constraintTop_toBottomOf="@id/textview_diaryview_contentview"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+        <Button
+            android:id="@+id/button_diaryview_deletebutton"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:text="@string/diaryview_deletebutton"
+            android:textSize="25sp"
+            app:layout_constraintStart_toEndOf="@id/button_diaryview_editbutton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textview_diaryview_contentview"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

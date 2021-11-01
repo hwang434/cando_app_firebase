@@ -40,7 +40,7 @@ class DiaryRecyclerViewAdapter(val list: LiveData<List<DiaryDto>>) : RecyclerVie
             binding.root.setOnClickListener {
                 Navigation.findNavController(binding.root).navigate(
                     DiaryFragmentDirections.actionDiaryFragmentToDiaryViewFragment(
-                        diary.dno
+                        diary.dno!!
                     )
                 )
             }

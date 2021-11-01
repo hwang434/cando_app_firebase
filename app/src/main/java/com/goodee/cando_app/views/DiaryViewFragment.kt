@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryViewBinding
 import com.goodee.cando_app.dto.DiaryDto
@@ -37,8 +38,17 @@ class DiaryViewFragment : Fragment() {
         diaryViewModel.diaryLiveData.observe(viewLifecycleOwner, Observer { diaryDto ->
             binding.textviewDiaryviewTitleview.text = diaryDto.title
             binding.textviewDiaryviewContentview.text = diaryDto.content
+            binding.textviewDiaryviewAuthorview.text = diaryDto.author
         })
+        setEvent()
 
         return binding.root
+    }
+
+    private fun setEvent() {
+        binding.buttonDiaryviewEditbutton.setOnClickListener {
+            Log.d(TAG,"DiaryViewFragment - editButton is clicked.")
+            findNavController().navigate(DiaryViewFragmentDirections.actionDiaryViewFragmentToDiaryWriteFragment(dno))
+        }
     }
 }

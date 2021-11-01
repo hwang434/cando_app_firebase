@@ -35,4 +35,8 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
         appRepository.writeDiary(diaryDto)
     }
 
+    fun editDiary(diaryDto: DiaryDto) {
+        appRepository.editDiary(diaryDto)
+    }
+
 }

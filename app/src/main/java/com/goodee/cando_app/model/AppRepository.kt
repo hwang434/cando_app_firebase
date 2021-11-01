@@ -66,11 +66,10 @@ class AppRepository(val application: Application) {
                     val dno = it.key
                     val author = it.child("author").value.toString()
                     val title = it.child("title").value.toString()
-                    val content = it.child("content").value.toString()
-                    val date = it.child("date").getValue()
+                    val date = it.child("date").value.toString().toLong()
 
-                    if (dno != null && title != null && content != null && author != null && date != null) {
-                        diaryList.add(DiaryDto(dno = dno, title = title, content = content, author = author, date = date as Long))
+                    if (dno != null && title != null && author != null && date != null) {
+                        diaryList.add(DiaryDto(dno = dno, title = title, content = "", author = author, date = date))
                     }
                 }
                 diaryList.reverse()
@@ -95,6 +94,26 @@ class AppRepository(val application: Application) {
         firebaseDatabase.child("Diary/${key}").setValue(diaryDto).addOnCompleteListener { task ->       // Diary/${key}에 글 저장하기
             if (task.isSuccessful) Toast.makeText(application, "글 작성에 성공했습니다.", Toast.LENGTH_SHORT).show()
             else Toast.makeText(application, "글 작성에 실패했습니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // 게시글 수정하기
+    fun editDiary(diaryDto: DiaryDto) {
+        Log.d(TAG,"AppRepository - editDiary() called")
+        val firebaseDatabase = RealTimeDatabase.getDatabase()
+        val map = HashMap<String, Any>()
+        map.put("title", diaryDto.title)
+        map.put("content", diaryDto.content)
+        map.put("author", diaryDto.author)
+        map.put("date", diaryDto.date)
+        Log.d(TAG,"AppRepository - map : ${map}")
+        firebaseDatabase.child("Diary/${diaryDto.dno}").updateChildren(map).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG,"AppRepository - 글 수정 성공")
+                _diaryLiveData.postValue(diaryDto)
+            } else {
+                Log.d(TAG,"AppRepository - 글 수정 실패")
+            }
         }
     }
 
@@ -147,4 +166,6 @@ class AppRepository(val application: Application) {
             }
         }
     }
+
+
 }

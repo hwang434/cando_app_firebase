@@ -26,12 +26,12 @@ class DiaryFragment : Fragment() {
     private lateinit var binding: FragmentDiaryBinding
     private lateinit var callback: OnBackPressedCallback
     private var backPressedTime: Long? = null
-    private val diaryViewModelViewModel: DiaryViewModel by lazy {DiaryViewModel(requireActivity().application)}
+    private val diaryViewModel: DiaryViewModel by lazy {DiaryViewModel(requireActivity().application)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"DiaryFragment - onCreate() called")
         super.onCreate(savedInstanceState)
-        diaryViewModelViewModel.getDiaryList()
+        diaryViewModel.getDiaryList()
     }
 
     override fun onCreateView(
@@ -40,10 +40,10 @@ class DiaryFragment : Fragment() {
     ): View? {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        diaryViewModelViewModel.diaryListLiveData.observe(viewLifecycleOwner, Observer { it ->
+        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner, Observer { it ->
             Log.d(TAG,"DiaryFragment - Data is changed.")
             if (it != null) {
-                setRecyclerView(diaryViewModelViewModel.diaryListLiveData)
+                setRecyclerView(diaryViewModel.diaryListLiveData)
             }
         })
         setEvent()
