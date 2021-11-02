@@ -31,7 +31,6 @@ class DiaryFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"DiaryFragment - onCreate() called")
         super.onCreate(savedInstanceState)
-        diaryViewModel.getDiaryList()
     }
 
     override fun onCreateView(
@@ -39,6 +38,7 @@ class DiaryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
+        diaryViewModel.getDiaryList()
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
         diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner, Observer { it ->
             Log.d(TAG,"DiaryFragment - Data is changed.")

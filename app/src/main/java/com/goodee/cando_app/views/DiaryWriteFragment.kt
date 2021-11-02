@@ -84,6 +84,6 @@ class DiaryWriteFragment : Fragment() {
         val time = System.currentTimeMillis()
         val diaryDto = DiaryDto(dno = dno, title = title, content = content, author = userEmail, date= time)
         diaryViewModel.editDiary(diaryDto)
-        findNavController().navigateUp()
+        findNavController().navigate(DiaryWriteFragmentDirections.actionDiaryWriteFragmentToDiaryViewFragment(dno))
     }
 }

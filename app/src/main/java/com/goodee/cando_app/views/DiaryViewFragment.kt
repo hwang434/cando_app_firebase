@@ -50,5 +50,9 @@ class DiaryViewFragment : Fragment() {
             Log.d(TAG,"DiaryViewFragment - editButton is clicked.")
             findNavController().navigate(DiaryViewFragmentDirections.actionDiaryViewFragmentToDiaryWriteFragment(dno))
         }
+        binding.buttonDiaryviewDeletebutton.setOnClickListener {
+            Log.d(TAG,"DiaryViewFragment - deleteButton is clicked")
+            diaryViewModel.deleteDiary(dno)
+        }
     }
 }

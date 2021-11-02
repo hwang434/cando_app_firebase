@@ -167,5 +167,14 @@ class AppRepository(val application: Application) {
         }
     }
 
-
+    fun deleteDiary(dno: String) {
+        Log.d(TAG,"AppRepository - deleteDiary() called")
+        RealTimeDatabase.getDatabase().child("Diary").child(dno).removeValue().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG,"AppRepository - 글 삭제 완료")
+            } else {
+                Log.d(TAG,"AppRepository - 글 삭제 실패")
+            }
+        }
+    }
 }
