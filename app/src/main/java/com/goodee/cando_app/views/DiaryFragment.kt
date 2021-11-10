@@ -11,6 +11,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.adapter.DiaryRecyclerViewAdapter
@@ -26,7 +27,9 @@ class DiaryFragment : Fragment() {
     private lateinit var binding: FragmentDiaryBinding
     private lateinit var callback: OnBackPressedCallback
     private var backPressedTime: Long? = null
-    private val diaryViewModel: DiaryViewModel by lazy {DiaryViewModel(requireActivity().application)}
+    private val diaryViewModel: DiaryViewModel by lazy {
+        ViewModelProvider(this).get(DiaryViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"DiaryFragment - onCreate() called")
@@ -89,9 +92,6 @@ class DiaryFragment : Fragment() {
 
         binding.bottomnavigationDiaryBottommenu.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.item_menu_myinfo -> {
-                    true
-                }
                 R.id.item_menu_signout -> {
                     Toast.makeText(
                         requireActivity(),

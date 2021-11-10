@@ -5,15 +5,26 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 
 class DiaryDeleteDialogFragment(val dno: String): DialogFragment() {
     private val TAG: String = "로그"
-    private lateinit var diaryViewModel: DiaryViewModel
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        diaryViewModel = DiaryViewModel(requireActivity().application)
+    private val diaryViewModel: DiaryViewModel by lazy {
+        ViewModelProvider(this).get(DiaryViewModel::class.java)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val alertDialogBuilder = requireActivity().let { it -> AlertDialog.Builder(it) }
@@ -23,6 +34,7 @@ class DiaryDeleteDialogFragment(val dno: String): DialogFragment() {
             setPositiveButton("확인", DialogInterface.OnClickListener { dialog, which ->
                 Log.d(TAG,"DiaryDeleteDialogFragment - dialog postiveButton is clicked")
                 diaryViewModel.deleteDiary(dno)
+                findNavController().navigateUp()
             })
             setNegativeButton("취소", DialogInterface.OnClickListener { dialog, which ->
                 Log.d(TAG,"DiaryDeleteDialogFragment - dialog negativeButton is clicked")

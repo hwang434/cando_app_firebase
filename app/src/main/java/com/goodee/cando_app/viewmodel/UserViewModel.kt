@@ -17,8 +17,14 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
         get() = _userLiveData
     
     init {
+        Log.d(TAG,"UserViewModel - init called")
         appRepository = AppRepository(application)
         _userLiveData = appRepository.userLiveData as MutableLiveData<FirebaseUser>
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d(TAG,"UserViewModel - onCleared() called")
     }
 
     // 회원가입

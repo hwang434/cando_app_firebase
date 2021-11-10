@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.Navigation
 import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.dto.UserDto
@@ -46,7 +47,7 @@ class AppRepository(val application: Application) {
                 val date = map.get("date")
                 if (dno != null && title != null && content != null && author != null && date != null) {
                     val diaryDto = DiaryDto(dno = dno, title = title, content = content, author = author, date = date.toLong())
-                    _diaryLiveData.postValue(diaryDto)
+                    _diaryLiveData.value = diaryDto
                 }
             }
         }
@@ -87,13 +88,15 @@ class AppRepository(val application: Application) {
         Log.d(TAG,"AppRepository - writeDiary() called")
         val key = RealTimeDatabase.getDatabase().child("Diary").push().key  // 주식별자 뽑기
         val diary = HashMap<String, DiaryDto>()
-        if (key != null) diary.put(key, diaryDto)
-        else throw Exception("AppRepository - writeDiary() key is null")
+        key?.let { it ->
+            diary.put(key, diaryDto)
+        }
 
         val firebaseDatabase = RealTimeDatabase.getDatabase()
         firebaseDatabase.child("Diary/${key}").setValue(diaryDto).addOnCompleteListener { task ->       // Diary/${key}에 글 저장하기
-            if (task.isSuccessful) Toast.makeText(application, "글 작성에 성공했습니다.", Toast.LENGTH_SHORT).show()
-            else Toast.makeText(application, "글 작성에 실패했습니다.", Toast.LENGTH_SHORT).show()
+            Log.d(TAG,"AppRepository - task.isSuccessful : ${task.isSuccessful}")
+            if (task.isSuccessful) Toast.makeText(application, "글 작성 성공", Toast.LENGTH_SHORT).show()
+            else Toast.makeText(application, "글 작성 실패", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -120,21 +123,21 @@ class AppRepository(val application: Application) {
     // 회원가입
     fun register(userDto: UserDto) {
         Log.d(TAG,"AppRepository - register() called")
-
         firebaseAuth.createUserWithEmailAndPassword(userDto.email, userDto.password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
             if (task.isSuccessful) {
                 val key = RealTimeDatabase.getDatabase().child("Users").push().key
                 RealTimeDatabase.getDatabase().child("Users/${key}").setValue(userDto)
                 _userLiveData.postValue(firebaseAuth.currentUser)
+            } else {
+                Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
             }
-            else Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
         }
     }
 
     // Firebase Authentication 로그인
     fun login(email: String, password: String) {
         Log.d(TAG,"AppRepository - login() called")
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task ->
             _userLiveData.postValue(firebaseAuth.currentUser)
         }
     }
@@ -170,11 +173,8 @@ class AppRepository(val application: Application) {
     fun deleteDiary(dno: String) {
         Log.d(TAG,"AppRepository - deleteDiary() called")
         RealTimeDatabase.getDatabase().child("Diary").child(dno).removeValue().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG,"AppRepository - 글 삭제 완료")
-            } else {
-                Log.d(TAG,"AppRepository - 글 삭제 실패")
-            }
+            Log.d(TAG,"AppRepository - task.isSueccessful : ${task.isSuccessful}")
+            _diaryLiveData.postValue(null)
         }
     }
 }

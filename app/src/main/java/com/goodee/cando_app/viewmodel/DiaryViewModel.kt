@@ -1,6 +1,7 @@
 package com.goodee.cando_app.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +9,7 @@ import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.model.AppRepository
 
 class DiaryViewModel(application: Application) : AndroidViewModel(application) {
+    private val TAG: String = "로그"
     private var appRepository: AppRepository
     private val _diaryListLiveData: MutableLiveData<List<DiaryDto>>
     val diaryListLiveData: LiveData<List<DiaryDto>>
@@ -17,6 +19,7 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
         get() = _diaryLiveData
 
     init {
+        Log.d(TAG,"DiaryViewModel - init called")
         appRepository = AppRepository(application)
         _diaryListLiveData = appRepository.diaryListLiveData as MutableLiveData<List<DiaryDto>>
         _diaryLiveData = appRepository.diaryLiveData as MutableLiveData<DiaryDto>
@@ -41,5 +44,10 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteDiary(dno: String) {
         appRepository.deleteDiary(dno)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d(TAG,"DiaryViewModel - onCleared() called")
     }
 }
