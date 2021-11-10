@@ -24,13 +24,10 @@ class FindPasswordFragment : Fragment() {
             } else if (binding.edittextFindpasswordEmailinput.text.isNullOrEmpty() || binding.edittextFindpasswordEmailinput.text.isBlank()) {
                 Toast.makeText(requireActivity(), "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show()
             } else {
-                // if : 이름과 이메일이 일치하는 회원이 존재함.
-
-                // -> 이메일 인증 시작
-
-                // -> 인증화면 보이게 처리
+                // if 아이디와 이메일이 일치하는 회원이 존재함 -> 이메일 인증 시작, 인증화면 보이게
                 binding.textviewFindpasswordEmailchecklabel.visibility = View.VISIBLE
                 binding.edittextFindpasswordEmailcheckinput.visibility = View.VISIBLE
+                // else -> 존재하지 않는 회원임.
             }
         }
 

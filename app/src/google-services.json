@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "233735829491",
+    "project_id": "cando-ad470",
+    "storage_bucket": "cando-ad470.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233735829491:android:b0d3158e78c2b039794486",
+        "android_client_info": {
+          "package_name": "com.goodee.cando_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "233735829491-u9dspd91apjvqf3fur6ot97c8nupm2t7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDn6mXpLhgXKJHzOBAq1-hGd6lqOhRMPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "233735829491-u9dspd91apjvqf3fur6ot97c8nupm2t7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

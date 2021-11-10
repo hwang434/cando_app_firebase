@@ -9,33 +9,33 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindIdBinding
+import com.goodee.cando_app.viewmodel.UserViewModel
 
 class FindIdFragment : Fragment() {
-
+    private lateinit var binding: FragmentFindIdBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = DataBindingUtil.inflate<FragmentFindIdBinding>(inflater, R.layout.fragment_find_id, container, false)
-
-        binding.buttonFindidSubmit.setOnClickListener {
-            if (binding.edittextFindidNameinput.text.isNullOrEmpty() || binding.edittextFindidNameinput.text.isBlank()) {
-                Toast.makeText(requireActivity(), "아이디를 입력해주세요", Toast.LENGTH_SHORT).show()
-            } else if (binding.edittextFindidEmailinput.text.isNullOrEmpty() || binding.edittextFindidEmailinput.text.isBlank()) {
-                Toast.makeText(requireActivity(), "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
-            }
-            // 아이디랑 이메일 입력을 했고,
-//            else {
-//                if (이름과 이메일이 일치하는 회원이 존재) {
-//                     아이디를 리턴
-//                }
-//                이름과 이메일이 일치하는 회원이 존재하지 않음.
-//                else {
-//                    리턴할 거 없음.
-//                }
-//            }
-        }
+        binding = DataBindingUtil.inflate<FragmentFindIdBinding>(inflater, R.layout.fragment_find_id, container, false)
+        setEvent()
 
         return binding.root
+    }
+
+    private fun setEvent() {
+        binding.buttonFindidSubmit.setOnClickListener {
+            val email = binding.edittextFindidEmailinput.text.toString()
+            val name = binding.edittextFindidNameinput.text.toString()
+
+            if (email.isNullOrEmpty() || email.isBlank()) {
+                Toast.makeText(requireActivity(), "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
+            } else if (name.isNullOrEmpty() || name.isBlank()) {
+                Toast.makeText(requireActivity(), "이름을 입력해주세요", Toast.LENGTH_SHORT).show()
+            } else {
+                val userViewModel = UserViewModel(requireActivity().application)
+                userViewModel.findUserId(email = email, name = name)
+            }
+        }
     }
 }

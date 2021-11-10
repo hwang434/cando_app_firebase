@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <style name="main_header">
         <item name="android:padding">10dp</item>
         <item name="android:shadowColor">#000000</item>
@@ -11,7 +10,6 @@
         <item name="android:textSize">48sp</item>
         <item name="android:textStyle">bold</item>
     </style>
-
     <style name="main_button">
         <item name="android:layout_width">150dp</item>
         <item name="android:layout_height">50dp</item>
@@ -20,15 +18,13 @@
         <item name="android:layout_margin">10dp</item>
         <item name="android:background">@drawable/main_radius_button</item>
     </style>
-
     <style name="register_pointer">
         <item name="android:gravity">center</item>
         <item name="android:textSize">24sp</item>
-        <item name="android:background">#76918E</item>
+        <item name="android:background">#5E706E</item>
     </style>
-
     <style name="register_input">
         <item name="android:textSize">22sp</item>
-        <item name="android:background">#C2D8D6</item>
+        <item name="android:background">#FFFFFF</item>
     </style>
 </resources>
