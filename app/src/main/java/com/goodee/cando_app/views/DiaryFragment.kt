@@ -31,6 +31,24 @@ class DiaryFragment : Fragment() {
         ViewModelProvider(this).get(DiaryViewModel::class.java)
     }
 
+    override fun onAttach(context: Context) {
+        Log.d(TAG,"DiaryFragment - onAttach() called")
+        super.onAttach(context)
+        // 2초 내에 두번 뒤로가기 버튼 누르면 앱 종료
+        callback = object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (backPressedTime != null && backPressedTime!! + 2000 > System.currentTimeMillis()) {
+                    requireActivity().finish()
+                } else {
+                    Toast.makeText(requireActivity(),"앱 종료를 원하시면 뒤로 가기 버튼을 눌러주세요.", Toast.LENGTH_SHORT).show()
+                }
+
+                backPressedTime = System.currentTimeMillis()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"DiaryFragment - onCreate() called")
         super.onCreate(savedInstanceState)
@@ -55,27 +73,29 @@ class DiaryFragment : Fragment() {
         return binding.root
     }
 
-    override fun onAttach(context: Context) {
-        Log.d(TAG,"DiaryFragment - onAttach() called")
-        super.onAttach(context)
-        // 2초 내에 두번 뒤로가기 버튼 누르면 앱 종료
-        callback = object: OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (backPressedTime != null && backPressedTime!! + 2000 > System.currentTimeMillis()) {
-                    requireActivity().finish()
-                } else {
-                    Toast.makeText(requireActivity(),"앱 종료를 원하시면 뒤로 가기 버튼을 눌러주세요.", Toast.LENGTH_SHORT).show()
-                }
-
-                backPressedTime = System.currentTimeMillis()
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG,"DiaryFragment - onPause() called")
     }
 
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG,"DiaryFragment - onStop() called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG,"DiaryFragment - onDestroy() called")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d(TAG,"DiaryFragment - onDestroyView() called")
+    }
+    
     override fun onDetach() {
-        Log.d(TAG,"DiaryFragment - onDetach() called")
         super.onDetach()
+        Log.d(TAG,"DiaryFragment - onDetach() called")
         callback.remove()
     }
 

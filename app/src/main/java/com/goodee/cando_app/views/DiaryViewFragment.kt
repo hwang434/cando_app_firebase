@@ -48,6 +48,26 @@ class DiaryViewFragment : Fragment() {
         return binding.root
     }
 
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG,"DiaryViewFragment - onPause() called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG,"DiaryViewFragment - onStop() called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG,"DiaryViewFragment - onDestroy() called")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d(TAG,"DiaryViewFragment - onDestroyView() called")
+    }
+
     private fun setEvent() {
         binding.buttonDiaryviewEditbutton.setOnClickListener {
             Log.d(TAG,"DiaryViewFragment - editButton is clicked.")

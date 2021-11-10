@@ -19,18 +19,11 @@ class DiaryDeleteDialogFragment(val dno: String): DialogFragment() {
         ViewModelProvider(this).get(DiaryViewModel::class.java)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val alertDialogBuilder = requireActivity().let { it -> AlertDialog.Builder(it) }
         alertDialogBuilder.apply {
-            setTitle("타이틀")
-            setMessage("메시지")
+            setTitle("이 글을 정말 삭제하시겠습니까?")
+            setMessage("삭제하려면 확인을 눌러주세요.")
             setPositiveButton("확인", DialogInterface.OnClickListener { dialog, which ->
                 Log.d(TAG,"DiaryDeleteDialogFragment - dialog postiveButton is clicked")
                 diaryViewModel.deleteDiary(dno)
