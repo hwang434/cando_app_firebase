@@ -42,5 +42,4 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteDiary(dno: String) {
         appRepository.deleteDiary(dno)
     }
-
 }
