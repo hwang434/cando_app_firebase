@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_mainFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_diaryFragment"
+            app:destination="@id/diaryFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -37,7 +40,11 @@
         android:id="@+id/registerFragment"
         android:name="com.goodee.cando_app.views.registerFragment"
         android:label="fragment_register"
-        tools:layout="@layout/fragment_register" />
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_diaryFragment"
+            app:destination="@id/diaryFragment" />
+    </fragment>
     <fragment
         android:id="@+id/diaryFragment"
         android:name="com.goodee.cando_app.views.DiaryFragment"
@@ -45,7 +52,15 @@
         tools:layout="@layout/fragment_diary_list" >
         <action
             android:id="@+id/action_diaryFragment_to_diaryWriteFragment"
-            app:destination="@id/diaryWriteFragment" />
+            app:destination="@id/diaryWriteFragment"/>
+        <action
+            android:id="@+id/action_diaryFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/mainFragment"
+            app:popUpToInclusive="true"/>
+        <action
+            android:id="@+id/action_diaryFragment_to_diaryViewFragment"
+            app:destination="@id/diaryViewFragment" />
     </fragment>
     <fragment
         android:id="@+id/findMember"
@@ -59,6 +74,29 @@
         tools:layout="@layout/fragment_diary_write" >
         <action
             android:id="@+id/action_diaryWriteFragment_to_diaryFragment"
+            app:destination="@id/diaryFragment" />
+        <argument
+            android:name="dno"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_diaryWriteFragment_to_diaryViewFragment"
+            app:destination="@id/diaryViewFragment"
+            app:popUpTo="@id/diaryFragment"/>
+    </fragment>
+    <fragment
+        android:id="@+id/diaryViewFragment"
+        android:name="com.goodee.cando_app.views.DiaryViewFragment"
+        android:label="fragment_diary_view"
+        tools:layout="@layout/fragment_diary_view">
+        <argument
+            android:name="dno"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_diaryViewFragment_to_diaryWriteFragment"
+            app:destination="@id/diaryWriteFragment"/>
+        <action
+            android:id="@+id/action_diaryViewFragment_to_diaryFragment"
             app:destination="@id/diaryFragment" />
     </fragment>
 </navigation>

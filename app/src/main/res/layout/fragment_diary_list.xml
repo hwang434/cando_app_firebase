@@ -8,16 +8,14 @@
         android:padding="10dp">
         <TextView
             android:id="@+id/textview_diarylist_title"
-            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_columnWeight="12"
+            android:layout_columnWeight="1"
             android:layout_column="0"
             android:layout_row="0"
             android:layout_columnSpan="4"
             tools:text="일기제목dddddddddddddddd"/>
         <TextView
             android:id="@+id/textview_diarylist_viewcount"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_row="1"
             android:layout_column="0"
@@ -26,7 +24,6 @@
             android:layout_columnSpan="1"/>
         <TextView
             android:id="@+id/textview_diarylist_writer"
-            android:layout_width="150dp"
             android:layout_height="match_parent"
             android:layout_row="1"
             android:layout_column="2"
@@ -35,7 +32,6 @@
             tools:text="작성자"/>
         <TextView
             android:id="@+id/textview_diarylist_date"
-            android:layout_width="130dp"
             android:layout_height="wrap_content"
             android:minWidth="130dp"
             android:layout_row="1"

@@ -9,26 +9,33 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindIdBinding
+import com.goodee.cando_app.viewmodel.UserViewModel
 
 class FindIdFragment : Fragment() {
-
+    private lateinit var binding: FragmentFindIdBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = DataBindingUtil.inflate<FragmentFindIdBinding>(inflater, R.layout.fragment_find_id, container, false)
-
-        binding.buttonFindidSubmit.setOnClickListener {
-            if (binding.edittextFindidNameinput.text.isNullOrEmpty() || binding.edittextFindidNameinput.text.isBlank()) {
-                Toast.makeText(requireActivity(), "아이디를 입력해주세요", Toast.LENGTH_SHORT).show()
-            } else if (binding.edittextFindidEmailinput.text.isNullOrEmpty() || binding.edittextFindidEmailinput.text.isBlank()) {
-                Toast.makeText(requireActivity(), "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
-            } else {
-                // if 입력한 회원이 존재 -> 아이디 인증 시작
-                // else 입력한 회원이 존재하지 않음 -> 그런 회원 없다.
-            }
-        }
+        binding = DataBindingUtil.inflate<FragmentFindIdBinding>(inflater, R.layout.fragment_find_id, container, false)
+        setEvent()
 
         return binding.root
+    }
+
+    private fun setEvent() {
+        binding.buttonFindidSubmit.setOnClickListener {
+            val email = binding.edittextFindidEmailinput.text.toString()
+            val name = binding.edittextFindidNameinput.text.toString()
+
+            if (email.isNullOrEmpty() || email.isBlank()) {
+                Toast.makeText(requireActivity(), "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
+            } else if (name.isNullOrEmpty() || name.isBlank()) {
+                Toast.makeText(requireActivity(), "이름을 입력해주세요", Toast.LENGTH_SHORT).show()
+            } else {
+                val userViewModel = UserViewModel(requireActivity().application)
+                userViewModel.findUserId(email = email, name = name)
+            }
+        }
     }
 }

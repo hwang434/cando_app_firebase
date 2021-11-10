@@ -6,6 +6,9 @@ import android.util.Log
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.ActivityMainBinding
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 
 class MainActivity : AppCompatActivity() {
     private val TAG: String = "로그"
