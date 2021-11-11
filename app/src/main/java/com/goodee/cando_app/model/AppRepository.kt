@@ -58,7 +58,7 @@ class AppRepository(val application: Application) {
         Log.d(TAG,"AppRepository - getDiaryList() called")
         val rootRef = RealTimeDatabase.getDatabase().ref
         val diaryRef = rootRef.child("Diary")
-        val query = diaryRef.orderByChild("date")
+        val query = diaryRef.orderByChild("date").limitToLast(10)
         val valueEventListner = object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 Log.d(TAG,"AppRepository - onDataChange() called")
