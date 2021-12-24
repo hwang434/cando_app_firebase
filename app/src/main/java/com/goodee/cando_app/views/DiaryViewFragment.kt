@@ -1,5 +1,6 @@
 package com.goodee.cando_app.views
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -21,6 +22,11 @@ class DiaryViewFragment : Fragment() {
         ViewModelProvider(this).get(DiaryViewModel::class.java)
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.d(TAG,"DiaryViewFragment - onAttach() called")
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG,"DiaryViewFragment - onCreate() called\n arguments : ${arguments.toString()}")
@@ -58,14 +64,19 @@ class DiaryViewFragment : Fragment() {
         Log.d(TAG,"DiaryViewFragment - onStop() called")
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d(TAG,"DiaryViewFragment - onDestroyView() called")
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG,"DiaryViewFragment - onDestroy() called")
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Log.d(TAG,"DiaryViewFragment - onDestroyView() called")
+    override fun onDetach() {
+        super.onDetach()
+        Log.d(TAG,"DiaryViewFragment - onDetach() called")
     }
 
     private fun setEvent() {
