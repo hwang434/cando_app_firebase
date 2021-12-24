@@ -44,9 +44,9 @@ class DiaryViewFragment : Fragment() {
         diaryViewModel.diaryLiveData.observe(viewLifecycleOwner, { diaryDto ->
             Log.d(TAG,"DiaryViewFragment - diaryLivedata change")
             if (diaryDto != null) {
-                binding.textviewDiaryviewTitleview.text = diaryDto.title
+                binding.textviewDiaryviewTitleview.text = "제목 : "+diaryDto.title
                 binding.textviewDiaryviewContentview.text = diaryDto.content
-                binding.textviewDiaryviewAuthorview.text = diaryDto.author
+                binding.textviewDiaryviewAuthorview.text = "작성자 : "+diaryDto.author
             }
         })
         setEvent()

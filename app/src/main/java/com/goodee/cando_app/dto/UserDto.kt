@@ -1,3 +1,3 @@
 package com.goodee.cando_app.dto
 
-data class UserDto(val id: String, val name: String, val email: String, val phone: String, val password: String)
+data class UserDto(val email: String, val password: String, val phone: String)

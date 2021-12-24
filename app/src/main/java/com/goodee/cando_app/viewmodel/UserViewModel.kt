@@ -46,7 +46,12 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
     
     // 비밀번호 찾기
-    fun findUserPassword(id: String, email: String) {
+    fun findUserPassword(email: String) {
         Log.d(TAG,"UserViewModel - findUserPassword() called")
+    }
+    
+    // 중복 회원 찾기
+    fun isExistEmail(email: String) {
+        Log.d(TAG,"UserViewModel - isExistEmail() called")
     }
 }
