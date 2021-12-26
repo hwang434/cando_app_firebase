@@ -107,7 +107,8 @@ class DiaryFragment : Fragment() {
                         Toast.makeText(requireActivity(), "Bottom",Toast.LENGTH_SHORT).show()
                     }
                 }
-        })
+            }
+        )
     }
 
     private fun setEvent() {
