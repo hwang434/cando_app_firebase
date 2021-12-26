@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.goodee.cando_app.R
 import com.goodee.cando_app.adapter.DiaryRecyclerViewAdapter
 import com.goodee.cando_app.databinding.FragmentDiaryBinding
@@ -25,27 +26,21 @@ import com.google.firebase.ktx.Firebase
 class DiaryFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var binding: FragmentDiaryBinding
-    private lateinit var callback: OnBackPressedCallback
+    private val diaryViewModel: DiaryViewModel by lazy { ViewModelProvider(this).get(DiaryViewModel::class.java) }
     private var backPressedTime: Long? = null
-    private val diaryViewModel: DiaryViewModel by lazy {
-        ViewModelProvider(this).get(DiaryViewModel::class.java)
-    }
+    private val callback by lazy {object: OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (backPressedTime != null && backPressedTime!! + 2000 > System.currentTimeMillis()) requireActivity().finish()
+            else Toast.makeText(requireActivity(),"앱 종료를 원하시면 뒤로 가기 버튼을 눌러주세요.", Toast.LENGTH_SHORT).show()
+
+            backPressedTime = System.currentTimeMillis()
+        }
+    }}
+
 
     override fun onAttach(context: Context) {
         Log.d(TAG,"DiaryFragment - onAttach() called")
         super.onAttach(context)
-        // 2초 내에 두번 뒤로가기 버튼 누르면 앱 종료
-        callback = object: OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (backPressedTime != null && backPressedTime!! + 2000 > System.currentTimeMillis()) {
-                    requireActivity().finish()
-                } else {
-                    Toast.makeText(requireActivity(),"앱 종료를 원하시면 뒤로 가기 버튼을 눌러주세요.", Toast.LENGTH_SHORT).show()
-                }
-
-                backPressedTime = System.currentTimeMillis()
-            }
-        }
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
@@ -65,6 +60,7 @@ class DiaryFragment : Fragment() {
             Log.d(TAG,"DiaryFragment - Data is changed.")
             if (it != null) {
                 setRecyclerView(diaryViewModel.diaryListLiveData)
+
             }
         })
         setEvent()
@@ -100,9 +96,18 @@ class DiaryFragment : Fragment() {
     }
 
     private fun setRecyclerView(diaryLiveData: LiveData<List<DiaryDto>>) {
+        Log.d(TAG,"DiaryFragment - setRecyclerView() called")
         val adapter = DiaryRecyclerViewAdapter(diaryLiveData)
         binding.recyclerviewDiaryDiarylist.adapter = adapter
         binding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
+        binding.recyclerviewDiaryDiarylist.addOnScrollListener(
+            object: RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    if (!binding.recyclerviewDiaryDiarylist.canScrollVertically(1)) {
+                        Toast.makeText(requireActivity(), "Bottom",Toast.LENGTH_SHORT).show()
+                    }
+                }
+        })
     }
 
     private fun setEvent() {
