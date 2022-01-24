@@ -3,23 +3,15 @@ package com.goodee.cando_app.model
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
-import com.goodee.cando_app.dto.UserDto
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 
-class AppRepository(val application: Application) {
+class DiaryRepository(val application: Application) {
     private val TAG: String = "로그"
-    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-
-    private val _userLiveData: MutableLiveData<FirebaseUser> = MutableLiveData()
-    val userLiveData: LiveData<FirebaseUser>
-        get() = _userLiveData
+//    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
     private val _diaryListLiveData: MutableLiveData<List<DiaryDto>> = MutableLiveData()
     val diaryListLiveData: LiveData<List<DiaryDto>>
@@ -29,7 +21,7 @@ class AppRepository(val application: Application) {
     val diaryLiveData: LiveData<DiaryDto>
         get() = _diaryLiveData
 
-    // 게시글 조회
+    // 게시글 조회(게시글 클릭 시 1개의 게시글을 읽음)
     fun getDiary(dno: String) {
         Log.d(TAG,"AppRepository - getDiary() called")
         RealTimeDatabase.getDatabase().child("Diary/${dno}").get().addOnCompleteListener { task ->
@@ -52,7 +44,7 @@ class AppRepository(val application: Application) {
         }
     }
 
-    // 게시글 목록 가져오기
+    // 게시글 목록 가져오기(로그인시 바로 보이는 게시글들)
     fun getDiaryList() {
         Log.d(TAG,"AppRepository - getDiaryList() called")
         val rootRef = RealTimeDatabase.getDatabase().ref
@@ -122,58 +114,6 @@ class AppRepository(val application: Application) {
                 _diaryLiveData.postValue(diaryDto)
             } else {
                 Log.d(TAG,"AppRepository - 글 수정 실패")
-            }
-        }
-    }
-
-    // 회원가입
-    fun register(userDto: UserDto) {
-        Log.d(TAG,"AppRepository - register() called")
-        firebaseAuth.createUserWithEmailAndPassword(userDto.email, userDto.password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
-            Log.d(TAG,"AppRepository - register task.isSuccessful : ${task.isSuccessful}")
-            if (task.isSuccessful) {
-                val key = RealTimeDatabase.getDatabase().child("Users").push().key
-                RealTimeDatabase.getDatabase().child("Users/${key}").setValue(userDto)
-                _userLiveData.postValue(firebaseAuth.currentUser)
-            } else {
-                Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    // Firebase Authentication 로그인
-    fun login(email: String, password: String) {
-        Log.d(TAG,"AppRepository - login() called")
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task ->
-            Log.d(TAG,"AppRepository - register task.isSuccessful : ${task.isSuccessful}")
-            _userLiveData.postValue(firebaseAuth.currentUser)
-        }
-    }
-
-    // 유저 아이디 찾기
-    fun findUserId(name: String, email: String) {
-        Log.d(TAG,"AppRepository - findUserId() called")
-        val firebaseDatabase = RealTimeDatabase.getDatabase().child("Users")
-        firebaseDatabase.orderByChild("name").equalTo(name).get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val snapshot = task.result
-                val map = mutableMapOf<String, String>()
-                snapshot?.children?.forEach { it ->
-                    it.children.forEach { children ->
-                        map[children.key!!] = children.value.toString()
-                    }
-                }
-                val userName = map["name"]
-                val userEmail = map["email"]
-                val userId = map["id"]
-                Log.d(TAG,"AppRepository - userName : $userName\nuserEmail : $userEmail\nuserId : $userId")
-
-                if (userName.equals(name) && userEmail.equals(email)) {
-                    Log.d(TAG,"AppRepository - $name $email")
-                    Toast.makeText(application.applicationContext, "찾으시는 아이디는 ${userId}입니다.", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(application.applicationContext, "일치하는 회원이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
-                }
             }
         }
     }

@@ -28,6 +28,33 @@ class DiaryFragment : Fragment() {
     private lateinit var binding: FragmentDiaryBinding
     private val diaryViewModel: DiaryViewModel by lazy { ViewModelProvider(this).get(DiaryViewModel::class.java) }
     private var backPressedTime: Long? = null
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.member_layout, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.item_menu_signout -> {
+                Toast.makeText(
+                    requireActivity(),
+                    "${Firebase.auth.currentUser?.email}님 안녕히 가세요.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Firebase.auth.signOut()
+                findNavController().navigate(R.id.action_diaryFragment_to_mainFragment)
+                return true
+            }
+            R.id.item_menu_myinfo -> {
+                Toast.makeText(requireContext(), "내 정보 클릭",Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_diaryFragment_to_memberWithdrawFragment)
+                return true
+            }
+        }
+
+        return false
+    }
+
     private val callback by lazy {object: OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (backPressedTime != null && backPressedTime!! + 2000 > System.currentTimeMillis()) requireActivity().finish()
@@ -43,10 +70,13 @@ class DiaryFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"DiaryFragment - onCreate() called")
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,7 +90,7 @@ class DiaryFragment : Fragment() {
             if (listOfDiaryDto != null) setRecyclerView(diaryViewModel.diaryListLiveData)
         })
         setEvent()
-        setHasOptionsMenu(true)
+
 
         return binding.root
     }
@@ -111,24 +141,6 @@ class DiaryFragment : Fragment() {
     private fun setEvent() {
         binding.floatingDiaryWritediary.setOnClickListener {
             findNavController().navigate(R.id.action_diaryFragment_to_diaryWriteFragment)
-        }
-
-        binding.bottomnavigationDiaryBottommenu.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.item_menu_signout -> {
-                    Toast.makeText(
-                        requireActivity(),
-                        "${Firebase.auth.currentUser!!.email}님 안녕히 가세요.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    Firebase.auth.signOut()
-                    findNavController().navigate(R.id.action_diaryFragment_to_mainFragment)
-                    true
-                }
-                else -> {
-                    false
-                }
-            }
         }
     }
 }

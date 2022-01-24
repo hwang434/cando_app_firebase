@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
 import com.goodee.cando_app.dto.UserDto
+import com.goodee.cando_app.util.PasswordEncoder
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -73,10 +74,10 @@ class registerFragment : Fragment() {
                 } else {
                     // 회원 가입 시키기
                     val email = binding.edittextRegisterEmailinput.text.toString()
-                    val password = binding.edittextRegisterPasswordinput.text.toString()
+                    val password = binding.edittextRegisterPasswordinput.text.toString().trim()
                     val phone = binding.edittextPhonePhoneinput.text.toString()
-                    val userDto = UserDto(email = email, password = password, phone = phone)
-                    userViewModel.register(userDto)
+                    val userDto = UserDto(email = email, phone = phone)
+                    userViewModel.register(userDto,password)
                 }
             }
 

@@ -6,19 +6,19 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.UserDto
-import com.goodee.cando_app.model.AppRepository
+import com.goodee.cando_app.model.UserRepository
 import com.google.firebase.auth.FirebaseUser
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
     private val TAG: String = "로그"
-    private var appRepository: AppRepository
+    private var appRepository: UserRepository
     private val _userLiveData: MutableLiveData<FirebaseUser>
     val userLiveData: LiveData<FirebaseUser>
         get() = _userLiveData
     
     init {
         Log.d(TAG,"UserViewModel - init called")
-        appRepository = AppRepository(application)
+        appRepository = UserRepository(application)
         _userLiveData = appRepository.userLiveData as MutableLiveData<FirebaseUser>
     }
 
@@ -28,9 +28,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 회원가입
-    fun register(userDto: UserDto) {
+    fun register(userDto: UserDto, password: String) {
         Log.d(TAG,"User - register() called")
-        appRepository.register(userDto)
+        appRepository.register(userDto, password)
     }
 
     // 로그인
