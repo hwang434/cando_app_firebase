@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.Navigation
 import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.dto.UserDto
@@ -38,14 +37,14 @@ class AppRepository(val application: Application) {
                 val map = mutableMapOf<String, String>()
                 task.result?.children?.forEach { child ->
                     Log.d(TAG,"AppRepository - key : ${child.key} value : ${child.value}")
-                    map.put(child.key.toString(), child.value.toString())
+                    map[child.key.toString()] = child.value.toString()
                 }
 
-                val title = map.get("title")
-                val content = map.get("content")
-                val author = map.get("author")
-                val date = map.get("date")
-                if (dno != null && title != null && content != null && author != null && date != null) {
+                val title = map["title"]
+                val content = map["content"]
+                val author = map["author"]
+                val date = map["date"]
+                if (title != null && content != null && author != null && date != null) {
                     val diaryDto = DiaryDto(dno = dno, title = title, content = content, author = author, date = date.toLong())
                     _diaryLiveData.value = diaryDto
                 }
@@ -58,20 +57,17 @@ class AppRepository(val application: Application) {
         Log.d(TAG,"AppRepository - getDiaryList() called")
         val rootRef = RealTimeDatabase.getDatabase().ref
         val diaryRef = rootRef.child("Diary")
-        val query = diaryRef.orderByChild("date").limitToLast(10)
-        val valueEventListner = object: ValueEventListener {
+        val query = diaryRef.orderByChild("dno").limitToLast(10)
+        val valueEventListener = object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 Log.d(TAG,"AppRepository - onDataChange() called")
                 val diaryList = mutableListOf<DiaryDto>()
-                snapshot.children.forEach { it ->
-                    val dno = it.key
-                    val author = it.child("author").value.toString()
-                    val title = it.child("title").value.toString()
-                    val date = it.child("date").value.toString().toLong()
-
-                    if (dno != null && title != null && author != null && date != null) {
-                        diaryList.add(DiaryDto(dno = dno, title = title, content = "", author = author, date = date))
-                    }
+                snapshot.children.forEach { ds ->
+                    val dno = ds.key
+                    val author = ds.child("author").value.toString()
+                    val title = ds.child("title").value.toString()
+                    val date = ds.child("date").value.toString().toLong()
+                    diaryList.add(DiaryDto(dno = dno, title = title, content = "", author = author, date = date))
                 }
                 diaryList.reverse()
                 _diaryListLiveData.postValue(diaryList)
@@ -80,15 +76,25 @@ class AppRepository(val application: Application) {
                 Log.d(TAG,"AppRepository - onCancelled() called")
             }
         }
-        query.addListenerForSingleValueEvent(valueEventListner)
+        query.addListenerForSingleValueEvent(valueEventListener)
     }
 
     // 게시글 작성
     fun writeDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"AppRepository - writeDiary() called")
-        val key = RealTimeDatabase.getDatabase().child("Diary").push().key  // 주식별자 뽑기
+        val diaryRef = RealTimeDatabase.getDatabase().child("Diary").ref
+        val key = diaryRef.push().key
+        val lastDno = diaryRef.limitToLast(1).get().addOnCompleteListener {
+            Log.d(TAG,"AppRepository - it : ${it.result}")
+        }
+        if (!lastDno.isSuccessful) {
+            Log.d(TAG,"AppRepository - diaryRef.limitToLast(1).get().isSuccessful : false")
+            return
+        }
+        Log.d(TAG,"AppRepository - lastDno : ${lastDno.result}")
+
         val diary = HashMap<String, DiaryDto>()
-        key?.let { it ->
+        key?.let {
             diary.put(key, diaryDto)
         }
 
@@ -105,11 +111,11 @@ class AppRepository(val application: Application) {
         Log.d(TAG,"AppRepository - editDiary() called")
         val firebaseDatabase = RealTimeDatabase.getDatabase()
         val map = HashMap<String, Any>()
-        map.put("title", diaryDto.title)
-        map.put("content", diaryDto.content)
-        map.put("author", diaryDto.author)
-        map.put("date", diaryDto.date)
-        Log.d(TAG,"AppRepository - map : ${map}")
+        map["title"] = diaryDto.title
+        map["content"] = diaryDto.content
+        map["author"] = diaryDto.author
+        map["date"] = diaryDto.date
+        Log.d(TAG,"AppRepository - map : $map")
         firebaseDatabase.child("Diary/${diaryDto.dno}").updateChildren(map).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Log.d(TAG,"AppRepository - 글 수정 성공")
@@ -124,6 +130,7 @@ class AppRepository(val application: Application) {
     fun register(userDto: UserDto) {
         Log.d(TAG,"AppRepository - register() called")
         firebaseAuth.createUserWithEmailAndPassword(userDto.email, userDto.password).addOnCompleteListener(ContextCompat.getMainExecutor(application.applicationContext)) { task ->
+            Log.d(TAG,"AppRepository - register task.isSuccessful : ${task.isSuccessful}")
             if (task.isSuccessful) {
                 val key = RealTimeDatabase.getDatabase().child("Users").push().key
                 RealTimeDatabase.getDatabase().child("Users/${key}").setValue(userDto)
@@ -138,6 +145,7 @@ class AppRepository(val application: Application) {
     fun login(email: String, password: String) {
         Log.d(TAG,"AppRepository - login() called")
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task ->
+            Log.d(TAG,"AppRepository - register task.isSuccessful : ${task.isSuccessful}")
             _userLiveData.postValue(firebaseAuth.currentUser)
         }
     }
@@ -152,12 +160,12 @@ class AppRepository(val application: Application) {
                 val map = mutableMapOf<String, String>()
                 snapshot?.children?.forEach { it ->
                     it.children.forEach { children ->
-                        map.put(children.key!!, children.value.toString())
+                        map[children.key!!] = children.value.toString()
                     }
                 }
-                val userName = map.get("name")
-                val userEmail = map.get("email")
-                val userId = map.get("id")
+                val userName = map["name"]
+                val userEmail = map["email"]
+                val userId = map["id"]
                 Log.d(TAG,"AppRepository - userName : $userName\nuserEmail : $userEmail\nuserId : $userId")
 
                 if (userName.equals(name) && userEmail.equals(email)) {
@@ -173,7 +181,7 @@ class AppRepository(val application: Application) {
     fun deleteDiary(dno: String) {
         Log.d(TAG,"AppRepository - deleteDiary() called")
         RealTimeDatabase.getDatabase().child("Diary").child(dno).removeValue().addOnCompleteListener { task ->
-            Log.d(TAG,"AppRepository - task.isSueccessful : ${task.isSuccessful}")
+            Log.d(TAG,"AppRepository - task.isSuccessful : ${task.isSuccessful}")
             _diaryLiveData.postValue(null)
         }
     }

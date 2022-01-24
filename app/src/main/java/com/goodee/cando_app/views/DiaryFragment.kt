@@ -32,7 +32,6 @@ class DiaryFragment : Fragment() {
         override fun handleOnBackPressed() {
             if (backPressedTime != null && backPressedTime!! + 2000 > System.currentTimeMillis()) requireActivity().finish()
             else Toast.makeText(requireActivity(),"앱 종료를 원하시면 뒤로 가기 버튼을 눌러주세요.", Toast.LENGTH_SHORT).show()
-
             backPressedTime = System.currentTimeMillis()
         }
     }}
@@ -56,12 +55,9 @@ class DiaryFragment : Fragment() {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         diaryViewModel.getDiaryList()
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner, Observer { it ->
+        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner, Observer { listOfDiaryDto ->
             Log.d(TAG,"DiaryFragment - Data is changed.")
-            if (it != null) {
-                setRecyclerView(diaryViewModel.diaryListLiveData)
-
-            }
+            if (listOfDiaryDto != null) setRecyclerView(diaryViewModel.diaryListLiveData)
         })
         setEvent()
         setHasOptionsMenu(true)
@@ -103,6 +99,7 @@ class DiaryFragment : Fragment() {
         binding.recyclerviewDiaryDiarylist.addOnScrollListener(
             object: RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    // When the scroll has arrived bottom of Entire scroll.
                     if (!binding.recyclerviewDiaryDiarylist.canScrollVertically(1)) {
                         Toast.makeText(requireActivity(), "Bottom",Toast.LENGTH_SHORT).show()
                     }
