@@ -2,6 +2,7 @@ package com.goodee.cando_app.views
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
@@ -13,6 +14,7 @@ import com.google.firebase.ktx.initialize
 class MainActivity : AppCompatActivity() {
     private val TAG: String = "로그"
     private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"MainActivity - onCreate() called")
         super.onCreate(savedInstanceState)

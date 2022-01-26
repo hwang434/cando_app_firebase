@@ -5,11 +5,12 @@
     <item
         android:id="@+id/item_menu_myinfo"
         android:enabled="true"
-        android:icon="@drawable/common_google_signin_btn_icon_dark_focused"
-        android:title="first"/>
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="내 정보"
+        />
     <item
         android:id="@+id/item_menu_signout"
         android:enabled="true"
-        android:icon="@drawable/common_google_signin_btn_icon_dark_focused"
-        android:title="logout"/>
+        android:icon="@drawable/googleg_disabled_color_18"
+        android:title="로그아웃"/>
 </menu>
