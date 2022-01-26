@@ -7,12 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindIdBinding
 import com.goodee.cando_app.viewmodel.UserViewModel
 
 class FindIdFragment : Fragment() {
     private lateinit var binding: FragmentFindIdBinding
+    private val userViewModel by lazy {
+        ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return UserViewModel(requireActivity().application) as T
+            }
+        }).get(UserViewModel::class.java)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -33,7 +43,6 @@ class FindIdFragment : Fragment() {
             } else if (name.isNullOrEmpty() || name.isBlank()) {
                 Toast.makeText(requireActivity(), "이름을 입력해주세요", Toast.LENGTH_SHORT).show()
             } else {
-                val userViewModel = UserViewModel(requireActivity().application)
                 userViewModel.findUserId(email = email, name = name)
             }
         }

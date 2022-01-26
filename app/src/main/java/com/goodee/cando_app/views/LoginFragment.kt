@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
@@ -15,19 +17,28 @@ import com.goodee.cando_app.databinding.FragmentLoginBinding
 import com.goodee.cando_app.listener.SingleClickListner
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 class LoginFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var binding: FragmentLoginBinding
-    private lateinit var userViewModel: UserViewModel
-    private lateinit var auth: FirebaseAuth
+    private val userViewModel: UserViewModel by lazy {
+        ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return UserViewModel(requireActivity().application) as T
+            }
+        }).get(UserViewModel::class.java)
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // Authenticate with Firebase
-        auth = Firebase.auth
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG,"LoginFragment - userViewModel : ${userViewModel.userLiveData.value}")
+        val firebaseAuth = FirebaseAuth.getInstance()
+        val currentUser = firebaseAuth.currentUser
+
+        // if current user is signed in update UI
+        currentUser?.let {
+            findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
+        }
     }
 
     override fun onCreateView(
@@ -36,7 +47,6 @@ class LoginFragment : Fragment() {
     ): View? {
         Log.d(TAG,"LoginFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
-        userViewModel = UserViewModel(requireActivity().application)
         userViewModel.userLiveData.observe(viewLifecycleOwner, { firebaseUser ->
             if (firebaseUser == null) Toast.makeText(requireContext(), "로그인 실패", Toast.LENGTH_SHORT).show()
             else findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
@@ -45,16 +55,6 @@ class LoginFragment : Fragment() {
         setEvent()
 
         return binding.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val currentUser = auth.currentUser
-
-        // if current user is signed in update UI
-        if (currentUser != null) {
-            findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
-        }
     }
 
     private fun setEvent() {
@@ -99,12 +99,13 @@ class LoginFragment : Fragment() {
         })
 
         // 키보드 엔터 누르면 클릭 이벤트 실행
-        binding.edittextLoginPasswordinput.setOnKeyListener { v, keyCode, event ->
+        binding.edittextLoginPasswordinput.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
                 binding.edittextLoginPasswordinput.callOnClick()
                 true
+            } else {
+                false
             }
-            false
         }
     }
 }

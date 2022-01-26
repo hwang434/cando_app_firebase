@@ -8,11 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryViewBinding
 import com.goodee.cando_app.viewmodel.DiaryViewModel
+import com.goodee.cando_app.viewmodel.UserViewModel
 
 class DiaryViewFragment : Fragment() {
     private val TAG: String = "로그"
@@ -21,15 +23,18 @@ class DiaryViewFragment : Fragment() {
     private val diaryViewModel: DiaryViewModel by lazy {
         ViewModelProvider(this).get(DiaryViewModel::class.java)
     }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Log.d(TAG,"DiaryViewFragment - onAttach() called")
+    private val userViewModel by lazy {
+        ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return UserViewModel(requireActivity().application) as T
+            }
+        }).get(UserViewModel::class.java)
     }
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG,"DiaryViewFragment - onCreate() called\n arguments : ${arguments.toString()}")
+        Log.d(TAG,"DiaryViewFragment - userViewModel : ${userViewModel.userLiveData.value}")
         dno = arguments?.get("dno").toString()
         diaryViewModel.getDiary(dno)
     }
@@ -52,31 +57,6 @@ class DiaryViewFragment : Fragment() {
         setEvent()
 
         return binding.root
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d(TAG,"DiaryViewFragment - onPause() called")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG,"DiaryViewFragment - onStop() called")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Log.d(TAG,"DiaryViewFragment - onDestroyView() called")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG,"DiaryViewFragment - onDestroy() called")
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        Log.d(TAG,"DiaryViewFragment - onDetach() called")
     }
 
     private fun setEvent() {

@@ -6,20 +6,33 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentMemberWithdrawBinding
+import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.*
+import java.util.ArrayList
 
 class MemberWithdrawFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var binding: FragmentMemberWithdrawBinding
+    private val userViewModel: UserViewModel by lazy {
+        ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return UserViewModel(requireActivity().application) as T
+            }
+        }).get(UserViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
     }
 
     override fun onCreateView(
@@ -35,42 +48,14 @@ class MemberWithdrawFragment : Fragment() {
     private fun setEvent() {
         Log.d(TAG,"MemberWithdrawFragment - setEvent() called")
         binding.buttonMemberwithdrawWithdrawbutton.setOnClickListener {
-            withdrawMember()
+            val password = binding.edittextMemberwithdrawPasswordinput.text.toString()
+            userViewModel.userLiveData.value?.email?.let { email -> withdrawMember(email, password) }
         }
     }
 
     // 회원 삭제
-    private fun withdrawMember() {
+    private fun withdrawMember(email: String, password: String) {
         Log.d(TAG,"MemberWithdrawFragment - withdrawMember() called")
-        checkPassword()
+        userViewModel.withdrawUser(email, password)
     }
-
-    private fun checkPassword() {
-        Log.d(TAG,"MemberWithdrawFragment - checkPassword() called")
-        val firebaseAuth = FirebaseAuth.getInstance()
-        if (firebaseAuth.currentUser != null && !binding.edittextMemberwithdrawPasswordinput.text.isNullOrBlank() && !binding.edittextMemberwithdrawPasswordinput.text.isEmpty()) {
-            firebaseAuth.signInWithEmailAndPassword(firebaseAuth.currentUser!!.email!!, binding.edittextMemberwithdrawPasswordinput.text.toString()).addOnCompleteListener { it ->
-                if (it.isSuccessful) {
-                    deleteUser()
-                }
-            }
-        }
-    }
-
-    private fun deleteUser(): Boolean {
-        val firebaseAuth = FirebaseAuth.getInstance()
-        firebaseAuth.currentUser!!.delete().addOnCompleteListener {
-            if (it.isSuccessful) {
-                Log.d(TAG,"MemberWithdrawFragment - deleteUser() 회원 탈퇴 성공")
-                Toast.makeText(requireContext(), "회원 탈퇴 성공", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_memberWithdrawFragment_to_mainFragment)
-            } else {
-                Log.d(TAG,"MemberWithdrawFragment - deleteUser() 회원 탈퇴 실패")
-                Toast.makeText(requireContext(), "회원 탈퇴 실패", Toast.LENGTH_SHORT).show()
-            }
-        }
-        return true
-    }
-
-
 }

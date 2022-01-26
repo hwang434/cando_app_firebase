@@ -11,6 +11,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
@@ -26,7 +28,13 @@ class registerFragment : Fragment() {
     private var isExistId = false
     private lateinit var binding: FragmentRegisterBinding
     private lateinit var auth: FirebaseAuth
-    private lateinit var userViewModel: UserViewModel
+    private val userViewModel by lazy {
+        ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return UserViewModel(requireActivity().application) as T
+            }
+        }).get(UserViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"registerFragment - onCreate() called")
@@ -42,7 +50,6 @@ class registerFragment : Fragment() {
         Log.d(TAG,"registerFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        userViewModel = UserViewModel(requireActivity().application)
         userViewModel.userLiveData.observe(viewLifecycleOwner, Observer { firebaseUser ->
             if (firebaseUser == null) Toast.makeText(requireContext(), "회원가입 실패", Toast.LENGTH_SHORT).show()
             else findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
@@ -96,9 +103,9 @@ class registerFragment : Fragment() {
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edittextRegisterEmailinput,0)
             } else {
-                if (isExistId == true) {
+                if (isExistId) {
                     Toast.makeText(requireActivity(), "이미 존재하는 이메일입니다.",Toast.LENGTH_LONG).show()
-                } else if (!isExistId ) {
+                } else {
                     Toast.makeText(requireActivity(), "사용하셔도 좋은 이메일입니다.", Toast.LENGTH_SHORT).show()
                     // 중복 체크 완료됐다는 로직이 들어가야함.
                 }
