@@ -8,11 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentMainBinding
+import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -27,11 +30,19 @@ class MainFragment : Fragment() {
         auth = Firebase.auth
 
         // 로그인 상태면 바로 다이어리 화면으로 이동
-        if (auth.currentUser != null) {
-            Toast.makeText(requireActivity(), "${auth.currentUser!!.email}님 환영합니다.",Toast.LENGTH_SHORT).show()
+        auth.currentUser?.let { user ->
+            var userViewModel = ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
+                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                    return UserViewModel(requireActivity().application) as T
+                }
+            }).get(UserViewModel::class.java)
+            userViewModel.autoLogin(user)
+
+            Toast.makeText(requireActivity(), "${user.email}님 환영합니다.",Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_mainFragment_to_diaryFragment)
         }
     }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
         Log.d(TAG,"MainFragment - onCreateView() called")
         binding = DataBindingUtil.inflate<FragmentMainBinding>(inflater,R.layout.fragment_main,container,false)
