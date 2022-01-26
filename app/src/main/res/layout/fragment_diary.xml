@@ -14,22 +14,22 @@
             android:layout_height="50dp"
             app:layout_constraintStart_toStartOf="@id/constraintlayout_diary_container"
             app:layout_constraintEnd_toEndOf="@id/constraintlayout_diary_container"
-            app:layout_constraintTop_toTopOf="@id/constraintlayout_diary_container">
+            app:layout_constraintTop_toTopOf="parent">
             <com.google.android.material.tabs.TabItem
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:text="new diary"/>
+                android:text="@string/diary_tabmenuname1"/>
             <com.google.android.material.tabs.TabItem
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:text="hot diary"/>
+                android:text="@string/diary_tabmenuname2"/>
         </com.google.android.material.tabs.TabLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_diary_diarylist"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/bottomnavigation_diary_bottommenu"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tablayout_diary_tabmenu" />
@@ -39,16 +39,10 @@
             android:layout_width="90dp"
             android:layout_height="0dp"
             android:layout_margin="20dp"
-            android:contentDescription="write diary"
+            android:contentDescription="@string/diary_writebutton"
             android:background="@color/white"
             android:src="@android:drawable/ic_input_add"
-            app:layout_constraintBottom_toTopOf="@id/bottomnavigation_diary_bottommenu"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/constraintlayout_diary_container" />
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottomnavigation_diary_bottommenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:menu="@menu/member_layout"
-            app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

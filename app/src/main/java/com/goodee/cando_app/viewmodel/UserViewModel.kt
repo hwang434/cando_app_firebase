@@ -6,20 +6,22 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.UserDto
-import com.goodee.cando_app.model.AppRepository
+import com.goodee.cando_app.model.UserRepository
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.ktx.Firebase
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
     private val TAG: String = "로그"
-    private var appRepository: AppRepository
+    private var userRepository: UserRepository
     private val _userLiveData: MutableLiveData<FirebaseUser>
     val userLiveData: LiveData<FirebaseUser>
         get() = _userLiveData
     
     init {
         Log.d(TAG,"UserViewModel - init called")
-        appRepository = AppRepository(application)
-        _userLiveData = appRepository.userLiveData as MutableLiveData<FirebaseUser>
+        userRepository = UserRepository(application)
+        _userLiveData = userRepository.userLiveData as MutableLiveData<FirebaseUser>
     }
 
     override fun onCleared() {
@@ -28,25 +30,40 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 회원가입
-    fun register(userDto: UserDto) {
+    fun register(userDto: UserDto, password: String) {
         Log.d(TAG,"User - register() called")
-        appRepository.register(userDto)
+        userRepository.register(userDto, password)
     }
 
     // 로그인
     fun login(email: String, password: String) {
         Log.d(TAG,"User - login() called")
-        appRepository.login(email, password)
+        userRepository.login(email, password)
     }
 
     // 아이디 찾기
     fun findUserId(name: String, email: String) {
         Log.d(TAG,"UserViewModel - findUserId() called")
-        appRepository.findUserId(name, email)
+        userRepository.findUserId(name, email)
     }
     
     // 비밀번호 찾기
-    fun findUserPassword(id: String, email: String) {
+    fun findUserPassword(email: String) {
         Log.d(TAG,"UserViewModel - findUserPassword() called")
+    }
+    
+    // 중복 회원 찾기
+    fun isExistEmail(email: String) {
+        Log.d(TAG,"UserViewModel - isExistEmail() called")
+    }
+
+    // 회원 삭제
+    fun withdrawUser(email: String, password: String) {
+        Log.d(TAG,"UserViewModel - withdrawUser() called")
+    }
+
+    // 중복 로그인 처리
+    fun autoLogin(firebaseUser: FirebaseUser) {
+        _userLiveData.postValue(firebaseUser)
     }
 }

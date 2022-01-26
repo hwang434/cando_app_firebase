@@ -1,5 +1,6 @@
 package com.goodee.cando_app.views
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -7,11 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryViewBinding
 import com.goodee.cando_app.viewmodel.DiaryViewModel
+import com.goodee.cando_app.viewmodel.UserViewModel
 
 class DiaryViewFragment : Fragment() {
     private val TAG: String = "로그"
@@ -20,10 +23,18 @@ class DiaryViewFragment : Fragment() {
     private val diaryViewModel: DiaryViewModel by lazy {
         ViewModelProvider(this).get(DiaryViewModel::class.java)
     }
+    private val userViewModel by lazy {
+        ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return UserViewModel(requireActivity().application) as T
+            }
+        }).get(UserViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG,"DiaryViewFragment - onCreate() called\n arguments : ${arguments.toString()}")
+        Log.d(TAG,"DiaryViewFragment - userViewModel : ${userViewModel.userLiveData.value}")
         dno = arguments?.get("dno").toString()
         diaryViewModel.getDiary(dno)
     }
@@ -38,9 +49,9 @@ class DiaryViewFragment : Fragment() {
         diaryViewModel.diaryLiveData.observe(viewLifecycleOwner, { diaryDto ->
             Log.d(TAG,"DiaryViewFragment - diaryLivedata change")
             if (diaryDto != null) {
-                binding.textviewDiaryviewTitleview.text = diaryDto.title
+                binding.textviewDiaryviewTitleview.text = "제목 : "+diaryDto.title
                 binding.textviewDiaryviewContentview.text = diaryDto.content
-                binding.textviewDiaryviewAuthorview.text = diaryDto.author
+                binding.textviewDiaryviewAuthorview.text = "작성자 : "+diaryDto.author
             }
         })
         setEvent()

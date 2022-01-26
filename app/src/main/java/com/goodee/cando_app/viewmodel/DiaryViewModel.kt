@@ -6,11 +6,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.DiaryDto
-import com.goodee.cando_app.model.AppRepository
+import com.goodee.cando_app.model.DiaryRepository
+import com.goodee.cando_app.model.UserRepository
 
 class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     private val TAG: String = "로그"
-    private var appRepository: AppRepository
+    private var appRepository: DiaryRepository
     private val _diaryListLiveData: MutableLiveData<List<DiaryDto>>
     val diaryListLiveData: LiveData<List<DiaryDto>>
         get() = _diaryListLiveData
@@ -20,7 +21,7 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         Log.d(TAG,"DiaryViewModel - init called")
-        appRepository = AppRepository(application)
+        appRepository = DiaryRepository(application)
         _diaryListLiveData = appRepository.diaryListLiveData as MutableLiveData<List<DiaryDto>>
         _diaryLiveData = appRepository.diaryLiveData as MutableLiveData<DiaryDto>
     }

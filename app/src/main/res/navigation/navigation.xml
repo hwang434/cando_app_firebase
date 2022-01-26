@@ -61,6 +61,9 @@
         <action
             android:id="@+id/action_diaryFragment_to_diaryViewFragment"
             app:destination="@id/diaryViewFragment" />
+        <action
+            android:id="@+id/action_diaryFragment_to_memberWithdrawFragment"
+            app:destination="@id/memberWithdrawFragment" />
     </fragment>
     <fragment
         android:id="@+id/findMember"
@@ -98,5 +101,13 @@
         <action
             android:id="@+id/action_diaryViewFragment_to_diaryFragment"
             app:destination="@id/diaryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/memberWithdrawFragment"
+        android:name="com.goodee.cando_app.views.MemberWithdrawFragment"
+        android:label="MemberWithdrawFragment" >
+        <action
+            android:id="@+id/action_memberWithdrawFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
     </fragment>
 </navigation>

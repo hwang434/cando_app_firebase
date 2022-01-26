@@ -41,5 +41,8 @@
     <!--  DiaryView  -->
     <string name="diaryview_editbutton">Edit</string>
     <string name="diaryview_deletebutton">Delete</string>
-
+    <!-- DiaryWrite -->
+    <string name="diary_writebutton">write diary</string>
+    <string name="diary_tabmenuname1">new diary</string>
+    <string name="diary_tabmenuname2">hot diary</string>
 </resources>
