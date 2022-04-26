@@ -72,20 +72,18 @@ class LoginFragment : Fragment() {
         binding.buttonLoginLoginbutton.setOnClickListener(object: SingleClickListner() {
             override fun onSingleClick(view: View?) {
                 Log.d(TAG,"LoginFragment - loginButton is activated")
-                val imm: InputMethodManager?
+                val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
                 // 아이디가 비었거나 Blank거나 null일 때
                 if (binding.edittextLoginEmailinput.text.isNullOrBlank() || binding.edittextLoginEmailinput.text.isEmpty()) {
-                    Toast.makeText(requireActivity(),"아이디를 확인해주세요.",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity(),getString(R.string.toast_id_check),Toast.LENGTH_SHORT).show()
 
                     binding.edittextLoginEmailinput.requestFocus()
-                    imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.showSoftInput(binding.edittextLoginEmailinput,0)
                 } else if (binding.edittextLoginPasswordinput.text.isNullOrBlank() || binding.edittextLoginPasswordinput.text.isEmpty()) {
-                    Toast.makeText(requireActivity(),"비밀번호를 확인해주세요.",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity(),getString(R.string.toast_check_password),Toast.LENGTH_SHORT).show()
 
                     binding.edittextLoginPasswordinput.requestFocus()
-                    imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.showSoftInput(binding.edittextLoginPasswordinput,0)
                 } else {
                     // 정규식을 만족했으므로 존재하는 데이터인지 확인.

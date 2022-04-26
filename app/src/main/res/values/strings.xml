@@ -45,4 +45,6 @@
     <string name="diary_writebutton">write diary</string>
     <string name="diary_tabmenuname1">new diary</string>
     <string name="diary_tabmenuname2">hot diary</string>
+    <string name="toast_id_check">아이디를 확인해주세요.</string>
+    <string name="toast_check_password">비밀번호를 확인해주세요.</string>
 </resources>
