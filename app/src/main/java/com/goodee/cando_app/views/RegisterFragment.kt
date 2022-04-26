@@ -49,10 +49,13 @@ class RegisterFragment : Fragment() {
         Log.d(TAG,"registerFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        userViewModel.userLiveData.observe(viewLifecycleOwner, { firebaseUser ->
-            if (firebaseUser == null) Toast.makeText(requireContext(), "회원가입 실패", Toast.LENGTH_SHORT).show()
-            else findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
-        })
+        userViewModel.userLiveData.observe(viewLifecycleOwner) { firebaseUser ->
+            if (firebaseUser == null) {
+                Toast.makeText(requireContext(), "회원가입 실패", Toast.LENGTH_SHORT).show()
+            } else {
+                findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
+            }
+        }
         setEvent()
 
         return binding.root
@@ -62,16 +65,16 @@ class RegisterFragment : Fragment() {
         // 회원가입과 정규식 처리
         binding.buttonRegisterRegisterbutton.setOnClickListener {
             var emptyView: View? = null
-            if (binding.edittextRegisterEmailinput.text.isNullOrEmpty() || binding.edittextRegisterEmailinput.text.isBlank()) {
+            if (binding.edittextRegisterEmailinput.text.isEmpty() || binding.edittextRegisterEmailinput.text.isBlank()) {
                 Toast.makeText(requireActivity(),"이메일을 확인해주세요",Toast.LENGTH_SHORT).show()
                 emptyView = binding.edittextRegisterEmailinput
-            } else if (binding.edittextRegisterPasswordinput.text.isNullOrEmpty() || binding.edittextRegisterPasswordinput.text.isBlank()) {
+            } else if (binding.edittextRegisterPasswordinput.text.isEmpty() || binding.edittextRegisterPasswordinput.text.isBlank()) {
                 Toast.makeText(requireActivity(),"비밀번호를 확인해주세요",Toast.LENGTH_SHORT).show()
                 emptyView = binding.edittextRegisterPasswordinput
-            } else if (binding.edittextRegisterPasswordcheckinput.text.isNullOrEmpty() || binding.edittextRegisterPasswordcheckinput.text.isBlank()) {
+            } else if (binding.edittextRegisterPasswordcheckinput.text.isEmpty() || binding.edittextRegisterPasswordcheckinput.text.isBlank()) {
                 Toast.makeText(requireActivity(),"비밀번호 확인 칸을 확인해주세요",Toast.LENGTH_SHORT).show()
                 emptyView = binding.edittextRegisterPasswordcheckinput
-            } else if (!binding.edittextRegisterPasswordinput.text.toString().equals(binding.edittextRegisterPasswordinput.text.toString())) {
+            } else if (binding.edittextRegisterPasswordinput.text.toString() != binding.edittextRegisterPasswordinput.text.toString()) {
                 Toast.makeText(requireActivity(),"입력하신 비밀번호가 일치하지 않습니다",Toast.LENGTH_SHORT).show()
                 emptyView = binding.edittextRegisterPasswordinput
             } else {

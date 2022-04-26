@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import com.goodee.cando_app.R
 
 
+// CanDo 로고가 있는 헤더
 class HeaderFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
