@@ -35,8 +35,8 @@
     <string name="findpassword_emailcheckinput">인증번호를 입력하세요</string>
     <string name="findpassword_emailbutton">확인</string>
     <!-- Register   -->
-    <string name="register_phonehint">휴대폰 번호</string>
-    <string name="register_registerbutton">회원가입</string>
+    <string name="register_phonehint">010-0000-0000</string>
+    <string name="register_register_button">회원가입</string>
     <string name="register_duplicatecheckbutton">중복</string>
     <!--  DiaryView  -->
     <string name="diaryview_editbutton">Edit</string>
@@ -47,4 +47,6 @@
     <string name="diary_tabmenuname2">hot diary</string>
     <string name="toast_id_check">아이디를 확인해주세요.</string>
     <string name="toast_check_password">비밀번호를 확인해주세요.</string>
+    <string name="edittext_register_name_input">이름을 입력해주세요.</string>
+    <string name="textview_register_name_pointer">이름</string>
 </resources>
