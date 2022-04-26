@@ -17,13 +17,12 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
 import com.goodee.cando_app.dto.UserDto
-import com.goodee.cando_app.util.PasswordEncoder
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class registerFragment : Fragment() {
+class RegisterFragment : Fragment() {
     private val TAG: String = "로그"
     private var isExistId = false
     private lateinit var binding: FragmentRegisterBinding
@@ -50,7 +49,7 @@ class registerFragment : Fragment() {
         Log.d(TAG,"registerFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        userViewModel.userLiveData.observe(viewLifecycleOwner, Observer { firebaseUser ->
+        userViewModel.userLiveData.observe(viewLifecycleOwner, { firebaseUser ->
             if (firebaseUser == null) Toast.makeText(requireContext(), "회원가입 실패", Toast.LENGTH_SHORT).show()
             else findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
         })

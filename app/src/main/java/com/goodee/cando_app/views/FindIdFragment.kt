@@ -38,9 +38,9 @@ class FindIdFragment : Fragment() {
             val email = binding.edittextFindidEmailinput.text.toString()
             val name = binding.edittextFindidNameinput.text.toString()
 
-            if (email.isNullOrEmpty() || email.isBlank()) {
+            if (email.isEmpty() || email.isBlank()) {
                 Toast.makeText(requireActivity(), "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
-            } else if (name.isNullOrEmpty() || name.isBlank()) {
+            } else if (name.isEmpty() || name.isBlank()) {
                 Toast.makeText(requireActivity(), "이름을 입력해주세요", Toast.LENGTH_SHORT).show()
             } else {
                 userViewModel.findUserId(email = email, name = name)

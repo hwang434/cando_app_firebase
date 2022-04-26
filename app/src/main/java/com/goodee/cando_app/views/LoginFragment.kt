@@ -44,15 +44,20 @@ class LoginFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Log.d(TAG,"LoginFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
-        userViewModel.userLiveData.observe(viewLifecycleOwner, { firebaseUser ->
-            if (firebaseUser == null) Toast.makeText(requireContext(), "로그인 실패", Toast.LENGTH_SHORT).show()
-            else findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
-            binding.progressbarLoginLoading.visibility = View.INVISIBLE
-        })
         setEvent()
+
+        userViewModel.userLiveData.observe(viewLifecycleOwner) { firebaseUser ->
+            if (firebaseUser == null) {
+                Toast.makeText(requireContext(), "로그인 실패", Toast.LENGTH_SHORT).show()
+            } else {
+                findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
+            }
+
+            binding.progressbarLoginLoading.visibility = View.INVISIBLE
+        }
 
         return binding.root
     }
@@ -74,7 +79,6 @@ class LoginFragment : Fragment() {
                 Log.d(TAG,"LoginFragment - loginButton is activated")
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
-                // 아이디가 비었거나 Blank거나 null일 때
                 if (binding.edittextLoginEmailinput.text.isNullOrBlank() || binding.edittextLoginEmailinput.text.isEmpty()) {
                     Toast.makeText(requireActivity(),getString(R.string.toast_id_check),Toast.LENGTH_SHORT).show()
 
