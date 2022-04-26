@@ -30,9 +30,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 회원가입
-    fun register(userDto: UserDto, password: String) {
+    fun register(email: String, userDto: UserDto, password: String) {
         Log.d(TAG,"User - register() called")
-        userRepository.register(userDto, password)
+        userRepository.register(email, userDto, password)
     }
 
     // 로그인
@@ -53,8 +53,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
     
     // 중복 회원 찾기
-    fun isExistEmail(email: String) {
+    fun isExistEmail(email: String): Boolean {
         Log.d(TAG,"UserViewModel - isExistEmail() called")
+        return true
     }
 
     // 회원 삭제

@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -82,15 +81,17 @@ class RegisterFragment : Fragment() {
                     Toast.makeText(requireActivity(),getString(R.string.toast_check_password_not_same),Toast.LENGTH_SHORT).show()
                     emptyView = edittextRegisterPasswordinput
                 } else {
-                    if (isExistId) {
+                    if (userViewModel.isExistEmail(edittextRegisterEmailinput.text.toString())) {
                         Toast.makeText(requireActivity(), getString(R.string.toast_is_exist_email),Toast.LENGTH_LONG).show()
                     } else {
                         // 회원 가입 시키기
                         val email = edittextRegisterEmailinput.text.toString()
+                        val name = edittextRegisterNameInput.text.toString()
                         val password = edittextRegisterPasswordinput.text.toString().trim()
                         val phone = edittextPhoneInput.text.toString()
-                        val userDto = UserDto(email = email, phone = phone)
-                        userViewModel.register(userDto,password)
+
+                        val userDto = UserDto(name = name, phone = phone)
+                        userViewModel.register(email, userDto, password)
                     }
                 }
 

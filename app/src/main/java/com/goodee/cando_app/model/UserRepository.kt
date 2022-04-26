@@ -20,9 +20,9 @@ class UserRepository(val application: Application) {
         get() = _userLiveData
 
     // 회원가입
-    fun register(userDto: UserDto, password: String) {
+    fun register(email: String, userDto: UserDto, password: String) {
         Log.d(TAG,"AppRepository - register() called")
-        firebaseAuth.createUserWithEmailAndPassword(userDto.email, password).addOnCompleteListener(
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(
             ContextCompat.getMainExecutor(application.applicationContext)) { task ->
             Log.d(TAG,"AppRepository - register task.isSuccessful : ${task.isSuccessful}")
             if (task.isSuccessful) {
