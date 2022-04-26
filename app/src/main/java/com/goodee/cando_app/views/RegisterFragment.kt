@@ -51,7 +51,7 @@ class RegisterFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         userViewModel.userLiveData.observe(viewLifecycleOwner) { firebaseUser ->
             if (firebaseUser == null) {
-                Toast.makeText(requireContext(), "회원가입 실패", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_fail_regist), Toast.LENGTH_SHORT).show()
             } else {
                 findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
             }
@@ -63,52 +63,57 @@ class RegisterFragment : Fragment() {
 
     private fun setEvent() {
         // 회원가입과 정규식 처리
-        binding.buttonRegisterRegisterbutton.setOnClickListener {
-            var emptyView: View? = null
-            if (binding.edittextRegisterEmailinput.text.isEmpty() || binding.edittextRegisterEmailinput.text.isBlank()) {
-                Toast.makeText(requireActivity(),"이메일을 확인해주세요",Toast.LENGTH_SHORT).show()
-                emptyView = binding.edittextRegisterEmailinput
-            } else if (binding.edittextRegisterPasswordinput.text.isEmpty() || binding.edittextRegisterPasswordinput.text.isBlank()) {
-                Toast.makeText(requireActivity(),"비밀번호를 확인해주세요",Toast.LENGTH_SHORT).show()
-                emptyView = binding.edittextRegisterPasswordinput
-            } else if (binding.edittextRegisterPasswordcheckinput.text.isEmpty() || binding.edittextRegisterPasswordcheckinput.text.isBlank()) {
-                Toast.makeText(requireActivity(),"비밀번호 확인 칸을 확인해주세요",Toast.LENGTH_SHORT).show()
-                emptyView = binding.edittextRegisterPasswordcheckinput
-            } else if (binding.edittextRegisterPasswordinput.text.toString() != binding.edittextRegisterPasswordinput.text.toString()) {
-                Toast.makeText(requireActivity(),"입력하신 비밀번호가 일치하지 않습니다",Toast.LENGTH_SHORT).show()
-                emptyView = binding.edittextRegisterPasswordinput
-            } else {
-                if (isExistId) {
-                    Toast.makeText(requireActivity(), "이미 존재하는 아이디입니다.",Toast.LENGTH_LONG).show()
+        binding.buttonRegisterRegisterButton.setOnClickListener {
+            binding.run {
+                var emptyView: View? = null
+                if (edittextRegisterEmailinput.text.isEmpty() || edittextRegisterEmailinput.text.isBlank()) {
+                    Toast.makeText(requireActivity(),getString(R.string.register_emailinput),Toast.LENGTH_SHORT).show()
+                    emptyView = edittextRegisterEmailinput
+                } else if (edittextRegisterNameInput.text.isEmpty() || edittextRegisterNameInput.text.isBlank()) {
+                    Toast.makeText(requireActivity(),getString(R.string.register_nameinput),Toast.LENGTH_SHORT).show()
+                    emptyView = edittextRegisterNameInput
+                } else if (edittextRegisterPasswordinput.text.isEmpty() || edittextRegisterPasswordinput.text.isBlank()) {
+                    Toast.makeText(requireActivity(),getString(R.string.toast_check_password),Toast.LENGTH_SHORT).show()
+                    emptyView = edittextRegisterPasswordinput
+                } else if (edittextRegisterPasswordcheckinput.text.isEmpty() || edittextRegisterPasswordcheckinput.text.isBlank()) {
+                    Toast.makeText(requireActivity(),getString(R.string.toast_check_recheck),Toast.LENGTH_SHORT).show()
+                    emptyView = edittextRegisterPasswordcheckinput
+                } else if (edittextRegisterPasswordinput.text.toString() != edittextRegisterPasswordinput.text.toString()) {
+                    Toast.makeText(requireActivity(),getString(R.string.toast_check_password_not_same),Toast.LENGTH_SHORT).show()
+                    emptyView = edittextRegisterPasswordinput
                 } else {
-                    // 회원 가입 시키기
-                    val email = binding.edittextRegisterEmailinput.text.toString()
-                    val password = binding.edittextRegisterPasswordinput.text.toString().trim()
-                    val phone = binding.edittextPhonePhoneinput.text.toString()
-                    val userDto = UserDto(email = email, phone = phone)
-                    userViewModel.register(userDto,password)
+                    if (isExistId) {
+                        Toast.makeText(requireActivity(), getString(R.string.toast_is_exist_email),Toast.LENGTH_LONG).show()
+                    } else {
+                        // 회원 가입 시키기
+                        val email = edittextRegisterEmailinput.text.toString()
+                        val password = edittextRegisterPasswordinput.text.toString().trim()
+                        val phone = edittextPhoneInput.text.toString()
+                        val userDto = UserDto(email = email, phone = phone)
+                        userViewModel.register(userDto,password)
+                    }
                 }
-            }
 
-            if (emptyView != null) {
-                emptyView.requestFocus()
-                val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(emptyView, 0)
+                if (emptyView != null) {
+                    emptyView.requestFocus()
+                    val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.showSoftInput(emptyView, 0)
+                }
             }
         }
 
         // 아이디 중복 확인
         binding.buttonRegisterDuplicatecheck.setOnClickListener {
             if (binding.edittextRegisterEmailinput.text.isNullOrBlank() || binding.edittextRegisterEmailinput.text.isEmpty()) {
-                Toast.makeText(requireActivity(),"이메일을 확인해주세요.",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity(),getString(R.string.toast_check_email),Toast.LENGTH_SHORT).show()
                 binding.edittextRegisterEmailinput.requestFocus()
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edittextRegisterEmailinput,0)
             } else {
                 if (isExistId) {
-                    Toast.makeText(requireActivity(), "이미 존재하는 이메일입니다.",Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity(), getString(R.string.toast_is_exist_email),Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(requireActivity(), "사용하셔도 좋은 이메일입니다.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity(), getString(R.string.toast_can_use_email), Toast.LENGTH_SHORT).show()
                     // 중복 체크 완료됐다는 로직이 들어가야함.
                 }
             }
