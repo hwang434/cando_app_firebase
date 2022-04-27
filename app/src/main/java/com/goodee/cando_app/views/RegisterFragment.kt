@@ -52,6 +52,7 @@ class RegisterFragment : Fragment() {
             if (firebaseUser == null) {
                 Toast.makeText(requireContext(), getString(R.string.toast_fail_regist), Toast.LENGTH_SHORT).show()
             } else {
+                Log.d(TAG,"RegisterFragment - ${firebaseUser.email}")
                 findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
             }
         }

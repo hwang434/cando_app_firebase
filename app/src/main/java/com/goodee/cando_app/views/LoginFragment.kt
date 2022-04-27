@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -17,6 +18,7 @@ import com.goodee.cando_app.databinding.FragmentLoginBinding
 import com.goodee.cando_app.listener.SingleClickListner
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class LoginFragment : Fragment() {
     private val TAG: String = "로그"
@@ -29,14 +31,24 @@ class LoginFragment : Fragment() {
         }).get(UserViewModel::class.java)
     }
 
+    val observer = Observer<FirebaseUser> { firebaseUser ->
+        when (firebaseUser) {
+            null -> Toast.makeText(requireActivity(), "로그인 실패", Toast.LENGTH_SHORT).show()
+            else -> findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
+        }
+
+        binding.progressbarLoginLoading.visibility = View.INVISIBLE
+    }
+
     override fun onStart() {
         super.onStart()
-        Log.d(TAG,"LoginFragment - userViewModel : ${userViewModel.userLiveData.value}")
+        Log.d(TAG,"LoginFragment - onStart() called")
         val firebaseAuth = FirebaseAuth.getInstance()
         val currentUser = firebaseAuth.currentUser
 
         // if current user is signed in update UI
         currentUser?.let {
+            Log.d(TAG,"LoginFragment - ${currentUser}")
             findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
         }
     }
@@ -48,16 +60,6 @@ class LoginFragment : Fragment() {
         Log.d(TAG,"LoginFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login,container, false)
         setEvent()
-
-        userViewModel.userLiveData.observe(viewLifecycleOwner) { firebaseUser ->
-            if (firebaseUser == null) {
-                Toast.makeText(requireContext(), "로그인 실패", Toast.LENGTH_SHORT).show()
-            } else {
-                findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
-            }
-
-            binding.progressbarLoginLoading.visibility = View.INVISIBLE
-        }
 
         return binding.root
     }
@@ -95,6 +97,9 @@ class LoginFragment : Fragment() {
                     val email = binding.edittextLoginEmailinput.text.toString()
                     val password = binding.edittextLoginPasswordinput.text.toString()
 
+                    if (!userViewModel.userLiveData.hasObservers()) {
+                        userViewModel.userLiveData.observe(viewLifecycleOwner, observer)
+                    }
                     userViewModel.login(email, password)
                 }
             }
@@ -109,5 +114,11 @@ class LoginFragment : Fragment() {
                 false
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG,"LoginFragment - onDestroy() called")
+        userViewModel.userLiveData.removeObserver(observer)
     }
 }

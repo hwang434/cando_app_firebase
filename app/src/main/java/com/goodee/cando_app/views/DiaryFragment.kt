@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +19,7 @@ import com.goodee.cando_app.adapter.DiaryRecyclerViewAdapter
 import com.goodee.cando_app.databinding.FragmentDiaryBinding
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.viewmodel.DiaryViewModel
+import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -40,7 +42,13 @@ class DiaryFragment : Fragment() {
                     "${Firebase.auth.currentUser?.email}님 안녕히 가세요.",
                     Toast.LENGTH_SHORT
                 ).show()
-                Firebase.auth.signOut()
+                val userViewModel = ViewModelProvider(requireActivity(), object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                        return UserViewModel(requireActivity().application) as T
+                    }
+                }).get(UserViewModel::class.java)
+                userViewModel.signOut()
+
                 findNavController().navigate(R.id.action_diaryFragment_to_mainFragment)
                 return true
             }

@@ -9,6 +9,7 @@ import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.model.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
@@ -66,5 +67,11 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     // 중복 로그인 처리
     fun autoLogin(firebaseUser: FirebaseUser) {
         _userLiveData.postValue(firebaseUser)
+    }
+
+    // 로그 아웃
+    fun signOut() {
+        Firebase.auth.signOut()
+        _userLiveData.postValue(null)
     }
 }
