@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.model.UserRepository
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -56,6 +55,7 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     // 중복 회원 찾기
     fun isExistEmail(email: String): Boolean {
         Log.d(TAG,"UserViewModel - isExistEmail() called")
+        userRepository.isExistEmail(email)
         return true
     }
 

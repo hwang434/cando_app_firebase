@@ -14,7 +14,6 @@ import com.google.firebase.auth.FirebaseUser
 class UserRepository(val application: Application) {
     private val TAG: String = "로그"
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-
     private val _userLiveData: MutableLiveData<FirebaseUser> = MutableLiveData()
     val userLiveData: LiveData<FirebaseUser>
         get() = _userLiveData
@@ -39,7 +38,10 @@ class UserRepository(val application: Application) {
         Log.d(TAG,"AppRepository - login() called")
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task ->
             Log.d(TAG,"AppRepository - register task.isSuccessful : ${task.isSuccessful}")
-            _userLiveData.postValue(firebaseAuth.currentUser)
+            when (task.isSuccessful) {
+                true -> _userLiveData.postValue(firebaseAuth.currentUser)
+                false -> _userLiveData.postValue(null)
+            }
         }
     }
 
@@ -67,6 +69,14 @@ class UserRepository(val application: Application) {
                 } else {
                     Toast.makeText(application.applicationContext, "일치하는 회원이 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
                 }
+            }
+        }
+    }
+
+    fun isExistEmail(email: String) {
+        firebaseAuth.fetchSignInMethodsForEmail(email).addOnCompleteListener {
+            if (it.isSuccessful) {
+
             }
         }
     }
