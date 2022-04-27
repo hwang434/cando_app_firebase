@@ -90,8 +90,7 @@ class RegisterFragment : Fragment() {
                         val name = edittextRegisterNameInput.text.toString()
                         val password = edittextRegisterPasswordinput.text.toString().trim()
                         val phone = edittextPhoneInput.text.toString()
-
-                        val userDto = UserDto(name = name, phone = phone)
+                        val userDto = UserDto(email = email, name = name, phone = phone)
                         userViewModel.register(email, userDto, password)
                     }
                 }
