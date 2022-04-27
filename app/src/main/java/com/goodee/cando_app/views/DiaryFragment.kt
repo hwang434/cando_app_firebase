@@ -95,8 +95,10 @@ class DiaryFragment : Fragment() {
         diaryViewModel.getDiaryList()
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
         diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner) { listOfDiaryDto ->
-            Log.d(TAG, "DiaryFragment - Data is changed.")
-            if (listOfDiaryDto != null) setRecyclerView(diaryViewModel.diaryListLiveData)
+            if (listOfDiaryDto != null) {
+                setRecyclerView(diaryViewModel.diaryListLiveData)
+                binding.progressbarDiaryLoading.visibility = View.GONE
+            }
         }
         setEvent()
 
