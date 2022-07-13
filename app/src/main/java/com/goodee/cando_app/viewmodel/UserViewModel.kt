@@ -56,10 +56,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
     
     // 중복 회원 찾기
-    fun isExistEmail(email: String): Boolean {
+    suspend fun isExistEmail(email: String): Boolean {
         Log.d(TAG,"UserViewModel - isExistEmail() called")
-        userRepository.isExistEmail(email)
-        return false
+        return userRepository.isExistEmail(email)
     }
 
     // 회원 삭제

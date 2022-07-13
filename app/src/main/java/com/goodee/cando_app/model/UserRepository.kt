@@ -9,6 +9,7 @@ import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.UserDto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.SignInMethodQueryResult
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 
@@ -76,11 +77,11 @@ class UserRepository(val application: Application) {
         }
     }
 
-    fun isExistEmail(email: String) {
-        firebaseAuth.fetchSignInMethodsForEmail(email).addOnCompleteListener {
-            if (it.isSuccessful) {
+    suspend fun isExistEmail(email: String): Boolean {
+        Log.d(TAG,"UserRepository - isExistEmail() called")
+        val result = firebaseAuth.fetchSignInMethodsForEmail(email).await()
 
-            }
-        }
+        // null이 아니고 비지 않았으면 존재하지 않는 이메일이므로 true를 리턴
+        return result?.signInMethods != null && result.signInMethods!!.isNotEmpty()
     }
 }
