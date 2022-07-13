@@ -50,7 +50,7 @@ class DiaryViewFragment : Fragment() {
             if (diaryDto != null) {
                 binding.textviewDiaryviewTitleview.text = "제목 : " + diaryDto.title
                 binding.textviewDiaryviewContentview.text = diaryDto.content
-                binding.textviewDiaryviewAuthorview.text = "작성자 : " + diaryDto.author
+                binding.textviewDiaryViewAuthorView.text = "작성자 : " + diaryDto.author
             }
         }
         setEvent()
