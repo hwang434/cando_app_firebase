@@ -9,7 +9,7 @@ import androidx.navigation.Navigation
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryListBinding
 import com.goodee.cando_app.dto.DiaryDto
-import com.goodee.cando_app.views.DiaryFragmentDirections
+import com.goodee.cando_app.views.diary.DiaryFragmentDirections
 import java.text.SimpleDateFormat
 
 class DiaryRecyclerViewAdapter(val list: LiveData<List<DiaryDto>>) : RecyclerView.Adapter<DiaryRecyclerViewAdapter.ViewHolder>() {

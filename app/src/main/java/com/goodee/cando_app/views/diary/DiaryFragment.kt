@@ -1,4 +1,4 @@
-package com.goodee.cando_app.views
+package com.goodee.cando_app.views.diary
 
 import android.content.Context
 import android.os.Bundle

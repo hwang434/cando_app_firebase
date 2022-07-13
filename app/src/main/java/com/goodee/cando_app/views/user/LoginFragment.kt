@@ -1,4 +1,4 @@
-package com.goodee.cando_app.views
+package com.goodee.cando_app.views.user
 
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle

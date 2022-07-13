@@ -1,4 +1,4 @@
-package com.goodee.cando_app.views
+package com.goodee.cando_app.views.user
 
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
@@ -17,15 +17,17 @@ import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.viewmodel.UserViewModel
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class RegisterFragment : Fragment() {
-    private val TAG: String = "로그"
+    companion object {
+        private const val TAG: String = "LOG"
+    }
+
     private var isExistId = false
     private lateinit var binding: FragmentRegisterBinding
-    private lateinit var auth: FirebaseAuth
+    private val auth by lazy { Firebase.auth }
     private val userViewModel by lazy {
         ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -37,8 +39,6 @@ class RegisterFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"registerFragment - onCreate() called")
         super.onCreate(savedInstanceState)
-        // Initialize firebase auth
-        auth = Firebase.auth
     }
 
     override fun onCreateView(

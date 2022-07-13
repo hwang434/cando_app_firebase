@@ -1,4 +1,4 @@
-package com.goodee.cando_app.views
+package com.goodee.cando_app.views.diary
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -10,7 +10,9 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 
 class DiaryDeleteDialogFragment(private val dno: String): DialogFragment() {
-    private val TAG: String = "로그"
+    companion object {
+        private const val TAG: String = "로그"
+    }
     private val diaryViewModel: DiaryViewModel by lazy {
         ViewModelProvider(this).get(DiaryViewModel::class.java)
     }

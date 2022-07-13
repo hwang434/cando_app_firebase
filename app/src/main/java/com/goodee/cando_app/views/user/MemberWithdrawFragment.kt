@@ -1,4 +1,4 @@
-package com.goodee.cando_app.views
+package com.goodee.cando_app.views.user
 
 import android.os.Bundle
 import android.util.Log

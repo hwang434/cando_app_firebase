@@ -1,4 +1,4 @@
-package com.goodee.cando_app.views
+package com.goodee.cando_app.views.diary
 
 import android.os.Bundle
 import android.util.Log
@@ -59,11 +59,12 @@ class DiaryViewFragment : Fragment() {
     private fun setEvent() {
         binding.buttonDiaryviewEditbutton.setOnClickListener {
             Log.d(TAG,"DiaryViewFragment - editButton is clicked.")
-            findNavController().navigate(DiaryViewFragmentDirections.actionDiaryViewFragmentToDiaryWriteFragment(dno))
+            findNavController().navigate(
+                DiaryViewFragmentDirections.actionDiaryViewFragmentToDiaryWriteFragment(dno)
+            )
         }
         binding.buttonDiaryviewDeletebutton.setOnClickListener {
             Log.d(TAG,"DiaryViewFragment - deleteButton is clicked")
-//            diaryViewModel.deleteDiary(dno)
             val dialog = DiaryDeleteDialogFragment(dno)
             dialog.show(requireActivity().supportFragmentManager, "쇼")
         }

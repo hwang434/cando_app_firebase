@@ -5,7 +5,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".views.FindPasswordFragment">
+        tools:context=".views.user.FindPasswordFragment">
 
         <TextView
             android:id="@+id/textview_findid_header"

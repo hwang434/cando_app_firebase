@@ -1,4 +1,4 @@
-package com.goodee.cando_app.views
+package com.goodee.cando_app.views.diary
 
 import android.os.Bundle
 import android.util.Log
@@ -8,15 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.google.firebase.auth.FirebaseAuth
-import java.lang.Exception
-import java.text.SimpleDateFormat
 
 class DiaryWriteFragment : Fragment() {
     private val TAG: String = "로그"
@@ -79,11 +76,12 @@ class DiaryWriteFragment : Fragment() {
 
         findNavController().navigate(R.id.action_diaryWriteFragment_to_diaryFragment)
     }
+
     private fun editDiary(dno: String, title: String, content: String, userEmail: String) {
         Log.d(TAG,"DiaryWriteFragment - editDiary() called")
         val time = System.currentTimeMillis()
         val diaryDto = DiaryDto(dno = dno, title = title, content = content, author = userEmail, date= time)
         diaryViewModel.editDiary(diaryDto)
-        findNavController().navigate(DiaryWriteFragmentDirections.actionDiaryWriteFragmentToDiaryViewFragment(dno))
+        findNavController().navigate(R.id.action_diaryWriteFragment_to_diaryViewFragment)
     }
 }
