@@ -72,9 +72,9 @@ class RegisterFragment : Fragment() {
                     emptyView = edittextRegisterPasswordinput
                 } else if (!isValidPassword(edittextRegisterPasswordinput.text.toString())){
                     val dialog = AlertDialog.Builder(requireContext()).create()
-                    dialog.setTitle("비밀번호를 다시 설정해주세요.")
-                    dialog.setMessage("1. 비밀번호는 8~15자.\n2. 대문자 1개, 소문자 1개, 숫자 1개를 포함해야 합니다.\n3. 특수문자도 사용 가능합니다.")
-                    dialog.setButton(Dialog.BUTTON_POSITIVE, "확인") { _, _ -> }
+                    dialog.setTitle(getString(R.string.dialog_re_check_password))
+                    dialog.setMessage(getString(R.string.dialog_regex_password))
+                    dialog.setButton(Dialog.BUTTON_POSITIVE, getString(R.string.yes)) { _, _ -> }
                     dialog.show()
                 } else if (edittextRegisterPasswordcheckinput.text.isEmpty() || edittextRegisterPasswordcheckinput.text.isBlank()) {
                     Toast.makeText(requireActivity(),getString(R.string.toast_check_recheck),Toast.LENGTH_SHORT).show()
@@ -98,13 +98,13 @@ class RegisterFragment : Fragment() {
                             }
                         } catch (e: FirebaseAuthUserCollisionException) {
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(requireContext(), "이미 존재하는 이메일입니다.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireContext(), getString(R.string.toast_is_exist_email), Toast.LENGTH_SHORT).show()
                                 binding.buttonRegisterDuplicatecheck.isEnabled = true
                                 binding.edittextRegisterEmailinput.isEnabled = true
                             }
                         } catch (e: FirebaseAuthWeakPasswordException) {
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(requireContext(), "너무 쉬운 비밀번호입니다.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireContext(), getString(R.string.toast_password_too_easy), Toast.LENGTH_SHORT).show()
                             }
                         } catch (e: Exception) {
                             Log.d(TAG,"RegisterFragment - setEvent() called")
@@ -129,28 +129,28 @@ class RegisterFragment : Fragment() {
                 imm.showSoftInput(binding.edittextRegisterEmailinput,0)
             } else {
                 if (!isValidEmail(binding.edittextRegisterEmailinput.text.toString())) {
-                    Toast.makeText(requireContext(), "잘못된 이메일입니다.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_register_is_wrong_email), Toast.LENGTH_SHORT).show()
                 } else {
                     lifecycleScope.launch(Dispatchers.IO) {
                         // if : 존재하지 않는 이메일
                         if (!userViewModel.isExistEmail(binding.edittextRegisterEmailinput.text.toString())) {
                             withContext(Dispatchers.Main) {
                                 val dialog = AlertDialog.Builder(requireContext()).create()
-                                dialog.setTitle("사용 가능한 이메일입니다.")
-                                dialog.setMessage("사용하시겠습니까?")
-                                dialog.setButton(Dialog.BUTTON_POSITIVE, "예") { _, _ ->
+                                dialog.setTitle(getString(R.string.dialog_is_valid_email_title))
+                                dialog.setMessage(getString(R.string.dialog_is_valid_email_message))
+                                dialog.setButton(Dialog.BUTTON_POSITIVE, getString(R.string.yes)) { _, _ ->
                                     binding.edittextRegisterEmailinput.isEnabled = false
                                     binding.buttonRegisterDuplicatecheck.isEnabled = false
                                 }
-                                dialog.setButton(Dialog.BUTTON_NEGATIVE, "아니요") { _, _ -> }
+                                dialog.setButton(Dialog.BUTTON_NEGATIVE, getString(R.string.no)) { _, _ -> }
                                 dialog.show()
                             }
                         } else {
                             withContext(Dispatchers.Main) {
                                 val dialog = AlertDialog.Builder(requireContext()).create()
-                                dialog.setTitle("이미 존재하는 이메일입니다.")
-                                dialog.setMessage("다른 이메일을 사용해주세요.")
-                                dialog.setButton(Dialog.BUTTON_NEUTRAL, "확인") { _, _ -> }
+                                dialog.setTitle(getString(R.string.toast_is_exist_email))
+                                dialog.setMessage(getString(R.string.dialog_change_email_message))
+                                dialog.setButton(Dialog.BUTTON_NEUTRAL, getString(R.string.yes)) { _, _ -> }
                                 dialog.show()
                             }
                         }
