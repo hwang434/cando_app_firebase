@@ -10,6 +10,7 @@ import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.UserDto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.tasks.await
 
 class UserRepository(val application: Application) {
     private val TAG: String = "로그"
@@ -34,15 +35,15 @@ class UserRepository(val application: Application) {
     }
 
     // Firebase Authentication 로그인
-    fun login(email: String, password: String) {
+    suspend fun login(email: String, password: String): Boolean {
         Log.d(TAG,"AppRepository - login() called")
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task ->
-            Log.d(TAG,"AppRepository - register task.isSuccessful : ${task.isSuccessful}")
-            when (task.isSuccessful) {
-                true -> _userLiveData.postValue(firebaseAuth.currentUser)
-                false -> _userLiveData.postValue(null)
-            }
+        val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+        if (authResult.user != null) {
+            _userLiveData.postValue(authResult.user)
+            return true
         }
+
+        return false
     }
 
     // 유저 아이디 찾기

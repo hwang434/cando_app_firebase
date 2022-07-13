@@ -39,9 +39,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 로그인
-    fun login(email: String, password: String) {
+    suspend fun login(email: String, password: String): Boolean {
         Log.d(TAG,"User - login() called")
-        userRepository.login(email, password)
+        return userRepository.login(email, password)
     }
 
     // 아이디 찾기

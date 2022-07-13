@@ -39,7 +39,7 @@
     <string name="findpassword_emailcheckinput">인증번호를 입력하세요</string>
     <string name="findpassword_emailbutton">확인</string>
     <!-- Register   -->
-    <string name="register_phonehint">010-0000-0000</string>
+    <string name="register_phone_hint">01000000000</string>
     <string name="register_register_button">회원가입</string>
     <string name="register_duplicatecheckbutton">중복</string>
     <!--  DiaryView  -->
@@ -55,4 +55,5 @@
     <string name="toast_check_email">이메일을 확인해주세요.</string>
     <string name="toast_can_use_email">사용하셔도 좋은 이메일입니다.</string>
     <string name="toast_fail_regist">회원가입 실패</string>
+    <string name="toast_login_fail">아이디 또는 비밀번호가 일치하지 않습니다.</string>
 </resources>

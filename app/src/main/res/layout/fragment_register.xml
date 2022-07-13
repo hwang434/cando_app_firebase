@@ -132,7 +132,7 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:autofillHints="phone"
-            android:hint="@string/register_phonehint"
+            android:hint="@string/register_phone_hint"
             android:inputType="phone"
             android:textColorHint="#004D40"
             android:textSize="24sp"

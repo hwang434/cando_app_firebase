@@ -8,19 +8,21 @@ import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentLoginBinding
 import com.goodee.cando_app.listener.SingleClickListner
 import com.goodee.cando_app.viewmodel.UserViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginFragment : Fragment() {
     companion object {
@@ -34,15 +36,6 @@ class LoginFragment : Fragment() {
                 return UserViewModel(requireActivity().application) as T
             }
         }).get(UserViewModel::class.java)
-    }
-
-    val observer = Observer<FirebaseUser> { firebaseUser ->
-        when (firebaseUser) {
-            null -> Toast.makeText(requireActivity(), "로그인 실패", Toast.LENGTH_SHORT).show()
-            else -> findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
-        }
-
-        binding.progressbarLoginLoading.visibility = View.INVISIBLE
     }
 
     override fun onStart() {
@@ -101,10 +94,20 @@ class LoginFragment : Fragment() {
                     val email = binding.edittextLoginEmailinput.text.toString()
                     val password = binding.edittextLoginPasswordinput.text.toString()
 
-                    if (!userViewModel.userLiveData.hasObservers()) {
-                        userViewModel.userLiveData.observe(viewLifecycleOwner, observer)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        try {
+                            if (userViewModel.login(email, password)) {
+                                withContext(Dispatchers.Main) {
+                                    findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
+                                }
+                            }
+                        } catch (e: FirebaseAuthInvalidCredentialsException) {
+                            withContext(Dispatchers.Main) {
+                                binding.progressbarLoginLoading.visibility = View.GONE
+                                Toast.makeText(requireContext(), getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
-                    userViewModel.login(email, password)
                 }
             }
         })
@@ -123,6 +126,5 @@ class LoginFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG,"LoginFragment - onDestroy() called")
-        userViewModel.userLiveData.removeObserver(observer)
     }
 }
