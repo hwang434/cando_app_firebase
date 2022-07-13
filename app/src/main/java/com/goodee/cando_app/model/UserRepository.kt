@@ -3,7 +3,6 @@ package com.goodee.cando_app.model
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.database.RealTimeDatabase
@@ -11,6 +10,7 @@ import com.goodee.cando_app.dto.UserDto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 
 class UserRepository(val application: Application) {
     private val TAG: String = "로그"
@@ -20,18 +20,20 @@ class UserRepository(val application: Application) {
         get() = _userLiveData
 
     // 회원가입
-    fun register(email: String, userDto: UserDto, password: String) {
+    suspend fun register(email: String, userDto: UserDto, password: String): Boolean {
         Log.d(TAG,"AppRepository - register() called")
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(
-            ContextCompat.getMainExecutor(application.applicationContext)) { task ->
-            Log.d(TAG,"AppRepository - register task.isSuccessful : ${task.isSuccessful}")
-            if (task.isSuccessful) {
-                RealTimeDatabase.getDatabase().child("Users/${firebaseAuth.currentUser?.uid}").setValue(userDto)
+        try {
+            val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+            if (authResult.user != null) {
+                RealTimeDatabase.getDatabase().child("Users/${firebaseAuth.currentUser?.uid}").setValue(userDto).await()
                 _userLiveData.postValue(firebaseAuth.currentUser)
-            } else {
-                Toast.makeText(application, "Register Fail.", Toast.LENGTH_SHORT).show()
+                return true
             }
+        } catch (e: Exception) {
+            throw e
         }
+
+        return false
     }
 
     // Firebase Authentication 로그인

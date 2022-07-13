@@ -12,17 +12,22 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.viewmodel.UserViewModel
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RegisterFragment : Fragment() {
     companion object {
         private const val TAG: String = "LOG"
     }
-    private var isExistId = false
     private lateinit var binding: FragmentRegisterBinding
 
     private val userViewModel by lazy {
@@ -44,15 +49,6 @@ class RegisterFragment : Fragment() {
     ): View {
         Log.d(TAG,"registerFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        userViewModel.userLiveData.observe(viewLifecycleOwner) { firebaseUser ->
-            if (firebaseUser == null) {
-                Toast.makeText(requireContext(), getString(R.string.toast_fail_register), Toast.LENGTH_SHORT).show()
-            } else {
-                Log.d(TAG,"RegisterFragment - ${firebaseUser.email}")
-                findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
-            }
-        }
         setEvent()
 
         return binding.root
@@ -88,7 +84,26 @@ class RegisterFragment : Fragment() {
                         val password = edittextRegisterPasswordinput.text.toString().trim()
                         val phone = edittextPhoneInput.text.toString()
                         val userDto = UserDto(email = email, name = name, phone = phone)
-                        userViewModel.register(email, userDto, password)
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            // if : 회원 가입 성공 -> 다이어리 화면으로 이동
+                            try {
+                                if (userViewModel.register(email, userDto, password)) {
+                                    withContext(Dispatchers.Main) {
+                                        findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
+                                    }
+                                }
+                            } catch (e: FirebaseAuthUserCollisionException) {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(requireContext(), "이미 존재하는 이메일입니다.", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: FirebaseAuthWeakPasswordException) {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(requireContext(), "너무 쉬운 비밀번호입니다.", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                Log.d(TAG,"RegisterFragment - setEvent() called")
+                            }
+                        }
                     }
                 }
 
@@ -108,12 +123,8 @@ class RegisterFragment : Fragment() {
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edittextRegisterEmailinput,0)
             } else {
-                if (isExistId) {
-                    Toast.makeText(requireActivity(), getString(R.string.toast_is_exist_email),Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(requireActivity(), getString(R.string.toast_can_use_email), Toast.LENGTH_SHORT).show()
-                    // 중복 체크 완료됐다는 로직이 들어가야함.
-                }
+                // if : 중복 아이디면,
+                // else : 중복아이디가 아니면
             }
         }
     }

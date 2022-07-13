@@ -150,9 +150,10 @@
             android:textColor="#000000"
             app:layout_constraintTop_toBottomOf="@+id/edittext_phone_input" />
         <ProgressBar
-            android:id="@+id/progressbar_regster_loading"
+            android:id="@+id/progressbar_register_loading"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
