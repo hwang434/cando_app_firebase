@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
@@ -22,20 +23,18 @@ import com.google.firebase.ktx.Firebase
 class MainFragment : Fragment() {
     private val TAG: String = "로그"
     private lateinit var binding: FragmentMainBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        autoLogin()
-    }
+        auth = Firebase.auth
 
-    // 로그인 상태면 바로 다이어리 화면으로 이동
-    private fun autoLogin() {
-        Firebase.auth.currentUser?.let { user ->
-            var userViewModel = ViewModelProvider(requireActivity(), object : ViewModelProvider.Factory {
+        // 로그인 상태면 바로 다이어리 화면으로 이동
+        auth.currentUser?.let { user ->
+            var userViewModel = ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
                 override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                     return UserViewModel(requireActivity().application) as T
                 }
-
             }).get(UserViewModel::class.java)
             userViewModel.autoLogin(user)
 

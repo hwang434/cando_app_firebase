@@ -6,18 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentMemberWithdrawBinding
 import com.goodee.cando_app.viewmodel.UserViewModel
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.*
-import java.util.ArrayList
 
 class MemberWithdrawFragment : Fragment() {
     private val TAG: String = "로그"

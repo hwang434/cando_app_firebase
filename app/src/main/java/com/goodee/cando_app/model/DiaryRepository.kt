@@ -11,12 +11,9 @@ import com.google.firebase.database.*
 
 class DiaryRepository(val application: Application) {
     private val TAG: String = "로그"
-//    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-
     private val _diaryListLiveData: MutableLiveData<List<DiaryDto>> = MutableLiveData()
     val diaryListLiveData: LiveData<List<DiaryDto>>
         get() = _diaryListLiveData
-
     private val _diaryLiveData: MutableLiveData<DiaryDto> = MutableLiveData()
     val diaryLiveData: LiveData<DiaryDto>
         get() = _diaryLiveData

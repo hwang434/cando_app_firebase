@@ -22,9 +22,11 @@
         <item name="android:gravity">center</item>
         <item name="android:textSize">24sp</item>
         <item name="android:background">#5E706E</item>
+        <item name="android:textColor">#EEEEEE</item>
     </style>
     <style name="register_input">
         <item name="android:textSize">22sp</item>
         <item name="android:background">#FFFFFF</item>
+        <item name="android:textColorHint">#78909C</item>
     </style>
 </resources>

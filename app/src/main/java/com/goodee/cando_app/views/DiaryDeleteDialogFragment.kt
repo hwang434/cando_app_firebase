@@ -2,7 +2,6 @@ package com.goodee.cando_app.views
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.DialogFragment
@@ -10,14 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 
-class DiaryDeleteDialogFragment(val dno: String): DialogFragment() {
+class DiaryDeleteDialogFragment(private val dno: String): DialogFragment() {
     private val TAG: String = "로그"
     private val diaryViewModel: DiaryViewModel by lazy {
         ViewModelProvider(this).get(DiaryViewModel::class.java)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val alertDialogBuilder = requireActivity().let {AlertDialog.Builder(it) }
+        val alertDialogBuilder = requireActivity().let { AlertDialog.Builder(it) }
         alertDialogBuilder.apply {
             setTitle("이 글을 정말 삭제하시겠습니까?")
             setMessage("삭제하려면 확인을 눌러주세요.")

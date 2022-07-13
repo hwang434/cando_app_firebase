@@ -7,8 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.model.UserRepository
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
@@ -30,9 +30,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 회원가입
-    fun register(userDto: UserDto, password: String) {
+    fun register(email: String, userDto: UserDto, password: String) {
         Log.d(TAG,"User - register() called")
-        userRepository.register(userDto, password)
+        userRepository.register(email, userDto, password)
     }
 
     // 로그인
@@ -53,8 +53,10 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
     
     // 중복 회원 찾기
-    fun isExistEmail(email: String) {
+    fun isExistEmail(email: String): Boolean {
         Log.d(TAG,"UserViewModel - isExistEmail() called")
+        userRepository.isExistEmail(email)
+        return true
     }
 
     // 회원 삭제
@@ -65,5 +67,11 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     // 중복 로그인 처리
     fun autoLogin(firebaseUser: FirebaseUser) {
         _userLiveData.postValue(firebaseUser)
+    }
+
+    // 로그 아웃
+    fun signOut() {
+        Firebase.auth.signOut()
+        _userLiveData.postValue(null)
     }
 }

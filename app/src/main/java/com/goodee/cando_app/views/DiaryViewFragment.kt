@@ -1,6 +1,5 @@
 package com.goodee.cando_app.views
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -33,8 +32,6 @@ class DiaryViewFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG,"DiaryViewFragment - onCreate() called\n arguments : ${arguments.toString()}")
-        Log.d(TAG,"DiaryViewFragment - userViewModel : ${userViewModel.userLiveData.value}")
         dno = arguments?.get("dno").toString()
         diaryViewModel.getDiary(dno)
     }
@@ -46,14 +43,14 @@ class DiaryViewFragment : Fragment() {
         Log.d(TAG,"DiaryViewFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary_view, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        diaryViewModel.diaryLiveData.observe(viewLifecycleOwner, { diaryDto ->
-            Log.d(TAG,"DiaryViewFragment - diaryLivedata change")
+        diaryViewModel.diaryLiveData.observe(viewLifecycleOwner) { diaryDto ->
+            Log.d(TAG, "DiaryViewFragment - diaryLivedata change")
             if (diaryDto != null) {
-                binding.textviewDiaryviewTitleview.text = "제목 : "+diaryDto.title
+                binding.textviewDiaryviewTitleview.text = "제목 : " + diaryDto.title
                 binding.textviewDiaryviewContentview.text = diaryDto.content
-                binding.textviewDiaryviewAuthorview.text = "작성자 : "+diaryDto.author
+                binding.textviewDiaryviewAuthorview.text = "작성자 : " + diaryDto.author
             }
-        })
+        }
         setEvent()
 
         return binding.root

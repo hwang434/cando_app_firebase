@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
-import com.goodee.cando_app.databinding.FragmentFindIdBinding
 import com.goodee.cando_app.databinding.FragmentFindPasswordBinding
 
 class FindPasswordFragment : Fragment() {
