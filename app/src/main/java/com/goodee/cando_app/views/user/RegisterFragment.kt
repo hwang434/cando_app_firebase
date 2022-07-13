@@ -47,7 +47,7 @@ class RegisterFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         userViewModel.userLiveData.observe(viewLifecycleOwner) { firebaseUser ->
             if (firebaseUser == null) {
-                Toast.makeText(requireContext(), getString(R.string.toast_fail_regist), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_fail_register), Toast.LENGTH_SHORT).show()
             } else {
                 Log.d(TAG,"RegisterFragment - ${firebaseUser.email}")
                 findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
@@ -64,10 +64,10 @@ class RegisterFragment : Fragment() {
             binding.run {
                 var emptyView: View? = null
                 if (edittextRegisterEmailinput.text.isEmpty() || edittextRegisterEmailinput.text.isBlank()) {
-                    Toast.makeText(requireActivity(),getString(R.string.register_emailinput),Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity(),getString(R.string.register_email_input),Toast.LENGTH_SHORT).show()
                     emptyView = edittextRegisterEmailinput
                 } else if (edittextRegisterNameInput.text.isEmpty() || edittextRegisterNameInput.text.isBlank()) {
-                    Toast.makeText(requireActivity(),getString(R.string.register_nameinput),Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity(),getString(R.string.register_name_input),Toast.LENGTH_SHORT).show()
                     emptyView = edittextRegisterNameInput
                 } else if (edittextRegisterPasswordinput.text.isEmpty() || edittextRegisterPasswordinput.text.isBlank()) {
                     Toast.makeText(requireActivity(),getString(R.string.toast_check_password),Toast.LENGTH_SHORT).show()

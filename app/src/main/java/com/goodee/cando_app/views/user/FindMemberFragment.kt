@@ -31,7 +31,7 @@ class FindMemberFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG,"FindMemberFragment - onViewCreated() called")
         val adapter = FindMemberAdapter(requireActivity())
-        val fragmentTitle = listOf(view.resources.getString(R.string.findid_header),view.resources.getString(R.string.findpassword_header))
+        val fragmentTitle = listOf(view.resources.getString(R.string.find_id_header),view.resources.getString(R.string.find_password_header))
 
         adapter.fragmentList = listOf(FindIdFragment(), FindPasswordFragment())
         binding.viewpagerFindmemberPager.adapter = adapter
