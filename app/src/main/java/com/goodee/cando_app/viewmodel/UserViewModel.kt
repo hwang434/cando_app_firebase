@@ -12,7 +12,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
-    private val TAG: String = "로그"
+    companion object {
+        private const val TAG: String = "로그"
+    }
+
     private var userRepository: UserRepository
     private val _userLiveData: MutableLiveData<FirebaseUser>
     val userLiveData: LiveData<FirebaseUser>

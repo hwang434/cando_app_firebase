@@ -14,7 +14,10 @@ import com.goodee.cando_app.databinding.FragmentMemberWithdrawBinding
 import com.goodee.cando_app.viewmodel.UserViewModel
 
 class MemberWithdrawFragment : Fragment() {
-    private val TAG: String = "로그"
+    companion object {
+        private const val TAG: String = "로그"
+    }
+
     private lateinit var binding: FragmentMemberWithdrawBinding
     private val userViewModel: UserViewModel by lazy {
         ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
@@ -24,15 +27,10 @@ class MemberWithdrawFragment : Fragment() {
         }).get(UserViewModel::class.java)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_member_withdraw, container, false)
         setEvent()
 

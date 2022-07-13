@@ -17,17 +17,14 @@ import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 class RegisterFragment : Fragment() {
     companion object {
         private const val TAG: String = "LOG"
     }
-
     private var isExistId = false
     private lateinit var binding: FragmentRegisterBinding
-    private val auth by lazy { Firebase.auth }
+
     private val userViewModel by lazy {
         ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -44,7 +41,7 @@ class RegisterFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Log.d(TAG,"registerFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
         binding.lifecycleOwner = viewLifecycleOwner

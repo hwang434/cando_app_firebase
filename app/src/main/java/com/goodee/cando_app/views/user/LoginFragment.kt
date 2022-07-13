@@ -19,9 +19,14 @@ import com.goodee.cando_app.listener.SingleClickListner
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class LoginFragment : Fragment() {
-    private val TAG: String = "로그"
+    companion object {
+        private const val TAG: String = "로그"
+    }
+
     private lateinit var binding: FragmentLoginBinding
     private val userViewModel: UserViewModel by lazy {
         ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
@@ -43,12 +48,11 @@ class LoginFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         Log.d(TAG,"LoginFragment - onStart() called")
-        val firebaseAuth = FirebaseAuth.getInstance()
-        val currentUser = firebaseAuth.currentUser
+        val currentUser = Firebase.auth.currentUser
 
         // if current user is signed in update UI
         currentUser?.let {
-            Log.d(TAG,"LoginFragment - ${currentUser}")
+            Log.d(TAG,"LoginFragment - $currentUser")
             findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
         }
     }

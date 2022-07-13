@@ -1,6 +1,7 @@
 package com.goodee.cando_app.views.user
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,9 @@ import com.goodee.cando_app.databinding.FragmentFindIdBinding
 import com.goodee.cando_app.viewmodel.UserViewModel
 
 class FindIdFragment : Fragment() {
+    companion object {
+        private const val TAG: String = "로그"
+    }
     private lateinit var binding: FragmentFindIdBinding
     private val userViewModel by lazy {
         ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
@@ -26,8 +30,9 @@ class FindIdFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate<FragmentFindIdBinding>(inflater, R.layout.fragment_find_id, container, false)
+    ): View {
+        Log.d(TAG,"FindIdFragment - onCreateView() called")
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_find_id, container, false)
         setEvent()
 
         return binding.root

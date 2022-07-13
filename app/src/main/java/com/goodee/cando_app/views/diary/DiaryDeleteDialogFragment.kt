@@ -22,15 +22,16 @@ class DiaryDeleteDialogFragment(private val dno: String): DialogFragment() {
         alertDialogBuilder.apply {
             setTitle("이 글을 정말 삭제하시겠습니까?")
             setMessage("삭제하려면 확인을 눌러주세요.")
-            setPositiveButton("확인") { dialog, which ->
-                Log.d(TAG, "DiaryDeleteDialogFragment - dialog postiveButton is clicked")
+            setPositiveButton("확인") { _, _ ->
+                Log.d(TAG, "DiaryDeleteDialogFragment - Dialog Positive Button is clicked")
                 diaryViewModel.deleteDiary(dno)
                 findNavController().navigateUp()
             }
-            setNegativeButton("취소") { dialog, which ->
+            setNegativeButton("취소") { _, _ ->
                 Log.d(TAG,"DiaryDeleteDialogFragment - dialog negativeButton is clicked")
             }
         }
+
         return alertDialogBuilder.create()
     }
 }

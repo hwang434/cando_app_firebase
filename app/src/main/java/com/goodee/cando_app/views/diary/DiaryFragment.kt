@@ -25,7 +25,10 @@ import com.google.firebase.ktx.Firebase
 
 
 class DiaryFragment : Fragment() {
-    private val TAG: String = "로그"
+    companion object {
+        private const val TAG: String = "로그"
+    }
+
     private lateinit var binding: FragmentDiaryBinding
     private val diaryViewModel: DiaryViewModel by lazy { ViewModelProvider(this).get(DiaryViewModel::class.java) }
     private var backPressedTime = System.currentTimeMillis()
@@ -90,7 +93,7 @@ class DiaryFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         diaryViewModel.getDiaryList()
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)

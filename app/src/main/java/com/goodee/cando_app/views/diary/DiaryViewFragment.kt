@@ -7,31 +7,33 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryViewBinding
 import com.goodee.cando_app.viewmodel.DiaryViewModel
-import com.goodee.cando_app.viewmodel.UserViewModel
 
 class DiaryViewFragment : Fragment() {
-    private val TAG: String = "로그"
+    companion object {
+        private const val TAG: String = "로그"
+    }
+
     private lateinit var binding: FragmentDiaryViewBinding
     private lateinit var dno: String
     private val diaryViewModel: DiaryViewModel by lazy {
         ViewModelProvider(this).get(DiaryViewModel::class.java)
     }
-    private val userViewModel by lazy {
-        ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return UserViewModel(requireActivity().application) as T
-            }
-        }).get(UserViewModel::class.java)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 번호가 전달이 안됐으면 이전 페이지로 이동
+        when (arguments) {
+            null -> {
+                findNavController().navigateUp()
+            }
+        }
+
+        // 전달이 됐으면 글을 조회
         dno = arguments?.get("dno").toString()
         diaryViewModel.getDiary(dno)
     }
@@ -39,7 +41,7 @@ class DiaryViewFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Log.d(TAG,"DiaryViewFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary_view, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
