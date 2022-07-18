@@ -9,6 +9,7 @@ import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.model.UserRepository
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.ktx.Firebase
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
@@ -45,9 +46,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 아이디 찾기
-    fun findUserId(name: String, email: String) {
+    suspend fun findUserId(name: String, email: String): QuerySnapshot {
         Log.d(TAG,"UserViewModel - findUserId() called")
-        userRepository.findUserId(name, email)
+        return userRepository.findUserId(name, email)
     }
     
     // 비밀번호 찾기
