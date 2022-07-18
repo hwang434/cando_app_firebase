@@ -1,5 +1,6 @@
 package com.goodee.cando_app.views.user
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,9 +11,13 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindIdBinding
 import com.goodee.cando_app.viewmodel.UserViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FindIdFragment : Fragment() {
     companion object {
@@ -48,7 +53,25 @@ class FindIdFragment : Fragment() {
             } else if (name.isEmpty() || name.isBlank()) {
                 Toast.makeText(requireActivity(), "이름을 입력해주세요", Toast.LENGTH_SHORT).show()
             } else {
-                userViewModel.findUserId(email = email, name = name)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val qResult = userViewModel.findUserId(email = email, name = name)
+                    if (qResult.isEmpty) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(requireContext(), "존재하지 않는 회원입니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            // if : 입력한 정보와 일치하는 회원이 여러 명
+                            if (qResult.documents.size > 1) {
+                            } else {
+                                val alertDialogBuilder = AlertDialog.Builder(requireContext()).create()
+                                alertDialogBuilder.setTitle("찾으시는 이메일")
+                                alertDialogBuilder.setMessage(qResult.documents[0].get("email").toString())
+                                alertDialogBuilder.show()
+                            }
+                        }
+                    }
+                }
             }
         }
     }
