@@ -1,4 +1,4 @@
-package com.goodee.cando_app.views
+package com.goodee.cando_app.views.user
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,15 +8,18 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.goodee.cando_app.R
-import com.goodee.cando_app.databinding.FragmentFindIdBinding
 import com.goodee.cando_app.databinding.FragmentFindPasswordBinding
 
 class FindPasswordFragment : Fragment() {
-    lateinit var binding: FragmentFindPasswordBinding
+    companion object {
+        private const val TAG: String = "로그"
+    }
+    private lateinit var binding: FragmentFindPasswordBinding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_find_password, container, false)
         binding.buttonFindpasswordEmailbutton.setOnClickListener {
             if (binding.edittextFindpasswordIdinput.text.isNullOrEmpty() || binding.edittextFindpasswordIdinput.text.isBlank()) {

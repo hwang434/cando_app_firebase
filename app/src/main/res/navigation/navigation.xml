@@ -21,7 +21,7 @@
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.goodee.cando_app.views.LoginFragment"
+        android:name="com.goodee.cando_app.views.user.LoginFragment"
         android:label="LoginFragment"
         tools:layout="@layout/fragment_login">
         <action
@@ -38,7 +38,7 @@
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.goodee.cando_app.views.registerFragment"
+        android:name="com.goodee.cando_app.views.user.RegisterFragment"
         android:label="fragment_register"
         tools:layout="@layout/fragment_register" >
         <action
@@ -47,7 +47,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryFragment"
-        android:name="com.goodee.cando_app.views.DiaryFragment"
+        android:name="com.goodee.cando_app.views.diary.DiaryFragment"
         android:label="fragment_diary_list"
         tools:layout="@layout/fragment_diary_list" >
         <action
@@ -67,12 +67,12 @@
     </fragment>
     <fragment
         android:id="@+id/findMember"
-        android:name="com.goodee.cando_app.views.FindMemberFragment"
+        android:name="com.goodee.cando_app.views.user.FindMemberFragment"
         android:label="FindMember"
         tools:layout="@layout/fragment_find_member"/>
     <fragment
         android:id="@+id/diaryWriteFragment"
-        android:name="com.goodee.cando_app.views.DiaryWriteFragment"
+        android:name="com.goodee.cando_app.views.diary.DiaryWriteFragment"
         android:label="fragment_diary_write"
         tools:layout="@layout/fragment_diary_write" >
         <action
@@ -89,7 +89,7 @@
     </fragment>
     <fragment
         android:id="@+id/diaryViewFragment"
-        android:name="com.goodee.cando_app.views.DiaryViewFragment"
+        android:name="com.goodee.cando_app.views.diary.DiaryViewFragment"
         android:label="fragment_diary_view"
         tools:layout="@layout/fragment_diary_view">
         <argument
@@ -104,7 +104,7 @@
     </fragment>
     <fragment
         android:id="@+id/memberWithdrawFragment"
-        android:name="com.goodee.cando_app.views.MemberWithdrawFragment"
+        android:name="com.goodee.cando_app.views.user.MemberWithdrawFragment"
         android:label="MemberWithdrawFragment" >
         <action
             android:id="@+id/action_memberWithdrawFragment_to_mainFragment"

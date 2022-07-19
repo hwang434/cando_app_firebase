@@ -8,6 +8,15 @@
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:background="@color/common_background">
+
+        <ProgressBar
+            android:id="@+id/progressbar_diary_loading"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tablayout_diary_tabmenu"
             android:layout_width="0dp"
@@ -18,11 +27,11 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:text="@string/diary_tabmenuname1"/>
+                android:text="@string/diary_tab_menu_new_diary"/>
             <com.google.android.material.tabs.TabItem
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:text="@string/diary_tabmenuname2"/>
+                android:text="@string/diary_tab_menu_hot_diary"/>
         </com.google.android.material.tabs.TabLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -39,7 +48,7 @@
             android:layout_width="90dp"
             android:layout_height="0dp"
             android:layout_margin="20dp"
-            android:contentDescription="@string/diary_writebutton"
+            android:contentDescription="@string/diary_write_button"
             android:background="@color/white"
             android:src="@android:drawable/ic_input_add"
             app:layout_constraintBottom_toBottomOf="parent"

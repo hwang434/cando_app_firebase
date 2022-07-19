@@ -78,11 +78,14 @@ dependencies {
     // Declare the dependency for the Realtime Database library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-database'
-
     // Declare the dependency for the Firebase Authentication library
     // When NOT using the BoM, you must specify versions in Firebase library dependencies
-    implementation 'com.google.firebase:firebase-auth-ktx'
-
+    /* Firebase Authentication */
+    implementation 'com.google.firebase:firebase-auth-ktx:19.2.0'
+    /*Firestore for online database*/
+    implementation 'com.google.firebase:firebase-firestore:21.4.0'
+    /* coroutines support for firebase operations */
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
     // Gson
     implementation 'com.google.code.gson:gson:2.8.8'
 }
