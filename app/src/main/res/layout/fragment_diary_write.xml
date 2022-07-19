@@ -17,14 +17,14 @@
                 android:layout_marginHorizontal="30dp"
                 android:background="@drawable/box_border"
                 android:inputType="text"
-                android:textSize="30sp"
+                android:textSize="14sp"
                 android:textColor="@color/black"/>
             <EditText
                 android:id="@+id/edittext_diarywrite_contentinput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="30dp"
-                android:textSize="30sp"
+                android:textSize="13sp"
                 android:inputType="textMultiLine"
                 android:minLines="10"
                 android:gravity="start"

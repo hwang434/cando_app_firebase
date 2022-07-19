@@ -6,13 +6,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/common_background">
+
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_containerview_register_header"
             android:name="com.goodee.cando_app.views.HeaderFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout="@layout/fragment_header" />
         <!-- 이메일 입력창 -->
@@ -20,7 +21,6 @@
             android:id="@+id/textview_register_email_pointer"
             style="@style/register_pointer"
             android:layout_width="0dp"
-            android:layout_height="50dp"
             android:text="@string/register_email_pointer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/edittext_register_emailinput"
@@ -31,31 +31,32 @@
             android:id="@+id/edittext_register_emailinput"
             style="@style/register_input"
             android:layout_width="0dp"
-            android:layout_height="50dp"
             android:autofillHints="emailAddress"
             android:hint="@string/register_email_input"
             android:inputType="textEmailAddress"
-            app:layout_constraintStart_toEndOf="@id/textview_register_email_pointer"
+            android:textColorHint="#00838F"
             app:layout_constraintEnd_toStartOf="@id/button_register_duplicatecheck"
             app:layout_constraintHorizontal_weight="5"
+            app:layout_constraintStart_toEndOf="@id/textview_register_email_pointer"
             app:layout_constraintTop_toBottomOf="@+id/fragment_containerview_register_header" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_register_duplicatecheck"
             android:layout_width="0dp"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/register_duplicate_check_button"
             app:layout_constraintBottom_toTopOf="@+id/edittext_register_name_input"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@id/edittext_register_emailinput"
-            app:layout_constraintTop_toBottomOf="@id/fragment_containerview_register_header" />
+            app:layout_constraintTop_toBottomOf="@+id/fragment_containerview_register_header" />
         <!-- 이름 입력창 -->
         <TextView
             android:id="@+id/textview_register_name_pointer"
             style="@style/register_pointer"
             android:layout_width="0dp"
-            android:layout_height="50dp"
             android:text="@string/textview_register_name_pointer"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toStartOf="parent"
@@ -67,13 +68,12 @@
             android:id="@+id/edittext_register_name_input"
             style="@style/register_input"
             android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:hint="@string/edittext_register_name_input"
             android:autofillHints="name"
+            android:hint="@string/edittext_register_name_input"
             android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="7"
             app:layout_constraintStart_toEndOf="@id/textview_register_name_pointer"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edittext_register_emailinput" />
 
         <!--비밀번호 입력창-->
@@ -81,19 +81,15 @@
             android:id="@+id/textview_register_passwordpointer"
             style="@style/register_pointer"
             android:layout_width="0dp"
-            android:layout_height="50dp"
             android:text="@string/register_password_pointer"
-            android:textSize="20sp"
             app:layout_constraintEnd_toStartOf="@id/edittext_register_passwordinput"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textview_register_name_pointer" />
-
         <EditText
             android:id="@+id/edittext_register_passwordinput"
             style="@style/register_input"
             android:layout_width="0dp"
-            android:layout_height="50dp"
             android:autofillHints="password"
             android:hint="@string/register_password_hint"
             android:inputType="textPassword"
@@ -106,9 +102,7 @@
             android:id="@+id/textview_register_passwordcheckpointer"
             style="@style/register_pointer"
             android:layout_width="0dp"
-            android:layout_height="50dp"
             android:text="@string/register_password_check"
-            android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@id/edittext_register_passwordcheckinput"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toStartOf="parent"
@@ -118,7 +112,6 @@
             android:id="@+id/edittext_register_passwordcheckinput"
             style="@style/register_input"
             android:layout_width="0dp"
-            android:layout_height="50dp"
             android:autofillHints="username"
             android:hint="@string/register_password_check_input"
             android:inputType="textPassword"
@@ -130,7 +123,7 @@
         <EditText
             android:id="@+id/edittext_phone_input"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            style="@style/register_pointer"
             android:autofillHints="phone"
             android:hint="@string/register_phone_hint"
             android:inputType="phone"
@@ -147,7 +140,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:text="@string/register_register_button"
-            android:textColor="#000000"
+            android:textColor="#00695C"
             app:layout_constraintTop_toBottomOf="@+id/edittext_phone_input" />
         <ProgressBar
             android:id="@+id/progressbar_register_loading"

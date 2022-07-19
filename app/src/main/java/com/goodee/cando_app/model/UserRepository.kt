@@ -55,6 +55,7 @@ class UserRepository(val application: Application) {
     suspend fun findUserId(name: String, email: String): QuerySnapshot {
         Log.d(TAG, "AppRepository - findUserId() called")
         val firebaseDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION)
+
         return firebaseDatabase.whereEqualTo("name", name).whereEqualTo("email", email).get()
             .await()
     }
