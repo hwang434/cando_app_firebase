@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
 import com.goodee.cando_app.dto.UserDto
+import com.goodee.cando_app.util.RegexChecker
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
@@ -70,7 +71,7 @@ class RegisterFragment : Fragment() {
                 } else if (edittextRegisterPasswordinput.text.isEmpty() || edittextRegisterPasswordinput.text.isBlank()) {
                     Toast.makeText(requireActivity(),getString(R.string.toast_check_password),Toast.LENGTH_SHORT).show()
                     emptyView = edittextRegisterPasswordinput
-                } else if (!isValidPassword(edittextRegisterPasswordinput.text.toString())){
+                } else if (!RegexChecker.isValidPassword(edittextRegisterPasswordinput.text.toString())){
                     val dialog = AlertDialog.Builder(requireContext()).create()
                     dialog.setTitle(getString(R.string.dialog_re_check_password))
                     dialog.setMessage(getString(R.string.dialog_regex_password))
@@ -128,7 +129,7 @@ class RegisterFragment : Fragment() {
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edittextRegisterEmailinput,0)
             } else {
-                if (!isValidEmail(binding.edittextRegisterEmailinput.text.toString())) {
+                if (!RegexChecker.isValidEmail(binding.edittextRegisterEmailinput.text.toString())) {
                     Toast.makeText(requireContext(), getString(R.string.toast_register_is_wrong_email), Toast.LENGTH_SHORT).show()
                 } else {
                     lifecycleScope.launch(Dispatchers.IO) {
@@ -158,22 +159,5 @@ class RegisterFragment : Fragment() {
                 }
             }
         }
-    }
-
-    // 비밀번호 정규식 체크
-    private fun isValidPassword(password: String): Boolean {
-        // 8~15자, 대문자 1개 소문자 1개 숫자1개 필수, 특수문자 가능
-        val regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,15}\$"
-        val pattern = Pattern.compile(regex)
-        val matcher = pattern.matcher(password)
-        return matcher.matches()
-    }
-
-    // 이메일 정규식 체크
-    private fun isValidEmail(email: String): Boolean {
-        val regex = "[a-z0-9!#\$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#\$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
-        val pattern = Pattern.compile(regex)
-        val matcher = pattern.matcher(email)
-        return matcher.matches()
     }
 }

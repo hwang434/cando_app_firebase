@@ -33,7 +33,7 @@ class FindMemberFragment : Fragment() {
         val adapter = FindMemberAdapter(requireActivity())
         val fragmentTitle = listOf(view.resources.getString(R.string.find_id_header),view.resources.getString(R.string.find_password_header))
 
-        adapter.fragmentList = listOf(FindIdFragment(), FindPasswordFragment())
+        adapter.fragmentList = listOf(FindEmailFragment(), FindPasswordFragment())
         binding.viewpagerFindmemberPager.adapter = adapter
 
         TabLayoutMediator(binding.tablayoutFindmemberTabmenu, binding.viewpagerFindmemberPager) { tab, position ->
