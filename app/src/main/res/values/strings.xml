@@ -40,7 +40,7 @@
     <string name="find_id_header">아이디 찾기</string>
     <string name="find_id_name_label">이름</string>
     <string name="find_id_name_input">이름 입력란</string>
-    <string name="find_id_email_label">이메일</string>
+    <string name="find_id_phone_label">전화 번호</string>
     <string name="find_id_submit">확인</string>
     <string name="find_password_header">비밀번호 찾기</string>
     <string name="find_password_id_label">아이디</string>
