@@ -46,12 +46,16 @@
             android:layout_height="wrap_content"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:text="@string/register_duplicate_check_button"
             app:layout_constraintBottom_toTopOf="@+id/edittext_register_name_input"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@id/edittext_register_emailinput"
-            app:layout_constraintTop_toBottomOf="@+id/fragment_containerview_register_header" />
+            app:layout_constraintTop_toBottomOf="@+id/fragment_containerview_register_header"
+            android:background="@drawable/main_radius_button"
+            android:text="@string/register_duplicate_check_button"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+             />
         <!-- 이름 입력창 -->
         <TextView
             android:id="@+id/textview_register_name_pointer"
