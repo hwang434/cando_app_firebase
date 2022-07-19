@@ -52,8 +52,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
     
     // 비밀번호 찾기
-    fun findUserPassword(email: String) {
-        Log.d(TAG,"UserViewModel - findUserPassword() called")
+    suspend fun isExistNameAndEmail(name: String, email: String): Boolean {
+        Log.d(TAG,"UserViewModel - isExistNameAndEmail() called")
+        return userRepository.isExistNameAndEmail(name, email)
     }
     
     // 중복 회원 찾기
@@ -76,5 +77,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     fun signOut() {
         Firebase.auth.signOut()
         _userLiveData.postValue(null)
+    }
+
+    suspend fun sendPasswordResetEmail(email: String) : Boolean {
+        return userRepository.sendPasswordResetEmail(email)
     }
 }

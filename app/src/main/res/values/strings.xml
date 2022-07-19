@@ -43,8 +43,8 @@
     <string name="find_id_phone_label">전화 번호</string>
     <string name="find_id_submit">확인</string>
     <string name="find_password_header">비밀번호 찾기</string>
-    <string name="find_password_id_label">아이디</string>
-    <string name="find_password_id_input">아이디 입력란</string>
+    <string name="find_password_name_label">이름</string>
+    <string name="find_password_name_input">이름 입력란</string>
     <string name="find_password_email_label">이메일</string>
     <string name="find_password_email_input">이메일 입력란</string>
     <string name="find_password_email_check_label">인증번호</string>
@@ -68,5 +68,4 @@
     <string name="toast_can_use_email">사용하셔도 좋은 이메일입니다.</string>
     <string name="toast_fail_register">회원가입 실패</string>
     <string name="toast_login_fail">아이디 또는 비밀번호가 일치하지 않습니다.</string>
-
 </resources>
