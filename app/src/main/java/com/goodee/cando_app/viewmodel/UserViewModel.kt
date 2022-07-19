@@ -46,9 +46,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 아이디 찾기
-    suspend fun findUserId(name: String, email: String): QuerySnapshot {
+    suspend fun findUserEmail(name: String, phone: String): QuerySnapshot {
         Log.d(TAG,"UserViewModel - findUserId() called")
-        return userRepository.findUserId(name, email)
+        return userRepository.findUserEmail(name, phone)
     }
     
     // 비밀번호 찾기

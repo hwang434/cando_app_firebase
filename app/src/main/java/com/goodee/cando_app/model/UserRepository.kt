@@ -52,11 +52,11 @@ class UserRepository(val application: Application) {
     }
 
     // 유저 아이디 찾기
-    suspend fun findUserId(name: String, email: String): QuerySnapshot {
+    suspend fun findUserEmail(name: String, phone: String): QuerySnapshot {
         Log.d(TAG, "AppRepository - findUserId() called")
         val firebaseDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION)
 
-        return firebaseDatabase.whereEqualTo("name", name).whereEqualTo("email", email).get()
+        return firebaseDatabase.whereEqualTo("name", name).whereEqualTo("phone", phone).get()
             .await()
     }
 

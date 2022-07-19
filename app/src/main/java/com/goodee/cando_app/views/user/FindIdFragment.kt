@@ -45,16 +45,16 @@ class FindIdFragment : Fragment() {
 
     private fun setEvent() {
         binding.buttonFindidSubmit.setOnClickListener {
-            val email = binding.edittextFindidEmailinput.text.toString()
+            val phone = binding.edittextFindidPhoneinput.text.toString().trim().replace("-","")
             val name = binding.edittextFindidNameinput.text.toString()
 
-            if (email.isEmpty() || email.isBlank()) {
+            if (phone.isEmpty() || phone.isBlank()) {
                 Toast.makeText(requireActivity(), "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
             } else if (name.isEmpty() || name.isBlank()) {
                 Toast.makeText(requireActivity(), "이름을 입력해주세요", Toast.LENGTH_SHORT).show()
             } else {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val qResult = userViewModel.findUserId(email = email, name = name)
+                    val qResult = userViewModel.findUserEmail(phone = phone, name = name)
                     if (qResult.isEmpty) {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(requireContext(), "존재하지 않는 회원입니다.", Toast.LENGTH_SHORT).show()
