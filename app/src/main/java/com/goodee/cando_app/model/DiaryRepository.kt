@@ -52,41 +52,15 @@ class DiaryRepository(val application: Application) {
         val qResult = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).orderBy("date").limitToLast(10).get().await()
         val diaryList = mutableListOf<DiaryDto>()
         qResult.documents.forEach { dSnapshot ->
-
-            Log.d(TAG,"DiaryRepository - dSnapShot.id : ${dSnapshot.id}")
-            val dno = dSnapshot.id
-            val author = dSnapshot.get("author").toString()
-            val title = dSnapshot.get("title").toString()
-            val date = dSnapshot.getDate("date")!!.time
-            val content = dSnapshot.get("content").toString()
-
-            val diary = DiaryDto(dno = dno,  title = title, content = content, author = author, date = date)
-            diaryList.add(diary)
+            Log.d(TAG,"DiaryRepository - dSnapshot.data : ${dSnapshot.data}")
+            val diary = dSnapshot.toObject(DiaryDto::class.java)
+            diary?.run {
+                DiaryDto(dno = dno,  title = title, content = content, author = author, date = date)
+                diaryList.add(this)
+            }
         }
         _diaryListLiveData.postValue(diaryList)
         return true
-//        val rootRef = RealTimeDatabase.getDatabase().ref
-//        val diaryRef = rootRef.child("Diary")
-//        val query = diaryRef.orderByChild("dno").limitToLast(10)
-//        val valueEventListener = object: ValueEventListener {
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                Log.d(TAG,"AppRepository - onDataChange() called")
-//                val diaryList = mutableListOf<DiaryDto>()
-//                snapshot.children.forEach { ds ->
-//                    val dno = ds.key
-//                    val author = ds.child("author").value.toString()
-//                    val title = ds.child("title").value.toString()
-//                    val date = ds.child("date").value.toString().toLong()
-//                    diaryList.add(DiaryDto(dno = dno, title = title, content = "", author = author, date = date))
-//                }
-//                diaryList.reverse()
-//                _diaryListLiveData.postValue(diaryList)
-//            }
-//            override fun onCancelled(error: DatabaseError) {
-//                Log.d(TAG,"AppRepository - onCancelled() called")
-//            }
-//        }
-//        query.addListenerForSingleValueEvent(valueEventListener)
     }
 
     // 게시글 작성
