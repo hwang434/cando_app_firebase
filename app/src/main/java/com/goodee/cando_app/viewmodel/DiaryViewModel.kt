@@ -7,11 +7,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.model.DiaryRepository
-import com.goodee.cando_app.model.UserRepository
 
 class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     private val TAG: String = "로그"
-    private var appRepository: DiaryRepository
+    private var diaryRepository: DiaryRepository
     private val _diaryListLiveData: MutableLiveData<List<DiaryDto>>
     val diaryListLiveData: LiveData<List<DiaryDto>>
         get() = _diaryListLiveData
@@ -21,34 +20,35 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         Log.d(TAG,"DiaryViewModel - init called")
-        appRepository = DiaryRepository(application)
-        _diaryListLiveData = appRepository.diaryListLiveData as MutableLiveData<List<DiaryDto>>
-        _diaryLiveData = appRepository.diaryLiveData as MutableLiveData<DiaryDto>
+        diaryRepository = DiaryRepository(application)
+        _diaryListLiveData = diaryRepository.diaryListLiveData as MutableLiveData<List<DiaryDto>>
+        _diaryLiveData = diaryRepository.diaryLiveData as MutableLiveData<DiaryDto>
     }
 
-    // 모든 게시글 불러오기
-    fun getDiaryList() {
-        appRepository.getDiaryList()
-    }
     // 게시글 1개 가져오기
     fun getDiary(dno: String) {
-        appRepository.getDiary(dno)
+        diaryRepository.getDiary(dno)
     }
     // 글 작성하기
     fun writeDiary(diaryDto: DiaryDto) {
-        appRepository.writeDiary(diaryDto)
+        diaryRepository.writeDiary(diaryDto)
     }
 
     fun editDiary(diaryDto: DiaryDto) {
-        appRepository.editDiary(diaryDto)
+        diaryRepository.editDiary(diaryDto)
     }
 
     fun deleteDiary(dno: String) {
-        appRepository.deleteDiary(dno)
+        diaryRepository.deleteDiary(dno)
     }
 
     override fun onCleared() {
         super.onCleared()
         Log.d(TAG,"DiaryViewModel - onCleared() called")
+    }
+
+    // refresh Diary List live data from Firestore.
+    suspend fun refreshDiaryList(): Boolean {
+        return diaryRepository.refreshDiaryList()
     }
 }
