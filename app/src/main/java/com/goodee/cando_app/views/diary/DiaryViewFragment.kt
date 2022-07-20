@@ -69,15 +69,6 @@ class DiaryViewFragment : Fragment() {
     ): View {
         Log.d(TAG,"DiaryViewFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary_view, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        diaryViewModel.diaryLiveData.observe(viewLifecycleOwner) { diaryDto ->
-            Log.d(TAG, "DiaryViewFragment - diaryLivedata change")
-            if (diaryDto != null) {
-                binding.textviewDiaryviewTitleview.text = diaryDto.title
-                binding.textviewDiaryviewContentview.text = diaryDto.content
-                binding.textviewDiaryViewAuthorView.text = diaryDto.author
-            }
-        }
         setEvent()
 
         return binding.root
