@@ -39,7 +39,6 @@ class FindPasswordFragment : Fragment() {
                 || !RegexChecker.isValidEmail(binding.edittextFindpasswordEmailinput.text.toString())) {
                 Toast.makeText(requireActivity(), "이메일을 확인해주세요.", Toast.LENGTH_SHORT).show()
             } else {
-                // if :
                 val name = binding.edittextFindpasswordNameInput.text.toString()
                 val email = binding.edittextFindpasswordEmailinput.text.toString()
 
@@ -47,9 +46,10 @@ class FindPasswordFragment : Fragment() {
                     // if : 존재하는 이름과 이메일이라면
                     if (userViewModel.isExistNameAndEmail(name = name, email = email)) {
                         // 비밀번호 리셋용 이메일 전송
-                        when (userViewModel.sendPasswordResetEmail(email)) {
-                            true -> {
-                                withContext(Dispatchers.Main) {
+                        val isEmailSend = userViewModel.sendPasswordResetEmail(email)
+                        withContext(Dispatchers.Main) {
+                            when (isEmailSend) {
+                                true -> {
                                     val alertDialogBuilder = AlertDialog.Builder(requireContext()).create()
                                     alertDialogBuilder.run {
                                         setTitle("이메일을 송신했습니다.")
@@ -58,9 +58,7 @@ class FindPasswordFragment : Fragment() {
                                         show()
                                     }
                                 }
-                            }
-                            false -> {
-                                withContext(Dispatchers.Main) {
+                                false -> {
                                     val alertDialogBuilder = AlertDialog.Builder(requireContext()).create()
                                     alertDialogBuilder.run {
                                         setTitle("서버에 상태가 좋지 않습니다.")
@@ -71,7 +69,6 @@ class FindPasswordFragment : Fragment() {
                                 }
                             }
                         }
-
                     } else {
                         // 이름과 이메일이 일치하는 회원이 존재하지 않음.
                         val alertDialogBuilder = AlertDialog.Builder(requireContext()).create()
