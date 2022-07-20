@@ -9,7 +9,9 @@ import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.model.DiaryRepository
 
 class DiaryViewModel(application: Application) : AndroidViewModel(application) {
-    private val TAG: String = "로그"
+    companion object {
+        private const val TAG: String = "로그"
+    }
     private var diaryRepository: DiaryRepository
     private val _diaryListLiveData: MutableLiveData<List<DiaryDto>>
     val diaryListLiveData: LiveData<List<DiaryDto>>
@@ -26,9 +28,10 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 게시글 1개 가져오기
-    suspend fun getDiary(dno: String): DiaryDto? {
-        return diaryRepository.getDiary(dno)
+    suspend fun refreshDiaryLiveData(dno: String): Boolean {
+        return diaryRepository.refreshDiaryLiveData(dno)
     }
+
     // 글 작성하기
     fun writeDiary(diaryDto: DiaryDto) {
         diaryRepository.writeDiary(diaryDto)

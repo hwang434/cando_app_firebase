@@ -24,15 +24,16 @@ class DiaryRepository(val application: Application) {
         get() = _diaryLiveData
 
     // 게시글 조회(게시글 클릭 시 1개의 게시글을 읽음)
-    suspend fun getDiary(dno: String): DiaryDto? {
+    suspend fun refreshDiaryLiveData(dno: String): Boolean {
         Log.d(TAG,"AppRepository - getDiary() called")
         val qResult = FirebaseFirestore.getInstance().collection("diary").whereEqualTo("dno", dno).get().await()
         // if : There is no document has a same diary and dno.
         if (qResult.isEmpty) {
-            return null
+            return false
         }
 
-        return qResult.first().toObject(DiaryDto::class.java)
+        _diaryLiveData.postValue(qResult.first().toObject(DiaryDto::class.java))
+        return true
     }
 
     // 게시글 목록 가져오기(로그인시 바로 보이는 게시글들)
