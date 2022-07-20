@@ -4,13 +4,12 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.ContextMenu
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
@@ -27,9 +26,7 @@ class DiaryViewFragment : Fragment() {
 
     private lateinit var binding: FragmentDiaryViewBinding
     private lateinit var dno: String
-    private val diaryViewModel: DiaryViewModel by lazy {
-        ViewModelProvider(this).get(DiaryViewModel::class.java)
-    }
+    private val diaryViewModel: DiaryViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

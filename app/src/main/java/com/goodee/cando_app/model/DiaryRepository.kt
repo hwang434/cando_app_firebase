@@ -9,6 +9,7 @@ import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 
 class DiaryRepository(val application: Application) {
     companion object {
@@ -81,22 +82,20 @@ class DiaryRepository(val application: Application) {
     }
 
     // 게시글 수정하기
-    fun editDiary(diaryDto: DiaryDto) {
+    suspend fun editDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"AppRepository - editDiary() called")
-        val firebaseDatabase = RealTimeDatabase.getDatabase()
-        val map = HashMap<String, Any>()
+        val map = mutableMapOf<String, Any>()
         map["title"] = diaryDto.title
         map["content"] = diaryDto.content
         map["author"] = diaryDto.author
         map["date"] = diaryDto.date
-        Log.d(TAG,"AppRepository - map : $map")
-        firebaseDatabase.child("Diary/${diaryDto.dno}").updateChildren(map).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG,"AppRepository - 글 수정 성공")
-                _diaryLiveData.postValue(diaryDto)
-            } else {
-                Log.d(TAG,"AppRepository - 글 수정 실패")
-            }
+        val task = FirebaseFirestore.getInstance().collection("diary").document(diaryDto.dno).update(map)
+
+        task.await()
+        if (task.isSuccessful) {
+            Log.d(TAG,"DiaryRepository - 글 수정 성공")
+        } else {
+            throw Exception("글 수정 실패")
         }
     }
 

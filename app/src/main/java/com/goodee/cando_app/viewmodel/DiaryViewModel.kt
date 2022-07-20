@@ -29,19 +29,23 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
 
     // 게시글 1개 가져오기
     suspend fun refreshDiaryLiveData(dno: String): Boolean {
+        Log.d(TAG,"DiaryViewModel - refreshDiaryLiveData() called")
         return diaryRepository.refreshDiaryLiveData(dno)
     }
 
     // 글 작성하기
     fun writeDiary(diaryDto: DiaryDto) {
+        Log.d(TAG,"DiaryViewModel - writeDiary() called")
         diaryRepository.writeDiary(diaryDto)
     }
 
-    fun editDiary(diaryDto: DiaryDto) {
+    suspend fun editDiary(diaryDto: DiaryDto) {
+        Log.d(TAG,"DiaryViewModel - editDiary() called")
         diaryRepository.editDiary(diaryDto)
     }
 
     fun deleteDiary(dno: String) {
+        Log.d(TAG,"DiaryViewModel - deleteDiary() called")
         diaryRepository.deleteDiary(dno)
     }
 
@@ -52,6 +56,7 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
 
     // refresh Diary List live data from Firestore.
     suspend fun refreshDiaryList(): Boolean {
+        Log.d(TAG,"DiaryViewModel - refreshDiaryList() called")
         return diaryRepository.refreshDiaryList()
     }
 }
