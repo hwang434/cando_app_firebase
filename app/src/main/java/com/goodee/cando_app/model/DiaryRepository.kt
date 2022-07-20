@@ -24,26 +24,15 @@ class DiaryRepository(val application: Application) {
         get() = _diaryLiveData
 
     // 게시글 조회(게시글 클릭 시 1개의 게시글을 읽음)
-    fun getDiary(dno: String) {
+    suspend fun getDiary(dno: String): DiaryDto? {
         Log.d(TAG,"AppRepository - getDiary() called")
-        RealTimeDatabase.getDatabase().child("Diary/${dno}").get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val map = mutableMapOf<String, String>()
-                task.result?.children?.forEach { child ->
-                    Log.d(TAG,"AppRepository - key : ${child.key} value : ${child.value}")
-                    map[child.key.toString()] = child.value.toString()
-                }
-
-                val title = map["title"]
-                val content = map["content"]
-                val author = map["author"]
-                val date = map["date"]
-                if (title != null && content != null && author != null && date != null) {
-                    val diaryDto = DiaryDto(dno = dno, title = title, content = content, author = author, date = date.toLong())
-                    _diaryLiveData.value = diaryDto
-                }
-            }
+        val qResult = FirebaseFirestore.getInstance().collection("diary").whereEqualTo("dno", dno).get().await()
+        // if : There is no document has a same diary and dno.
+        if (qResult.isEmpty) {
+            return null
         }
+
+        return qResult.first().toObject(DiaryDto::class.java)
     }
 
     // 게시글 목록 가져오기(로그인시 바로 보이는 게시글들)

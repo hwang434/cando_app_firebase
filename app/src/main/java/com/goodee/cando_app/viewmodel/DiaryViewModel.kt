@@ -26,8 +26,8 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 게시글 1개 가져오기
-    fun getDiary(dno: String) {
-        diaryRepository.getDiary(dno)
+    suspend fun getDiary(dno: String): DiaryDto? {
+        return diaryRepository.getDiary(dno)
     }
     // 글 작성하기
     fun writeDiary(diaryDto: DiaryDto) {
