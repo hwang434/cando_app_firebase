@@ -7,10 +7,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
-import com.google.firebase.database.*
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 class DiaryRepository(val application: Application) {
-    private val TAG: String = "로그"
+    companion object {
+        private const val TAG: String = "로그"
+        private const val DIARY_COLLECTION = "diary"
+    }
+
     private val _diaryListLiveData: MutableLiveData<List<DiaryDto>> = MutableLiveData()
     val diaryListLiveData: LiveData<List<DiaryDto>>
         get() = _diaryListLiveData
@@ -19,53 +24,32 @@ class DiaryRepository(val application: Application) {
         get() = _diaryLiveData
 
     // 게시글 조회(게시글 클릭 시 1개의 게시글을 읽음)
-    fun getDiary(dno: String) {
+    suspend fun getDiary(dno: String): DiaryDto? {
         Log.d(TAG,"AppRepository - getDiary() called")
-        RealTimeDatabase.getDatabase().child("Diary/${dno}").get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val map = mutableMapOf<String, String>()
-                task.result?.children?.forEach { child ->
-                    Log.d(TAG,"AppRepository - key : ${child.key} value : ${child.value}")
-                    map[child.key.toString()] = child.value.toString()
-                }
-
-                val title = map["title"]
-                val content = map["content"]
-                val author = map["author"]
-                val date = map["date"]
-                if (title != null && content != null && author != null && date != null) {
-                    val diaryDto = DiaryDto(dno = dno, title = title, content = content, author = author, date = date.toLong())
-                    _diaryLiveData.value = diaryDto
-                }
-            }
+        val qResult = FirebaseFirestore.getInstance().collection("diary").whereEqualTo("dno", dno).get().await()
+        // if : There is no document has a same diary and dno.
+        if (qResult.isEmpty) {
+            return null
         }
+
+        return qResult.first().toObject(DiaryDto::class.java)
     }
 
     // 게시글 목록 가져오기(로그인시 바로 보이는 게시글들)
-    fun getDiaryList() {
-        Log.d(TAG,"AppRepository - getDiaryList() called")
-        val rootRef = RealTimeDatabase.getDatabase().ref
-        val diaryRef = rootRef.child("Diary")
-        val query = diaryRef.orderByChild("dno").limitToLast(10)
-        val valueEventListener = object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                Log.d(TAG,"AppRepository - onDataChange() called")
-                val diaryList = mutableListOf<DiaryDto>()
-                snapshot.children.forEach { ds ->
-                    val dno = ds.key
-                    val author = ds.child("author").value.toString()
-                    val title = ds.child("title").value.toString()
-                    val date = ds.child("date").value.toString().toLong()
-                    diaryList.add(DiaryDto(dno = dno, title = title, content = "", author = author, date = date))
-                }
-                diaryList.reverse()
-                _diaryListLiveData.postValue(diaryList)
-            }
-            override fun onCancelled(error: DatabaseError) {
-                Log.d(TAG,"AppRepository - onCancelled() called")
+    suspend fun refreshDiaryList(): Boolean {
+        Log.d(TAG,"DiaryRepository - refreshDiaryList() called")
+        val qResult = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).orderBy("date").limitToLast(10).get().await()
+        val diaryList = mutableListOf<DiaryDto>()
+        qResult.documents.forEach { dSnapshot ->
+            Log.d(TAG,"DiaryRepository - dSnapshot.data : ${dSnapshot.data}")
+            val diary = dSnapshot.toObject(DiaryDto::class.java)
+            diary?.run {
+                DiaryDto(dno = dno,  title = title, content = content, author = author, date = date)
+                diaryList.add(this)
             }
         }
-        query.addListenerForSingleValueEvent(valueEventListener)
+        _diaryListLiveData.postValue(diaryList)
+        return true
     }
 
     // 게시글 작성

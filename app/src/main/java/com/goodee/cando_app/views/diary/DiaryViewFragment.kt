@@ -1,5 +1,6 @@
 package com.goodee.cando_app.views.diary
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -8,10 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryViewBinding
 import com.goodee.cando_app.viewmodel.DiaryViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DiaryViewFragment : Fragment() {
     companion object {
@@ -35,7 +40,27 @@ class DiaryViewFragment : Fragment() {
 
         // 전달이 됐으면 글을 조회
         dno = arguments?.get("dno").toString()
-        diaryViewModel.getDiary(dno)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val diaryDto = diaryViewModel.getDiary(dno)
+            withContext(Dispatchers.Main) {
+                when (diaryDto) {
+                    null -> {
+                        val alertDialog = AlertDialog.Builder(requireContext()).create()
+                        alertDialog.setTitle("오류")
+                        alertDialog.setMessage("이미 삭제 된 글입니다.")
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "확인") { _, _ ->
+                            findNavController().navigateUp()
+                        }
+                    }
+                    else -> {
+                        binding.textviewDiaryviewTitleview.text = diaryDto.title
+                        binding.textviewDiaryviewContentview.text = diaryDto.content
+                        binding.textviewDiaryViewAuthorView.text = diaryDto.author
+                        binding.progressbarDiaryviewLoading.visibility = View.GONE
+                    }
+                }
+            }
+        }
     }
 
     override fun onCreateView(
@@ -44,15 +69,6 @@ class DiaryViewFragment : Fragment() {
     ): View {
         Log.d(TAG,"DiaryViewFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary_view, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        diaryViewModel.diaryLiveData.observe(viewLifecycleOwner) { diaryDto ->
-            Log.d(TAG, "DiaryViewFragment - diaryLivedata change")
-            if (diaryDto != null) {
-                binding.textviewDiaryviewTitleview.text = "제목 : " + diaryDto.title
-                binding.textviewDiaryviewContentview.text = diaryDto.content
-                binding.textviewDiaryViewAuthorView.text = "작성자 : " + diaryDto.author
-            }
-        }
         setEvent()
 
         return binding.root
