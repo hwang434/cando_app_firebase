@@ -67,4 +67,16 @@ class UserRepository(val application: Application) {
         // null이 아니고 비지 않았으면 존재하지 않는 이메일이므로 true를 리턴
         return result?.signInMethods != null && result.signInMethods!!.isNotEmpty()
     }
+
+    suspend fun isExistNameAndEmail(name: String, email: String): Boolean {
+        val firebaseDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION)
+        Log.d(TAG,"UserRepository - ${firebaseDatabase.whereEqualTo("name", name).whereEqualTo("email", email).get().await().documents}")
+        return !firebaseDatabase.whereEqualTo("name", name).whereEqualTo("email", email).get().await().isEmpty
+    }
+
+    suspend fun sendPasswordResetEmail(email: String): Boolean {
+        val result = FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+        result.await()
+        return result.isSuccessful
+    }
 }

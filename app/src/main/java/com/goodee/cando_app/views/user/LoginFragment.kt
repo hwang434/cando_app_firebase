@@ -17,7 +17,7 @@ import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentLoginBinding
 import com.goodee.cando_app.listener.SingleClickListner
 import com.goodee.cando_app.viewmodel.UserViewModel
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
@@ -95,16 +95,17 @@ class LoginFragment : Fragment() {
                     val password = binding.edittextLoginPasswordinput.text.toString()
 
                     lifecycleScope.launch(Dispatchers.IO) {
-                        try {
-                            if (userViewModel.login(email, password)) {
-                                withContext(Dispatchers.Main) {
+                        withContext(Dispatchers.Main) {
+                            try {
+                                if (userViewModel.login(email, password)) {
                                     findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
                                 }
-                            }
-                        } catch (e: FirebaseAuthInvalidCredentialsException) {
-                            withContext(Dispatchers.Main) {
-                                binding.progressbarLoginLoading.visibility = View.GONE
-                                Toast.makeText(requireContext(), getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show()
+                            } catch (e: Exception) {
+                                Log.d(TAG,"LoginFragment - e : ${e.message}")
+                                if (e is FirebaseAuthException) {
+                                    binding.progressbarLoginLoading.visibility = View.GONE
+                                    Toast.makeText(requireContext(), getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
                     }
