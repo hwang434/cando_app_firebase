@@ -39,9 +39,9 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
         return diaryRepository.writeDiary(diaryDto)
     }
 
-    suspend fun editDiary(diaryDto: DiaryDto) {
+    suspend fun editDiary(diaryDto: DiaryDto): Boolean {
         Log.d(TAG,"DiaryViewModel - editDiary() called")
-        diaryRepository.editDiary(diaryDto)
+        return diaryRepository.editDiary(diaryDto)
     }
 
     fun deleteDiary(dno: String) {
