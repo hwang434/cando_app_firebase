@@ -67,7 +67,7 @@ class DiaryRepository(val application: Application) {
     }
 
     // 게시글 수정하기
-    suspend fun editDiary(diaryDto: DiaryDto) {
+    suspend fun editDiary(diaryDto: DiaryDto): Boolean {
         Log.d(TAG,"AppRepository - editDiary() called")
         val map = mutableMapOf<String, Any>()
         map["title"] = diaryDto.title
@@ -77,11 +77,10 @@ class DiaryRepository(val application: Application) {
         val task = FirebaseFirestore.getInstance().collection("diary").document(diaryDto.dno).update(map)
 
         task.await()
-        if (task.isSuccessful) {
-            Log.d(TAG,"DiaryRepository - 글 수정 성공")
-        } else {
+        if (!task.isSuccessful) {
             throw Exception("글 수정 실패")
         }
+        return task.isSuccessful
     }
 
     fun deleteDiary(dno: String) {
