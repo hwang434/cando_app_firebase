@@ -1,7 +1,6 @@
 package com.goodee.cando_app.views.diary
 
 import android.app.AlertDialog
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -15,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryViewBinding
 import com.goodee.cando_app.viewmodel.DiaryViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,6 +44,12 @@ class DiaryViewFragment : Fragment() {
             binding.textviewDiaryviewContentview.text = diaryDto.content
             binding.textviewDiaryViewAuthorView.text = diaryDto.author
             binding.progressbarDiaryviewLoading.visibility = View.GONE
+
+            // if : 로그인한 유저의 이메일과 게시자의 이메일이 일치 -> 글 수정, 삭제 버튼을 보여줌.
+            if (FirebaseAuth.getInstance().currentUser?.email == diaryViewModel.diaryLiveData.value?.author) {
+                binding.buttonDiaryviewEditbutton.visibility = View.VISIBLE
+                binding.buttonDiaryviewDeletebutton.visibility = View.VISIBLE
+            }
         }
 
         // 전달이 됐으면 글을 조회
@@ -58,6 +64,7 @@ class DiaryViewFragment : Fragment() {
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "확인") { _, _ ->
                         findNavController().navigateUp()
                     }
+                    alertDialog.show()
                 }
             }
         }
@@ -78,5 +85,12 @@ class DiaryViewFragment : Fragment() {
             val dialog = DiaryDeleteDialogFragment(dno)
             dialog.show(requireActivity().supportFragmentManager, "쇼")
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // When you leave fragment or navigate to next fragment.
+        // It will clear ViewModel.
+        activity?.viewModelStore?.clear()
     }
 }

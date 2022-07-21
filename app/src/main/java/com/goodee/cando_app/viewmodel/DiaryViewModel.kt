@@ -49,14 +49,14 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
         diaryRepository.deleteDiary(dno)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        Log.d(TAG,"DiaryViewModel - onCleared() called")
-    }
-
     // refresh Diary List live data from Firestore.
     suspend fun refreshDiaryList(): Boolean {
         Log.d(TAG,"DiaryViewModel - refreshDiaryList() called")
         return diaryRepository.refreshDiaryList()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d(TAG,"DiaryViewModel - onCleared() called")
     }
 }
