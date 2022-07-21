@@ -34,9 +34,9 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 회원가입
-    suspend fun register(email: String, userDto: UserDto, password: String): Boolean {
+    suspend fun sendRegisterEmail(email: String, userDto: UserDto, password: String): Boolean {
         Log.d(TAG,"User - register() called")
-        return userRepository.register(email, userDto, password)
+        return userRepository.sendRegisterEmail(email, userDto, password)
     }
 
     // 로그인

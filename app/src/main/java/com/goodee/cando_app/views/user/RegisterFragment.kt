@@ -23,10 +23,10 @@ import com.goodee.cando_app.util.RegexChecker
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.squareup.okhttp.Dispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.regex.Pattern
 
 class RegisterFragment : Fragment() {
     companion object {
@@ -92,10 +92,20 @@ class RegisterFragment : Fragment() {
                     lifecycleScope.launch(Dispatchers.IO) {
                         // if : 회원 가입 성공 -> 다이어리 화면으로 이동
                         try {
-                            if (userViewModel.register(email, userDto, password)) {
-                                withContext(Dispatchers.Main) {
-                                    findNavController().navigate(R.id.action_registerFragment_to_diaryFragment)
+                            val isSendEmailSuccess = userViewModel.sendRegisterEmail(email, userDto, password)
+                            withContext(Dispatchers.Main) {
+                                val alertDialog = AlertDialog.Builder(requireContext()).create()
+                                if (isSendEmailSuccess) {
+                                    alertDialog.setTitle("회원가입 이메일 전송")
+                                    alertDialog.setMessage("회원 가입 메일을 $email 로 전송하였습니다.\n해당 계정으로 접속하여 받은 이메일 링크를 클릭해주세요.")
+                                } else {
+                                    alertDialog.setTitle("회원가입 실패")
+                                    alertDialog.setMessage("오류가 발생했습니다.\n다시 시도해주세요")
                                 }
+                                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "확인")  { _, _ ->
+                                    findNavController().navigateUp()
+                                }
+                                alertDialog.show()
                             }
                         } catch (e: FirebaseAuthUserCollisionException) {
                             withContext(Dispatchers.Main) {
@@ -108,7 +118,7 @@ class RegisterFragment : Fragment() {
                                 Toast.makeText(requireContext(), getString(R.string.toast_password_too_easy), Toast.LENGTH_SHORT).show()
                             }
                         } catch (e: Exception) {
-                            Log.d(TAG,"RegisterFragment - setEvent() called")
+                            Log.w(TAG, "setEvent: register Exception", e)
                         }
                     }
                 }

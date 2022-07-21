@@ -23,13 +23,26 @@ class UserRepository(val application: Application) {
         get() = _userLiveData
 
     // 회원가입
-    suspend fun register(email: String, userDto: UserDto, password: String): Boolean {
-        Log.d(TAG,"AppRepository - register() called")
+    suspend fun sendRegisterEmail(email: String, userDto: UserDto, password: String): Boolean {
+        Log.d(TAG,"UserRepository - sendRegisterEmail() called")
         try {
+            // 파이어 베이스 회원 가입
             val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+            Log.d(TAG,"UserRepository - authResult : $authResult")
+            // if : 파이어 베이스 회원 가입 성공했으면
             if (authResult.user != null) {
-                FirebaseFirestore.getInstance().collection("$USER_COLLECTION").add(userDto).await()
-                _userLiveData.postValue(firebaseAuth.currentUser)
+                // 파이어스토어에 회원 정보를 저장
+                val saveUserToDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION).add(userDto)
+                saveUserToDatabase.await()
+                // 회원 정보를 저장하는데 실패하면, 회원 탈퇴
+                if (!saveUserToDatabase.isSuccessful) {
+                    firebaseAuth.currentUser?.delete()?.await()
+                    return false
+                }
+
+                // 회원 정보 저장 성공하면 인증 이메일을 보내고 로그아웃
+                FirebaseAuth.getInstance().currentUser?.sendEmailVerification()?.await()
+                FirebaseAuth.getInstance().signOut()
                 return true
             }
         } catch (e: Exception) {
