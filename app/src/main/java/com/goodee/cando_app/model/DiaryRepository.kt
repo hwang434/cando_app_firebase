@@ -2,7 +2,6 @@ package com.goodee.cando_app.model
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.database.RealTimeDatabase
@@ -26,7 +25,7 @@ class DiaryRepository(val application: Application) {
 
     // 게시글 조회(게시글 클릭 시 1개의 게시글을 읽음)
     suspend fun refreshDiaryLiveData(dno: String): Boolean {
-        Log.d(TAG,"AppRepository - getDiary() called")
+        Log.d(TAG,"DiaryRepository - refreshDiaryLiveData(dno : $dno)")
         val qResult = FirebaseFirestore.getInstance().collection("diary").whereEqualTo("dno", dno).get().await()
         // if : There is no document has a same diary and dno.
         if (qResult.isEmpty) {
@@ -43,11 +42,9 @@ class DiaryRepository(val application: Application) {
         val qResult = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).orderBy("date").limitToLast(10).get().await()
         val diaryList = mutableListOf<DiaryDto>()
         qResult.documents.forEach { dSnapshot ->
-            Log.d(TAG,"DiaryRepository - dSnapshot.data : ${dSnapshot.data}")
             val diary = dSnapshot.toObject(DiaryDto::class.java)
             diary?.run {
-                DiaryDto(dno = dno,  title = title, content = content, author = author, date = date)
-                diaryList.add(this)
+                diaryList.add(DiaryDto(dno = dno,  title = title, author = author, date = date))
             }
         }
         _diaryListLiveData.postValue(diaryList)
@@ -56,8 +53,9 @@ class DiaryRepository(val application: Application) {
 
     // 게시글 작성
     suspend fun writeDiary(diaryDto: DiaryDto): Boolean {
-        Log.d(TAG,"AppRepository - writeDiary() called")
-        val task = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document().set(diaryDto)
+        Log.d(TAG,"AppRepository - writeDiary(diaryDto : $diaryDto) called")
+        diaryDto.dno = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document().id
+        val task = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document(diaryDto.dno).set(diaryDto)
 
         task.await()
         if (!task.isSuccessful) {
@@ -68,7 +66,7 @@ class DiaryRepository(val application: Application) {
 
     // 게시글 수정하기
     suspend fun editDiary(diaryDto: DiaryDto): Boolean {
-        Log.d(TAG,"AppRepository - editDiary() called")
+        Log.d(TAG,"AppRepository - editDiary(diaryDto : $diaryDto) called")
         val map = mutableMapOf<String, Any>()
         map["title"] = diaryDto.title
         map["content"] = diaryDto.content
