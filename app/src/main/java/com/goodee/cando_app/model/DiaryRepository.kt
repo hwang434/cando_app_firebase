@@ -55,15 +55,30 @@ class DiaryRepository(val application: Application) {
     }
 
     // 게시글 작성
-    suspend fun writeDiary(diaryDto: DiaryDto): Boolean {
+    fun writeDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"AppRepository - writeDiary() called")
-        val task = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document().set(diaryDto)
-
-        task.await()
-        if (!task.isSuccessful) {
-            throw Exception("글 작성 실패")
+        val diaryRef = RealTimeDatabase.getDatabase().child("Diary").ref
+        val key = diaryRef.push().key
+        val lastDno = diaryRef.limitToLast(1).get().addOnCompleteListener {
+            Log.d(TAG,"AppRepository - it : ${it.result}")
         }
-        return task.isSuccessful
+        if (!lastDno.isSuccessful) {
+            Log.d(TAG,"AppRepository - diaryRef.limitToLast(1).get().isSuccessful : false")
+            return
+        }
+        Log.d(TAG,"AppRepository - lastDno : ${lastDno.result}")
+
+        val diary = HashMap<String, DiaryDto>()
+        key?.let {
+            diary.put(key, diaryDto)
+        }
+
+        val firebaseDatabase = RealTimeDatabase.getDatabase()
+        firebaseDatabase.child("Diary/${key}").setValue(diaryDto).addOnCompleteListener { task ->       // Diary/${key}에 글 저장하기
+            Log.d(TAG,"AppRepository - task.isSuccessful : ${task.isSuccessful}")
+            if (task.isSuccessful) Toast.makeText(application, "글 작성 성공", Toast.LENGTH_SHORT).show()
+            else Toast.makeText(application, "글 작성 실패", Toast.LENGTH_SHORT).show()
+        }
     }
 
     // 게시글 수정하기

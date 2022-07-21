@@ -64,10 +64,9 @@ class DiaryWriteFragment : Fragment() {
                 val title = binding.edittextDiarywriteTitleinput.text.toString()
                 val content = binding.edittextDiarywriteContentinput.text.toString()
                 val author = FirebaseAuth.getInstance().currentUser?.email
-                val date = System.currentTimeMillis()
 
                 try {
-                    val newDiaryDto = DiaryDto(dno = requireArguments().get("dno").toString(), title = title, content = content, author = author.toString(), date = date)
+                    val newDiaryDto = DiaryDto(dno = requireArguments().get("dno").toString(), title = title, content = content, author = author.toString())
                     // if : 네비게이션을 통해 dno를 받았으면(글 조회에서 넘어왔으면) -> 현재 글 수정
                     // else : 새로 글 작성이면 -> 새로운 글 작성
                     if (arguments?.get("dno") != null) {

@@ -34,9 +34,9 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 글 작성하기
-    suspend fun writeDiary(diaryDto: DiaryDto): Boolean {
+    fun writeDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"DiaryViewModel - writeDiary() called")
-        return diaryRepository.writeDiary(diaryDto)
+        diaryRepository.writeDiary(diaryDto)
     }
 
     suspend fun editDiary(diaryDto: DiaryDto) {
