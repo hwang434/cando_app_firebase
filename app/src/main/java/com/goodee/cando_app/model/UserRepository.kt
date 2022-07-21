@@ -56,11 +56,13 @@ class UserRepository(val application: Application) {
     suspend fun login(email: String, password: String): Boolean {
         Log.d(TAG,"AppRepository - login() called")
         val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-        if (authResult.user != null) {
+
+        if (authResult.user != null && authResult.user!!.isEmailVerified) {
             _userLiveData.postValue(authResult.user)
             return true
         }
 
+        FirebaseAuth.getInstance().signOut()
         return false
     }
 
