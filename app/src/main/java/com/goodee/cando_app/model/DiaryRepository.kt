@@ -57,7 +57,8 @@ class DiaryRepository(val application: Application) {
     // 게시글 작성
     suspend fun writeDiary(diaryDto: DiaryDto): Boolean {
         Log.d(TAG,"AppRepository - writeDiary() called")
-        val task = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document().set(diaryDto)
+        diaryDto.dno = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document().id
+        val task = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document(diaryDto.dno).set(diaryDto)
 
         task.await()
         if (!task.isSuccessful) {
