@@ -81,12 +81,12 @@ class LoginFragment : Fragment() {
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 val email = binding.edittextLoginEmailinput.text.trim().toString()
                 val password = binding.edittextLoginPasswordinput.text.trim().toString()
-                if (email.isNullOrBlank() || email.isEmpty()) {
+                if (email.isBlank() || email.isEmpty()) {
                     Toast.makeText(requireActivity(),getString(R.string.toast_id_check),Toast.LENGTH_SHORT).show()
 
                     binding.edittextLoginEmailinput.requestFocus()
                     imm.showSoftInput(binding.edittextLoginEmailinput,0)
-                } else if (password.isNullOrBlank() || password.isEmpty()) {
+                } else if (password.isBlank() || password.isEmpty()) {
                     Toast.makeText(requireActivity(),getString(R.string.toast_check_password),Toast.LENGTH_SHORT).show()
 
                     binding.edittextLoginPasswordinput.requestFocus()
@@ -104,11 +104,19 @@ class LoginFragment : Fragment() {
                                 } else {
                                     Toast.makeText(requireContext(), "해당 아이디로 이메일 인증을 해주세요.", Toast.LENGTH_SHORT).show()
                                 }
-                                binding.progressbarLoginLoading.visibility = View.GONE
                             }
                         } catch (e: FirebaseAuthInvalidCredentialsException) {
                             // 비밀번호 잘못 입력
                             Log.w(TAG, "onSingleClick: ", e)
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(requireContext(), getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: FirebaseAuthInvalidUserException) {
+                            // 존재하지 않는 유저
+                            Log.w(TAG, "onSingleClick: ", e)
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(requireContext(), getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show()
+                            }
                         } catch (e: FirebaseAuthInvalidUserException) {
                             // 존재하지 않는 유저
                             Log.w(TAG, "onSingleClick: ", e)
@@ -117,7 +125,6 @@ class LoginFragment : Fragment() {
                         } finally {
                             withContext(Dispatchers.Main) {
                                 binding.progressbarLoginLoading.visibility = View.GONE
-                                Toast.makeText(requireContext(), getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
