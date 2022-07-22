@@ -117,6 +117,9 @@ class LoginFragment : Fragment() {
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(requireContext(), getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show()
                             }
+                        } catch (e: FirebaseAuthInvalidUserException) {
+                            // 존재하지 않는 유저
+                            Log.w(TAG, "onSingleClick: ", e)
                         } catch (e: Exception) {
                             Log.w(TAG, "onSingleClick: ", e)
                         } finally {
