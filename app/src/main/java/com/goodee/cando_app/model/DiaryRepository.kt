@@ -4,7 +4,6 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -81,11 +80,11 @@ class DiaryRepository(val application: Application) {
         return task.isSuccessful
     }
 
-    fun deleteDiary(dno: String) {
-        Log.d(TAG,"AppRepository - deleteDiary() called")
-        RealTimeDatabase.getDatabase().child("Diary").child(dno).removeValue().addOnCompleteListener { task ->
-            Log.d(TAG,"AppRepository - task.isSuccessful : ${task.isSuccessful}")
-            _diaryLiveData.postValue(null)
-        }
+    suspend fun deleteDiary(dno: String): Boolean {
+        Log.d(TAG,"AppRepository - deleteDiary(dno = $dno) called")
+        val task = FirebaseFirestore.getInstance().collection("diary").document(dno).delete()
+        task.await()
+        Log.d(TAG,"DiaryRepository - task.isSuccessful : ${task.isSuccessful}")
+        return task.isSuccessful
     }
 }

@@ -92,8 +92,6 @@ class DiaryFragment : Fragment() {
         super.onCreate(savedInstanceState)
         Log.d(TAG,"DiaryFragment - onCreate() called")
         setHasOptionsMenu(true)
-
-
     }
 
     override fun onCreateView(

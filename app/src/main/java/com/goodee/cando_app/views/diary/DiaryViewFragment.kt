@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 class DiaryViewFragment : Fragment() {
     companion object {
@@ -82,8 +83,32 @@ class DiaryViewFragment : Fragment() {
         }
         binding.buttonDiaryviewDeletebutton.setOnClickListener {
             Log.d(TAG, "DiaryViewFragment - deleteButton is clicked")
-            val dialog = DiaryDeleteDialogFragment(dno)
-            dialog.show(requireActivity().supportFragmentManager, "쇼")
+            val aBuilder = AlertDialog.Builder(requireContext())
+            aBuilder.run {
+                setTitle("이 글을 정말 삭제하시겠습니까?")
+                setMessage("삭제하려면 확인을 눌러주세요.")
+                setPositiveButton("확인") { _, _ ->
+                    Log.d(TAG,"DiaryDeleteDialogFragment - Dialog Positive Button is clicked")
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        try {
+                            if (diaryViewModel.deleteDiary(dno)) {
+                                withContext(Dispatchers.Main) {
+                                    findNavController().navigateUp()
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.w(TAG, "setEvent: ", e)
+                            withContext(Dispatchers.Main) {
+                                AlertDialog.Builder(requireContext()).setTitle("에러").setMessage("글 삭제에 실패하였습니다.").create().show()
+                            }
+                        }
+                    }
+                }
+                setNegativeButton("취소") { _, _ ->
+                    Log.d(TAG,"DiaryDeleteDialogFragment - Dialog Negative Button is clicked")
+                }
+            }
+            aBuilder.create().show()
         }
     }
 

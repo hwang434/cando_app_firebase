@@ -44,9 +44,9 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
         return diaryRepository.editDiary(diaryDto)
     }
 
-    fun deleteDiary(dno: String) {
+    suspend fun deleteDiary(dno: String): Boolean {
         Log.d(TAG,"DiaryViewModel - deleteDiary() called")
-        diaryRepository.deleteDiary(dno)
+        return diaryRepository.deleteDiary(dno)
     }
 
     // refresh Diary List live data from Firestore.
