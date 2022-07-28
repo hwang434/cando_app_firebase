@@ -44,6 +44,8 @@ class DiaryViewFragment : Fragment() {
             binding.textviewDiaryviewContentview.text = diaryDto.content
             binding.textviewDiaryViewAuthorView.text = diaryDto.author
             binding.progressbarDiaryviewLoading.visibility = View.GONE
+            binding.scrollviewDiaryViewBoardRoot.visibility = View.VISIBLE
+            binding.buttonDiaryViewLikeButton.text = diaryDto.favorites.size.toString()
 
             // if : 로그인한 유저의 이메일과 게시자의 이메일이 일치 -> 글 수정, 삭제 버튼을 보여줌.
             if (FirebaseAuth.getInstance().currentUser?.email == diaryViewModel.diaryLiveData.value?.author) {
