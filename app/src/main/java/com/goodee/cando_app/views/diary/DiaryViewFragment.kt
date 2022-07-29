@@ -84,14 +84,32 @@ class DiaryViewFragment : Fragment() {
         return binding.root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // When you leave fragment or navigate to next fragment.
+        // It will clear ViewModel.
+        activity?.viewModelStore?.clear()
+    }
+
     private fun setEvent() {
-        binding.buttonDiaryviewEditbutton.setOnClickListener {
-            Log.d(TAG, "DiaryViewFragment - editButton is clicked.")
-            findNavController().navigate(
-                DiaryViewFragmentDirections.actionDiaryViewFragmentToDiaryWriteFragment(dno)
-            )
+        binding.apply {
+            buttonDiaryviewEditbutton.setOnClickListener {
+                findNavController().navigate(
+                    DiaryViewFragmentDirections.actionDiaryViewFragmentToDiaryWriteFragment(dno)
+                )
+            }
+
+            buttonDiaryViewLikeButton.setOnClickListener {
+                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                // if : 사용자가 좋아요를 전에 눌렀으면 -> 좋아요 취소 else : 좋아요 동작
+                if (diaryViewModel.diaryLiveData.value?.favorites?.contains(uid) == true) {
+                    unlike(diaryViewModel, uid)
+                } else {
+                    like(diaryViewModel, uid)
+                }
+            }
         }
-        
+
         binding.buttonDiaryviewDeletebutton.setOnClickListener {
             Log.d(TAG, "DiaryViewFragment - deleteButton is clicked")
             val aBuilder = AlertDialog.Builder(requireContext())
@@ -120,38 +138,6 @@ class DiaryViewFragment : Fragment() {
                 }
             }
             aBuilder.create().show()
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        // When you leave fragment or navigate to next fragment.
-        // It will clear ViewModel.
-        activity?.viewModelStore?.clear()
-    }
-
-    private fun setEvent() {
-        binding.apply {
-            buttonDiaryviewEditbutton.setOnClickListener {
-                findNavController().navigate(
-                    DiaryViewFragmentDirections.actionDiaryViewFragmentToDiaryWriteFragment(dno)
-                )
-            }
-
-            buttonDiaryviewDeletebutton.setOnClickListener {
-                val dialog = DiaryDeleteDialogFragment(dno)
-                dialog.show(requireActivity().supportFragmentManager, "쇼")
-            }
-
-            buttonDiaryViewLikeButton.setOnClickListener {
-                val uid = FirebaseAuth.getInstance().currentUser?.uid
-                // if : 사용자가 좋아요를 전에 눌렀으면 -> 좋아요 취소 else : 좋아요 동작
-                if (diaryViewModel.diaryLiveData.value?.favorites?.contains(uid) == true) {
-                    unlike(diaryViewModel, uid)
-                } else {
-                    like(diaryViewModel, uid)
-                }
-            }
         }
     }
 
