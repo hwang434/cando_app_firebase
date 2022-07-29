@@ -41,8 +41,8 @@ class UserRepository(val application: Application) {
                 }
 
                 // 회원 정보 저장 성공하면 인증 이메일을 보내고 로그아웃
-                FirebaseAuth.getInstance().currentUser?.sendEmailVerification()?.await()
-                FirebaseAuth.getInstance().signOut()
+                firebaseAuth.currentUser?.sendEmailVerification()?.await()
+                firebaseAuth.signOut()
                 return true
             }
         } catch (e: Exception) {
@@ -62,7 +62,7 @@ class UserRepository(val application: Application) {
             return true
         }
 
-        FirebaseAuth.getInstance().signOut()
+        firebaseAuth.signOut()
         return false
     }
 
@@ -79,18 +79,20 @@ class UserRepository(val application: Application) {
         Log.d(TAG,"UserRepository - isExistEmail() called")
         val result = firebaseAuth.fetchSignInMethodsForEmail(email).await()
 
-        // null이 아니고 비지 않았으면 존재하지 않는 이메일이므로 true를 리턴
+        // If this email is already registered. return true.
         return result?.signInMethods != null && result.signInMethods!!.isNotEmpty()
     }
 
     suspend fun isExistNameAndEmail(name: String, email: String): Boolean {
+        Log.d(TAG,"UserRepository - isExistNameAndEmail() called")
         val firebaseDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION)
         Log.d(TAG,"UserRepository - ${firebaseDatabase.whereEqualTo("name", name).whereEqualTo("email", email).get().await().documents}")
         return !firebaseDatabase.whereEqualTo("name", name).whereEqualTo("email", email).get().await().isEmpty
     }
 
     suspend fun sendPasswordResetEmail(email: String): Boolean {
-        val result = FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+        Log.d(TAG,"UserRepository - sendPasswordResetEmail() called")
+        val result = firebaseAuth.sendPasswordResetEmail(email)
         result.await()
         return result.isSuccessful
     }

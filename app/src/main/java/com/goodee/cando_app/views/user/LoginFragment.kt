@@ -15,7 +15,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentLoginBinding
-import com.goodee.cando_app.listener.SingleClickListner
+import com.goodee.cando_app.listener.SingleClickListener
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -45,7 +45,7 @@ class LoginFragment : Fragment() {
         Log.d(TAG,"LoginFragment - onStart() called")
         val currentUser = Firebase.auth.currentUser
 
-        // if current user is signed in update UI
+        // if current user is not null, navigate to diary fragment.
         currentUser?.let {
             Log.d(TAG,"LoginFragment - $currentUser")
             findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
@@ -75,7 +75,7 @@ class LoginFragment : Fragment() {
         }
 
         // 정규식과 로그인 처리
-        binding.buttonLoginLoginbutton.setOnClickListener(object: SingleClickListner() {
+        binding.buttonLoginLoginbutton.setOnClickListener(object: SingleClickListener() {
             override fun onSingleClick(view: View?) {
                 Log.d(TAG,"LoginFragment - loginButton is activated")
                 val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
