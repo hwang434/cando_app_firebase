@@ -2,15 +2,19 @@ package com.goodee.cando_app.model
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.goodee.cando_app.database.RealTimeDatabase
 import com.goodee.cando_app.dto.DiaryDto
-import com.google.firebase.database.*
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 
 class DiaryRepository(val application: Application) {
-    private val TAG: String = "로그"
+    companion object {
+        private const val TAG: String = "로그"
+        private const val DIARY_COLLECTION = "diary"
+    }
+
     private val _diaryListLiveData: MutableLiveData<List<DiaryDto>> = MutableLiveData()
     val diaryListLiveData: LiveData<List<DiaryDto>>
         get() = _diaryListLiveData
@@ -19,107 +23,94 @@ class DiaryRepository(val application: Application) {
         get() = _diaryLiveData
 
     // 게시글 조회(게시글 클릭 시 1개의 게시글을 읽음)
-    fun getDiary(dno: String) {
-        Log.d(TAG,"AppRepository - getDiary() called")
-        RealTimeDatabase.getDatabase().child("Diary/${dno}").get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val map = mutableMapOf<String, String>()
-                task.result?.children?.forEach { child ->
-                    Log.d(TAG,"AppRepository - key : ${child.key} value : ${child.value}")
-                    map[child.key.toString()] = child.value.toString()
-                }
-
-                val title = map["title"]
-                val content = map["content"]
-                val author = map["author"]
-                val date = map["date"]
-                if (title != null && content != null && author != null && date != null) {
-                    val diaryDto = DiaryDto(dno = dno, title = title, content = content, author = author, date = date.toLong())
-                    _diaryLiveData.value = diaryDto
-                }
-            }
+    suspend fun refreshDiaryLiveData(dno: String): Boolean {
+        Log.d(TAG,"DiaryRepository - refreshDiaryLiveData(dno : $dno)")
+        val qResult = FirebaseFirestore.getInstance().collection("diary").whereEqualTo("dno", dno).get().await()
+        // if : There is no document has a same diary and dno.
+        if (qResult.isEmpty) {
+            return false
         }
+
+        _diaryLiveData.postValue(qResult.first().toObject(DiaryDto::class.java))
+        return true
     }
 
     // 게시글 목록 가져오기(로그인시 바로 보이는 게시글들)
-    fun getDiaryList() {
-        Log.d(TAG,"AppRepository - getDiaryList() called")
-        val rootRef = RealTimeDatabase.getDatabase().ref
-        val diaryRef = rootRef.child("Diary")
-        val query = diaryRef.orderByChild("dno").limitToLast(10)
-        val valueEventListener = object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                Log.d(TAG,"AppRepository - onDataChange() called")
-                val diaryList = mutableListOf<DiaryDto>()
-                snapshot.children.forEach { ds ->
-                    val dno = ds.key
-                    val author = ds.child("author").value.toString()
-                    val title = ds.child("title").value.toString()
-                    val date = ds.child("date").value.toString().toLong()
-                    diaryList.add(DiaryDto(dno = dno, title = title, content = "", author = author, date = date))
-                }
-                diaryList.reverse()
-                _diaryListLiveData.postValue(diaryList)
-            }
-            override fun onCancelled(error: DatabaseError) {
-                Log.d(TAG,"AppRepository - onCancelled() called")
+    suspend fun refreshDiaryList(): Boolean {
+        Log.d(TAG,"DiaryRepository - refreshDiaryList() called")
+        val qResult = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).orderBy("date").limitToLast(10).get().await()
+        val diaryList = mutableListOf<DiaryDto>()
+        qResult.documents.forEach { dSnapshot ->
+            val diary = dSnapshot.toObject(DiaryDto::class.java)
+            diary?.run {
+                diaryList.add(DiaryDto(dno = dno,  title = title, author = author, date = date))
             }
         }
-        query.addListenerForSingleValueEvent(valueEventListener)
+        _diaryListLiveData.postValue(diaryList)
+        return true
     }
 
     // 게시글 작성
-    fun writeDiary(diaryDto: DiaryDto) {
-        Log.d(TAG,"AppRepository - writeDiary() called")
-        val diaryRef = RealTimeDatabase.getDatabase().child("Diary").ref
-        val key = diaryRef.push().key
-        val lastDno = diaryRef.limitToLast(1).get().addOnCompleteListener {
-            Log.d(TAG,"AppRepository - it : ${it.result}")
-        }
-        if (!lastDno.isSuccessful) {
-            Log.d(TAG,"AppRepository - diaryRef.limitToLast(1).get().isSuccessful : false")
-            return
-        }
-        Log.d(TAG,"AppRepository - lastDno : ${lastDno.result}")
+    suspend fun writeDiary(diaryDto: DiaryDto): Boolean {
+        Log.d(TAG,"AppRepository - writeDiary(diaryDto : $diaryDto) called")
+        diaryDto.dno = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document().id
+        val task = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document(diaryDto.dno).set(diaryDto)
 
-        val diary = HashMap<String, DiaryDto>()
-        key?.let {
-            diary.put(key, diaryDto)
+        task.await()
+        if (!task.isSuccessful) {
+            throw Exception("글 작성 실패")
         }
-
-        val firebaseDatabase = RealTimeDatabase.getDatabase()
-        firebaseDatabase.child("Diary/${key}").setValue(diaryDto).addOnCompleteListener { task ->       // Diary/${key}에 글 저장하기
-            Log.d(TAG,"AppRepository - task.isSuccessful : ${task.isSuccessful}")
-            if (task.isSuccessful) Toast.makeText(application, "글 작성 성공", Toast.LENGTH_SHORT).show()
-            else Toast.makeText(application, "글 작성 실패", Toast.LENGTH_SHORT).show()
-        }
+        return task.isSuccessful
     }
 
     // 게시글 수정하기
-    fun editDiary(diaryDto: DiaryDto) {
-        Log.d(TAG,"AppRepository - editDiary() called")
-        val firebaseDatabase = RealTimeDatabase.getDatabase()
-        val map = HashMap<String, Any>()
+    suspend fun editDiary(diaryDto: DiaryDto): Boolean {
+        Log.d(TAG,"AppRepository - editDiary(diaryDto : $diaryDto) called")
+        val map = mutableMapOf<String, Any>()
         map["title"] = diaryDto.title
         map["content"] = diaryDto.content
         map["author"] = diaryDto.author
         map["date"] = diaryDto.date
-        Log.d(TAG,"AppRepository - map : $map")
-        firebaseDatabase.child("Diary/${diaryDto.dno}").updateChildren(map).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG,"AppRepository - 글 수정 성공")
-                _diaryLiveData.postValue(diaryDto)
-            } else {
-                Log.d(TAG,"AppRepository - 글 수정 실패")
-            }
+        val task = FirebaseFirestore.getInstance().collection("diary").document(diaryDto.dno).update(map)
+
+        task.await()
+        if (!task.isSuccessful) {
+            throw Exception("글 수정 실패")
         }
+        return task.isSuccessful
     }
 
-    fun deleteDiary(dno: String) {
-        Log.d(TAG,"AppRepository - deleteDiary() called")
-        RealTimeDatabase.getDatabase().child("Diary").child(dno).removeValue().addOnCompleteListener { task ->
-            Log.d(TAG,"AppRepository - task.isSuccessful : ${task.isSuccessful}")
-            _diaryLiveData.postValue(null)
+    suspend fun deleteDiary(dno: String): Boolean {
+        Log.d(TAG,"AppRepository - deleteDiary(dno = $dno) called")
+        val task = FirebaseFirestore.getInstance().collection("diary").document(dno).delete()
+        task.await()
+        Log.d(TAG,"DiaryRepository - task.isSuccessful : ${task.isSuccessful}")
+        return task.isSuccessful
+    }
+
+    suspend fun like(dno: String, uid: String): Boolean {
+        Log.d(TAG,"DiaryRepository - like() called")
+        val fireStore = FirebaseFirestore.getInstance()
+        val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
+
+        val result = fireStore.runTransaction { transaction ->
+            diaryLiveData.value?.favorites?.add(uid)
+            transaction.update(diaryRef, "favorites", diaryLiveData.value?.favorites)
         }
+        result.await()
+        return result.isSuccessful
+    }
+
+    suspend fun unlike(dno: String, uid: String): Boolean {
+        Log.d(TAG,"DiaryRepository - unlike() called")
+        val fireStore = FirebaseFirestore.getInstance()
+        val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
+
+        val result = fireStore.runTransaction { transaction ->
+            diaryLiveData.value?.favorites?.remove(uid)
+            transaction.update(diaryRef, "favorites", diaryLiveData.value?.favorites)
+        }
+        result.await()
+        return result.isSuccessful
     }
 }

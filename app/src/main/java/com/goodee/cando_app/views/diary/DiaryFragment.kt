@@ -1,5 +1,6 @@
 package com.goodee.cando_app.views.diary
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.goodee.cando_app.R
@@ -22,6 +24,9 @@ import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class DiaryFragment : Fragment() {
@@ -56,7 +61,6 @@ class DiaryFragment : Fragment() {
                 return true
             }
             R.id.item_menu_myinfo -> {
-                Toast.makeText(requireActivity(), "내 정보 클릭",Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_diaryFragment_to_memberWithdrawFragment)
                 return true
             }
@@ -95,8 +99,23 @@ class DiaryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
-        diaryViewModel.getDiaryList()
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
+        lifecycleScope.launch(Dispatchers.IO) {
+            // if : 글 목록을 읽어 오지 못하면
+            if (!diaryViewModel.refreshDiaryList()) {
+                Log.d(TAG,"DiaryFragment - 실패")
+                withContext(Dispatchers.Main) {
+                    val alertDialog = AlertDialog.Builder(requireContext()).create()
+                    alertDialog.setTitle("서버 상태가 좋지 않습니다.")
+                    alertDialog.setMessage("나중에 다시 접속해주세요.")
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "확인") { _, _ ->
+                        findNavController().navigateUp()
+                    }
+                    alertDialog.show()
+                }
+            }
+        }
+
         diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner) { listOfDiaryDto ->
             if (listOfDiaryDto != null) {
                 setRecyclerView(diaryViewModel.diaryListLiveData)
