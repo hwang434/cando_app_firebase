@@ -87,4 +87,30 @@ class DiaryRepository(val application: Application) {
         Log.d(TAG,"DiaryRepository - task.isSuccessful : ${task.isSuccessful}")
         return task.isSuccessful
     }
+
+    suspend fun like(dno: String, uid: String): Boolean {
+        Log.d(TAG,"DiaryRepository - like() called")
+        val fireStore = FirebaseFirestore.getInstance()
+        val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
+
+        val result = fireStore.runTransaction { transaction ->
+            diaryLiveData.value?.favorites?.add(uid)
+            transaction.update(diaryRef, "favorites", diaryLiveData.value?.favorites)
+        }
+        result.await()
+        return result.isSuccessful
+    }
+
+    suspend fun unlike(dno: String, uid: String): Boolean {
+        Log.d(TAG,"DiaryRepository - unlike() called")
+        val fireStore = FirebaseFirestore.getInstance()
+        val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
+
+        val result = fireStore.runTransaction { transaction ->
+            diaryLiveData.value?.favorites?.remove(uid)
+            transaction.update(diaryRef, "favorites", diaryLiveData.value?.favorites)
+        }
+        result.await()
+        return result.isSuccessful
+    }
 }

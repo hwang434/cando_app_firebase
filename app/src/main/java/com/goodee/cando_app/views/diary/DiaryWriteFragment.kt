@@ -30,13 +30,12 @@ class DiaryWriteFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"DiaryWriteFragment - onCreate() called")
         super.onCreate(savedInstanceState)
-        
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Log.d(TAG,"DiaryWriteFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_diary_write, container, false)
         arguments?.let { bundle ->
