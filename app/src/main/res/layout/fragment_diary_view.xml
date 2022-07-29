@@ -24,7 +24,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:text="제목"
                     android:textSize="18sp"
                     android:background="@drawable/box_border"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -35,7 +34,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:text="작성자"
                     android:textSize="18sp"
                     android:background="@drawable/box_border"
                     app:layout_constraintBottom_toTopOf="@id/textview_diaryview_contentview"
@@ -54,15 +52,15 @@
                     app:layout_constraintBottom_toTopOf="@id/button_diaryview_editbutton"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    android:background="@drawable/box_border"
-                    android:text="내용\n내용\n내용\n내용\n내용"/>
-                <Button
+                    android:background="@drawable/box_border" />
+                <ImageButton
                     android:id="@+id/button_diary_view_like_button"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:text="좋아요 수"
+                    android:src="@drawable/unlike_button"
                     android:gravity="center"
                     android:background="@drawable/box_border"
+                    android:contentDescription="@string/button_diary_view_like"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textview_diaryview_contentview"/>
                 <Button
