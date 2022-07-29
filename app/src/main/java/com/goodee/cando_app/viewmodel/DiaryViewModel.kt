@@ -67,7 +67,6 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
         Log.d(TAG,"DiaryViewModel - like() called")
         // if : 좋아요 성공하면
         if (diaryRepository.like(dno, uid)) {
-            _diaryLiveData.postValue(diaryLiveData.value)
             return true
         }
 
@@ -77,9 +76,8 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     // 좋아요 취소
     suspend fun unlike(dno: String, uid: String): Boolean {
         Log.d(TAG,"DiaryViewModel - unlike() called")
-        // if : 좋아요 성공하면
+        // if : 좋아요 취소 성공하면
         if (diaryRepository.unlike(dno, uid)) {
-            _diaryLiveData.postValue(diaryLiveData.value)
             return true
         }
 

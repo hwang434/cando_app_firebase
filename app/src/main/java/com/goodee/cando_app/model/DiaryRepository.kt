@@ -92,12 +92,24 @@ class DiaryRepository(val application: Application) {
         Log.d(TAG,"DiaryRepository - like() called")
         val fireStore = FirebaseFirestore.getInstance()
         val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
+        var diaryDto: DiaryDto? = null
 
         val result = fireStore.runTransaction { transaction ->
-            diaryLiveData.value?.favorites?.add(uid)
-            transaction.update(diaryRef, "favorites", diaryLiveData.value?.favorites)
+            diaryDto = transaction.get(diaryRef).toObject(DiaryDto::class.java)
+            diaryDto?.let {
+                if (!diaryDto!!.favorites.contains(uid)) {
+                    diaryDto!!.favorites.add(uid)
+                    transaction.update(diaryRef, "favorites", diaryDto?.favorites)
+                }
+            }
         }
+
         result.await()
+        if (!result.isSuccessful) {
+            return false
+        }
+
+        _diaryLiveData.postValue(diaryDto)
         return result.isSuccessful
     }
 
@@ -105,12 +117,24 @@ class DiaryRepository(val application: Application) {
         Log.d(TAG,"DiaryRepository - unlike() called")
         val fireStore = FirebaseFirestore.getInstance()
         val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
+        var diaryDto: DiaryDto? = null
 
         val result = fireStore.runTransaction { transaction ->
-            diaryLiveData.value?.favorites?.remove(uid)
-            transaction.update(diaryRef, "favorites", diaryLiveData.value?.favorites)
+            diaryDto = transaction.get(diaryRef).toObject(DiaryDto::class.java)
+            diaryDto?.let {
+                if (diaryDto!!.favorites.contains(uid)) {
+                    diaryDto!!.favorites.remove(uid)
+                    transaction.update(diaryRef, "favorites", diaryDto!!.favorites)
+                }
+            }
         }
+
         result.await()
+        if (!result.isSuccessful) {
+            return false
+        }
+
+        _diaryLiveData.postValue(diaryDto)
         return result.isSuccessful
     }
 }
