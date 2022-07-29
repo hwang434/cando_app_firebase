@@ -40,15 +40,25 @@ class DiaryViewFragment : Fragment() {
         Log.d(TAG, "DiaryViewFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary_view, container, false)
         diaryViewModel.diaryLiveData.observe(viewLifecycleOwner) { diaryDto ->
-            binding.textviewDiaryviewTitleview.text = diaryDto.title
-            binding.textviewDiaryviewContentview.text = diaryDto.content
-            binding.textviewDiaryViewAuthorView.text = diaryDto.author
-            binding.progressbarDiaryviewLoading.visibility = View.GONE
+            binding.apply {
+                textviewDiaryviewTitleview.text = diaryDto.title
+                textviewDiaryviewContentview.text = diaryDto.content
+                textviewDiaryViewAuthorView.text = diaryDto.author
+                progressbarDiaryviewLoading.visibility = View.GONE
+                scrollviewDiaryViewBoardRoot.visibility = View.VISIBLE
 
-            // if : 로그인한 유저의 이메일과 게시자의 이메일이 일치 -> 글 수정, 삭제 버튼을 보여줌.
-            if (FirebaseAuth.getInstance().currentUser?.email == diaryViewModel.diaryLiveData.value?.author) {
-                binding.buttonDiaryviewEditbutton.visibility = View.VISIBLE
-                binding.buttonDiaryviewDeletebutton.visibility = View.VISIBLE
+                // if : 로그인한 유저의 이메일과 게시자의 이메일이 일치 -> 글 수정, 삭제 버튼을 보여줌.
+                if (FirebaseAuth.getInstance().currentUser?.email == diaryViewModel.diaryLiveData.value?.author) {
+                    buttonDiaryviewEditbutton.visibility = View.VISIBLE
+                    buttonDiaryviewDeletebutton.visibility = View.VISIBLE
+                }
+
+                // if : 좋아요를 눌렀으면 -> 좋아요 버튼이 색칠되어 있음
+                if (diaryDto.favorites.contains(FirebaseAuth.getInstance().currentUser!!.uid)) {
+                    buttonDiaryViewLikeButton.setImageResource(R.drawable.like_button)
+                } else {
+                    buttonDiaryViewLikeButton.setImageResource(R.drawable.unlike_button)
+                }
             }
         }
 
@@ -73,24 +83,87 @@ class DiaryViewFragment : Fragment() {
         return binding.root
     }
 
-    private fun setEvent() {
-        binding.buttonDiaryviewEditbutton.setOnClickListener {
-            Log.d(TAG, "DiaryViewFragment - editButton is clicked.")
-            findNavController().navigate(
-                DiaryViewFragmentDirections.actionDiaryViewFragmentToDiaryWriteFragment(dno)
-            )
-        }
-        binding.buttonDiaryviewDeletebutton.setOnClickListener {
-            Log.d(TAG, "DiaryViewFragment - deleteButton is clicked")
-            val dialog = DiaryDeleteDialogFragment(dno)
-            dialog.show(requireActivity().supportFragmentManager, "쇼")
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         // When you leave fragment or navigate to next fragment.
         // It will clear ViewModel.
         activity?.viewModelStore?.clear()
+    }
+
+    private fun setEvent() {
+        binding.apply {
+            buttonDiaryviewEditbutton.setOnClickListener {
+                findNavController().navigate(
+                    DiaryViewFragmentDirections.actionDiaryViewFragmentToDiaryWriteFragment(dno)
+                )
+            }
+
+            buttonDiaryviewDeletebutton.setOnClickListener {
+                val dialog = DiaryDeleteDialogFragment(dno)
+                dialog.show(requireActivity().supportFragmentManager, "쇼")
+            }
+
+            buttonDiaryViewLikeButton.setOnClickListener {
+                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                // if : 사용자가 좋아요를 전에 눌렀으면 -> 좋아요 취소 else : 좋아요 동작
+                if (diaryViewModel.diaryLiveData.value?.favorites?.contains(uid) == true) {
+                    unlike(diaryViewModel, uid)
+                } else {
+                    like(diaryViewModel, uid)
+                }
+            }
+        }
+    }
+
+    // 좋아요 기능
+    private fun like(diaryViewModel: DiaryViewModel, uid: String?) {
+        binding.progressbarDiaryviewLoading.visibility = View.VISIBLE
+        diaryViewModel.diaryLiveData.value?.apply {
+            // if : 게시판을 읽지 못했거나, 로그인하지 않았으면 -> 종료
+            if (uid == null) {
+                binding.progressbarDiaryviewLoading.visibility = View.GONE
+                return
+            }
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val isSuccess = diaryViewModel.like(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
+                withContext(Dispatchers.Main) {
+                    // if : like is fail
+                    if (!isSuccess) {
+                        val alertDialog = AlertDialog.Builder(requireContext()).create()
+                        alertDialog.setTitle("좋아요에 실패했습니다.")
+                        alertDialog.setMessage("좋아요 기능 실패")
+                        alertDialog.setMessage("확인인인")
+                    }
+                    binding.progressbarDiaryviewLoading.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    // 좋아요 취소
+    private fun unlike(diaryViewModel: DiaryViewModel, uid: String?) {
+        binding.progressbarDiaryviewLoading.visibility = View.VISIBLE
+        diaryViewModel.diaryLiveData.value?.apply {
+            // if : 게시판을 읽지 못했거나, 로그인하지 않았으면 -> 종료
+            if (uid == null) {
+                binding.progressbarDiaryviewLoading.visibility = View.GONE
+                return
+            }
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val isSuccess = diaryViewModel.unlike(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
+                withContext(Dispatchers.Main) {
+                    // if : like is fail
+                    if (!isSuccess) {
+                        val alertDialog = AlertDialog.Builder(requireContext()).create()
+                        alertDialog.setTitle("좋아요 취소에 실패했습니다.")
+                        alertDialog.setMessage("좋아요 기능 실패")
+                        alertDialog.setMessage("확인인인")
+                    }
+                    binding.progressbarDiaryviewLoading.visibility = View.GONE
+                }
+            }
+        }
     }
 }
