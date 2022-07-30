@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentLoginBinding
 import com.goodee.cando_app.listener.SingleClickListener
+import com.goodee.cando_app.util.RegexChecker
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -33,11 +34,7 @@ class LoginFragment : Fragment() {
 
     private lateinit var binding: FragmentLoginBinding
     private val userViewModel: UserViewModel by lazy {
-        ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return UserViewModel(requireActivity().application) as T
-            }
-        }).get(UserViewModel::class.java)
+        UserViewModel(requireActivity().application)
     }
 
     override fun onStart() {
@@ -45,7 +42,7 @@ class LoginFragment : Fragment() {
         Log.d(TAG,"LoginFragment - onStart() called")
         val currentUser = Firebase.auth.currentUser
 
-        // if current user is not null, navigate to diary fragment.
+        // if current user is not null than user is signed in. Thus navigate to diary fragment.
         currentUser?.let {
             Log.d(TAG,"LoginFragment - $currentUser")
             findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
@@ -64,37 +61,55 @@ class LoginFragment : Fragment() {
     }
 
     private fun setEvent() {
-        // 회원 찾기 페이지 이동
-        binding.buttonLoginFindmember.setOnClickListener {
-            view?.findNavController()?.navigate(R.id.action_loginFragment_to_findMember)
-        }
+        binding.apply {
+            // 회원 찾기 페이지 이동
+            buttonLoginFindmember.setOnClickListener {
+                view?.findNavController()?.navigate(R.id.action_loginFragment_to_findMember)
+            }
 
-        // 회원가입 페이지 이동
-        binding.buttonLoginRegisterbutton.setOnClickListener {
-            view?.findNavController()?.navigate(R.id.action_loginFragment_to_registerFragment)
-        }
+            // 회원가입 페이지 이동
+            buttonLoginRegisterbutton.setOnClickListener {
+                view?.findNavController()?.navigate(R.id.action_loginFragment_to_registerFragment)
+            }
 
-        // 정규식과 로그인 처리
-        binding.buttonLoginLoginbutton.setOnClickListener(object: SingleClickListener() {
-            override fun onSingleClick(view: View?) {
-                Log.d(TAG,"LoginFragment - loginButton is activated")
-                val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                val email = binding.edittextLoginEmailinput.text.trim().toString()
-                val password = binding.edittextLoginPasswordinput.text.trim().toString()
-                if (email.isBlank() || email.isEmpty()) {
-                    Toast.makeText(requireActivity(),getString(R.string.toast_id_check),Toast.LENGTH_SHORT).show()
-
-                    binding.edittextLoginEmailinput.requestFocus()
-                    imm.showSoftInput(binding.edittextLoginEmailinput,0)
-                } else if (password.isBlank() || password.isEmpty()) {
-                    Toast.makeText(requireActivity(),getString(R.string.toast_check_password),Toast.LENGTH_SHORT).show()
-
-                    binding.edittextLoginPasswordinput.requestFocus()
-                    imm.showSoftInput(binding.edittextLoginPasswordinput,0)
+            // 키보드 엔터 누르면 클릭 이벤트 실행
+            edittextLoginPasswordinput.setOnKeyListener { _, keyCode, event ->
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
+                    binding.edittextLoginPasswordinput.callOnClick()
+                    true
                 } else {
-                    // 정규식을 만족했으므로 존재하는 데이터인지 확인.
-                    binding.progressbarLoginLoading.visibility = View.VISIBLE
+                    false
+                }
+            }
 
+            // 정규식과 로그인 처리
+            buttonLoginLoginbutton.setOnClickListener(getLoginSingleClickListener())
+        }
+    }
+
+    private fun getLoginSingleClickListener(): SingleClickListener {
+        val singleClickListener = object: SingleClickListener() {
+            override fun onSingleClick(view: View?) {
+                binding.apply {
+                    val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    val email = edittextLoginEmailinput.text.trim().toString()
+                    val password = edittextLoginPasswordinput.text.trim().toString()
+                    if (!RegexChecker.isValidEmail(email)) {
+                        Toast.makeText(requireActivity(),getString(R.string.toast_id_check),Toast.LENGTH_SHORT).show()
+                        edittextLoginEmailinput.requestFocus()
+                        imm.showSoftInput(edittextLoginEmailinput,0)
+                        return
+                    }
+
+                    if (password.isBlank() || password.isEmpty()) {
+                        Toast.makeText(requireActivity(),getString(R.string.toast_check_password),Toast.LENGTH_SHORT).show()
+                        edittextLoginPasswordinput.requestFocus()
+                        imm.showSoftInput(edittextLoginPasswordinput,0)
+                        return
+                    }
+
+                    // 정규식을 만족했으므로 존재하는 데이터인지 확인.
+                    progressbarLoginLoading.visibility = View.VISIBLE
                     lifecycleScope.launch(Dispatchers.IO) {
                         try {
                             val isLoginSuccess = userViewModel.login(email, password)
@@ -117,34 +132,17 @@ class LoginFragment : Fragment() {
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(requireContext(), getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show()
                             }
-                        } catch (e: FirebaseAuthInvalidUserException) {
-                            // 존재하지 않는 유저
-                            Log.w(TAG, "onSingleClick: ", e)
                         } catch (e: Exception) {
                             Log.w(TAG, "onSingleClick: ", e)
                         } finally {
                             withContext(Dispatchers.Main) {
-                                binding.progressbarLoginLoading.visibility = View.GONE
+                                progressbarLoginLoading.visibility = View.GONE
                             }
                         }
                     }
                 }
             }
-        })
-
-        // 키보드 엔터 누르면 클릭 이벤트 실행
-        binding.edittextLoginPasswordinput.setOnKeyListener { _, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-                binding.edittextLoginPasswordinput.callOnClick()
-                true
-            } else {
-                false
-            }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG,"LoginFragment - onDestroy() called")
+        return singleClickListener
     }
 }
