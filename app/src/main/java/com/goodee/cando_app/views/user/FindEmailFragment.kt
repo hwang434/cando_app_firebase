@@ -45,33 +45,42 @@ class FindEmailFragment : Fragment() {
     }
 
     private fun setEvent() {
+        Log.d(TAG,"FindEmailFragment - setEvent() called")
         binding.buttonFindidSubmit.setOnClickListener {
-            val phone = binding.edittextFindidPhoneinput.text.toString().trim().replace("-","")
-            val name = binding.edittextFindidNameinput.text.toString()
+            findId()
+        }
+    }
 
-            if (name.isEmpty() || name.isBlank()) {
-                Toast.makeText(requireActivity(), "이름을 입력해주세요", Toast.LENGTH_SHORT).show()
-            } else if (phone.isEmpty() || phone.isBlank() || !RegexChecker.isValidPhone(phone)) {
-                Toast.makeText(requireActivity(), "전화번호를 확인해주세요", Toast.LENGTH_SHORT).show()
-            } else {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val qResult = userViewModel.findUserEmail(phone = phone, name = name)
+    private fun findId() {
+        Log.d(TAG,"FindEmailFragment - findId() called")
+        val phone = binding.edittextFindidPhoneinput.text.toString().trim().replace("-","")
+        val name = binding.edittextFindidNameinput.text.toString().trim()
+
+        if (name.isEmpty()) {
+            Toast.makeText(requireActivity(), getString(R.string.register_name_input), Toast.LENGTH_SHORT).show()
+        } else if (phone.isEmpty() || !RegexChecker.isValidPhone(phone)) {
+            Toast.makeText(requireActivity(), getString(R.string.toast_find_id_check_phone), Toast.LENGTH_SHORT).show()
+        } else {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val qResult = userViewModel.findUserEmail(phone = phone, name = name)
+                withContext(Dispatchers.Main) {
                     if (qResult.isEmpty) {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(requireContext(), "존재하지 않는 회원입니다.", Toast.LENGTH_SHORT).show()
-                        }
+                        Toast.makeText(requireContext(), getString(R.string.toast_find_id_not_exist_info), Toast.LENGTH_SHORT).show()
                     } else {
-                        withContext(Dispatchers.Main) {
-                            // if : 입력한 정보와 일치하는 회원이 여러 명
-                            if (qResult.documents.size > 1) {
-
-                            } else if (qResult.documents.isNotEmpty()){
-                                val alertDialogBuilder = AlertDialog.Builder(requireContext()).create()
-                                alertDialogBuilder.setTitle("찾으시는 이메일")
-                                alertDialogBuilder.setMessage(qResult.documents[0].get("email").toString())
-                                alertDialogBuilder.show()
+                        val alertDialogBuilder = AlertDialog.Builder(requireContext()).create()
+                        // if : 입력한 정보와 일치하는 회원이 여러 명
+                        if (qResult.documents.size == 1) {
+                            alertDialogBuilder.apply {
+                                setTitle(getString(R.string.alert_find_email_title))
+                                setMessage(qResult.documents[0].get("email").toString())
+                            }
+                        } else if (qResult.documents.size > 1) {
+                            alertDialogBuilder.apply {
+                                setTitle(getString(R.string.error_title))
+                                setMessage(getString(R.string.error_message))
                             }
                         }
+                        alertDialogBuilder.show()
                     }
                 }
             }

@@ -40,47 +40,15 @@ class DiaryViewFragment : Fragment() {
     ): View {
         Log.d(TAG, "DiaryViewFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary_view, container, false)
-        diaryViewModel.diaryLiveData.observe(viewLifecycleOwner) { diaryDto ->
-            binding.apply {
-                textviewDiaryviewTitleview.text = diaryDto.title
-                textviewDiaryviewContentview.text = diaryDto.content
-                textviewDiaryViewAuthorView.text = diaryDto.author
-                progressbarDiaryviewLoading.visibility = View.GONE
-                scrollviewDiaryViewBoardRoot.visibility = View.VISIBLE
+        observeDiaryLiveData()
 
-                // if : 로그인한 유저의 이메일과 게시자의 이메일이 일치 -> 글 수정, 삭제 버튼을 보여줌.
-                if (FirebaseAuth.getInstance().currentUser?.email == diaryViewModel.diaryLiveData.value?.author) {
-                    buttonDiaryviewEditbutton.visibility = View.VISIBLE
-                    buttonDiaryviewDeletebutton.visibility = View.VISIBLE
-                }
-
-                // if : 좋아요를 눌렀으면 -> 좋아요 버튼이 색칠되어 있음
-                if (diaryDto.favorites.contains(FirebaseAuth.getInstance().currentUser!!.uid)) {
-                    buttonDiaryViewLikeButton.setImageResource(R.drawable.like_button)
-                } else {
-                    buttonDiaryViewLikeButton.setImageResource(R.drawable.unlike_button)
-                }
-            }
-        }
-
-        // 전달이 됐으면 글을 조회
+        // if : dno is received Successfully, read the diary that has a dno given from preview fragment.
         dno = arguments?.get("dno").toString()
-        lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccess = diaryViewModel.refreshDiaryLiveData(dno)
-            withContext(Dispatchers.Main) {
-                if (!isSuccess) {
-                    val alertDialog = AlertDialog.Builder(requireContext()).create()
-                    alertDialog.setTitle("오류")
-                    alertDialog.setMessage("이미 삭제 된 글입니다.")
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "확인") { _, _ ->
-                        findNavController().navigateUp()
-                    }
-                    alertDialog.show()
-                }
-            }
+        if (!dno.isEmpty()) {
+            readDiary(dno)
         }
-        setEvent()
 
+        setEvent()
         return binding.root
     }
 
@@ -108,37 +76,42 @@ class DiaryViewFragment : Fragment() {
                     like(diaryViewModel, uid)
                 }
             }
-        }
 
-        binding.buttonDiaryviewDeletebutton.setOnClickListener {
-            Log.d(TAG, "DiaryViewFragment - deleteButton is clicked")
-            val aBuilder = AlertDialog.Builder(requireContext())
-            aBuilder.run {
-                setTitle("이 글을 정말 삭제하시겠습니까?")
-                setMessage("삭제하려면 확인을 눌러주세요.")
-                setPositiveButton("확인") { _, _ ->
-                    Log.d(TAG,"DiaryDeleteDialogFragment - Dialog Positive Button is clicked")
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        try {
-                            if (diaryViewModel.deleteDiary(dno)) {
-                                withContext(Dispatchers.Main) {
-                                    findNavController().navigateUp()
-                                }
-                            }
-                        } catch (e: Exception) {
-                            Log.w(TAG, "setEvent: ", e)
+            buttonDiaryviewDeletebutton.setOnClickListener {
+                deleteDiary()
+            }
+        }
+    }
+
+    // 글 삭제
+    private fun deleteDiary() {
+        Log.d(TAG,"DiaryViewFragment - deleteDiary() called")
+        val aBuilder = AlertDialog.Builder(requireContext())
+        aBuilder.run {
+            setTitle(getString(R.string.alert_diary_view_title))
+            setMessage(getString(R.string.alert_diary_view_message))
+            setPositiveButton(getString(R.string.alert_diary_view_postive_button)) { _, _ ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    try {
+                        if (diaryViewModel.deleteDiary(dno)) {
                             withContext(Dispatchers.Main) {
-                                AlertDialog.Builder(requireContext()).setTitle("에러").setMessage("글 삭제에 실패하였습니다.").create().show()
+                                findNavController().navigateUp()
                             }
+                        }
+                    } catch (e: Exception) {
+                        Log.w(TAG, "setEvent: delete diary fail.", e)
+                        withContext(Dispatchers.Main) {
+                            AlertDialog.Builder(requireContext()).setTitle(getString(R.string.alert_diary_view_fail_title))
+                                .setMessage(getString(R.string.alert_diary_view_fail_message)).create().show()
                         }
                     }
                 }
-                setNegativeButton("취소") { _, _ ->
-                    Log.d(TAG,"DiaryDeleteDialogFragment - Dialog Negative Button is clicked")
-                }
             }
-            aBuilder.create().show()
+            setNegativeButton("취소") { _, _ ->
+                Log.d(TAG,"DiaryDeleteDialogFragment - Dialog Negative Button is clicked")
+            }
         }
+        aBuilder.create().show()
     }
 
     // 좋아요 기능
@@ -157,9 +130,10 @@ class DiaryViewFragment : Fragment() {
                     // if : like is fail
                     if (!isSuccess) {
                         val alertDialog = AlertDialog.Builder(requireContext()).create()
-                        alertDialog.setTitle("좋아요에 실패했습니다.")
-                        alertDialog.setMessage("좋아요 기능 실패")
-                        alertDialog.setMessage("확인인인")
+                        alertDialog.apply {
+                            setTitle(getString(R.string.alert_diary_view_like_fail_title))
+                            setMessage(getString(R.string.alert_diary_view_error_message))
+                        }
                     }
                     binding.progressbarDiaryviewLoading.visibility = View.GONE
                 }
@@ -183,11 +157,56 @@ class DiaryViewFragment : Fragment() {
                     // if : like is fail
                     if (!isSuccess) {
                         val alertDialog = AlertDialog.Builder(requireContext()).create()
-                        alertDialog.setTitle("좋아요 취소에 실패했습니다.")
-                        alertDialog.setMessage("좋아요 기능 실패")
-                        alertDialog.setMessage("확인인인")
+                        alertDialog.apply {
+                            setTitle("좋아요 취소에 실패했습니다.")
+                            setMessage(getString(R.string.alert_diary_view_fail_message))
+                        }
                     }
                     binding.progressbarDiaryviewLoading.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    // 라이브 데이터르 게시글 최신화
+    private fun observeDiaryLiveData() {
+        diaryViewModel.diaryLiveData.observe(viewLifecycleOwner) { diaryDto ->
+            binding.apply {
+                textviewDiaryviewTitleview.text = diaryDto.title
+                textviewDiaryviewContentview.text = diaryDto.content
+                textviewDiaryViewAuthorView.text = diaryDto.author
+                progressbarDiaryviewLoading.visibility = View.GONE
+                scrollviewDiaryViewBoardRoot.visibility = View.VISIBLE
+
+                // if : 로그인한 유저의 이메일과 게시자의 이메일이 일치 -> 글 수정, 삭제 버튼을 보여줌.
+                if (FirebaseAuth.getInstance().currentUser?.email == diaryViewModel.diaryLiveData.value?.author) {
+                    buttonDiaryviewEditbutton.visibility = View.VISIBLE
+                    buttonDiaryviewDeletebutton.visibility = View.VISIBLE
+                }
+
+                // if : 좋아요를 눌렀으면 -> 좋아요 버튼이 색칠되어 있음
+                if (diaryDto.favorites.contains(FirebaseAuth.getInstance().currentUser!!.uid)) {
+                    buttonDiaryViewLikeButton.setImageResource(R.drawable.like_button)
+                } else {
+                    buttonDiaryViewLikeButton.setImageResource(R.drawable.unlike_button)
+                }
+            }
+        }
+    }
+
+    // 글을 조회하여 현재 페이지를 최신화
+    private fun readDiary(dno: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isSuccess = diaryViewModel.refreshDiaryLiveData(dno)
+            withContext(Dispatchers.Main) {
+                if (!isSuccess) {
+                    val alertDialog = AlertDialog.Builder(requireContext()).create()
+                    alertDialog.setTitle("오류")
+                    alertDialog.setMessage("이미 삭제 된 글입니다.")
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "확인") { _, _ ->
+                        findNavController().navigateUp()
+                    }
+                    alertDialog.show()
                 }
             }
         }

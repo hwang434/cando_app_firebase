@@ -69,4 +69,19 @@
     <string name="toast_fail_register">회원가입 실패</string>
     <string name="toast_login_fail">아이디 또는 비밀번호가 일치하지 않습니다.</string>
     <string name="button_diary_view_like">작성자의 글을 좋아합니다.</string>
+    <string name="alert_diary_view_title">이 글을 정말 삭제하시겠습니까?</string>
+    <string name="alert_diary_view_message">삭제하려면 확인을 눌러주세요.</string>
+    <string name="alert_diary_view_postive_button">확인</string>
+    <string name="alert_diary_view_fail_title">에러</string>
+    <string name="alert_diary_view_fail_message">글 삭제에 실패하였습니다.</string>
+    <string name="alert_diary_view_like_fail_title">좋아요에 실패했습니다.</string>
+    <string name="alert_diary_view_error_message">에러가 발생했습니다.</string>
+    <string name="alert_find_email_title">찾으시는 이메일</string>
+    <string name="error_title">오류</string>
+    <string name="error_message">에러가 발생했습니다.</string>
+    <string name="toast_find_id_check_phone">전화번호를 확인해주세요</string>
+    <string name="toast_find_id_not_exist_info">존재하지 않는 회원입니다.</string>
+    <string name="alert_find_password_email_send_title">이메일을 송신했습니다.</string>
+    <string name="alert_find_password_email_send_message">해당 이메일로 비밀번호 초기화 메일을 보냈습니다.</string>
+    <string name="confirm">확인</string>
 </resources>

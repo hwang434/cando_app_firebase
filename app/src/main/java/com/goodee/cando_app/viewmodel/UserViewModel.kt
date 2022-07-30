@@ -16,7 +16,6 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     companion object {
         private const val TAG: String = "로그"
     }
-
     private var userRepository: UserRepository
     private val _userLiveData: MutableLiveData<FirebaseUser>
     val userLiveData: LiveData<FirebaseUser>

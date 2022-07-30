@@ -21,11 +21,12 @@ class DiaryRepository(val application: Application) {
     private val _diaryLiveData: MutableLiveData<DiaryDto> = MutableLiveData()
     val diaryLiveData: LiveData<DiaryDto>
         get() = _diaryLiveData
+    private val fireStore = FirebaseFirestore.getInstance()
 
     // 게시글 조회(게시글 클릭 시 1개의 게시글을 읽음)
     suspend fun refreshDiaryLiveData(dno: String): Boolean {
         Log.d(TAG,"DiaryRepository - refreshDiaryLiveData(dno : $dno)")
-        val qResult = FirebaseFirestore.getInstance().collection("diary").whereEqualTo("dno", dno).get().await()
+        val qResult =fireStore.collection("diary").whereEqualTo("dno", dno).get().await()
         // if : There is no document has a same diary and dno.
         if (qResult.isEmpty) {
             return false
@@ -38,7 +39,7 @@ class DiaryRepository(val application: Application) {
     // 게시글 목록 가져오기(로그인시 바로 보이는 게시글들)
     suspend fun refreshDiaryList(): Boolean {
         Log.d(TAG,"DiaryRepository - refreshDiaryList() called")
-        val qResult = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).orderBy("date").limitToLast(10).get().await()
+        val qResult = fireStore.collection(DIARY_COLLECTION).orderBy("date").limitToLast(10).get().await()
         val diaryList = mutableListOf<DiaryDto>()
         qResult.documents.forEach { dSnapshot ->
             val diary = dSnapshot.toObject(DiaryDto::class.java)
@@ -53,8 +54,8 @@ class DiaryRepository(val application: Application) {
     // 게시글 작성
     suspend fun writeDiary(diaryDto: DiaryDto): Boolean {
         Log.d(TAG,"AppRepository - writeDiary(diaryDto : $diaryDto) called")
-        diaryDto.dno = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document().id
-        val task = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document(diaryDto.dno).set(diaryDto)
+        diaryDto.dno = fireStore.collection(DIARY_COLLECTION).document().id
+        val task = fireStore.collection(DIARY_COLLECTION).document(diaryDto.dno).set(diaryDto)
 
         task.await()
         if (!task.isSuccessful) {
@@ -71,7 +72,7 @@ class DiaryRepository(val application: Application) {
         map["content"] = diaryDto.content
         map["author"] = diaryDto.author
         map["date"] = diaryDto.date
-        val task = FirebaseFirestore.getInstance().collection("diary").document(diaryDto.dno).update(map)
+        val task = fireStore.collection("diary").document(diaryDto.dno).update(map)
 
         task.await()
         if (!task.isSuccessful) {
@@ -82,15 +83,13 @@ class DiaryRepository(val application: Application) {
 
     suspend fun deleteDiary(dno: String): Boolean {
         Log.d(TAG,"AppRepository - deleteDiary(dno = $dno) called")
-        val task = FirebaseFirestore.getInstance().collection("diary").document(dno).delete()
+        val task = fireStore.collection("diary").document(dno).delete()
         task.await()
-        Log.d(TAG,"DiaryRepository - task.isSuccessful : ${task.isSuccessful}")
         return task.isSuccessful
     }
 
     suspend fun like(dno: String, uid: String): Boolean {
         Log.d(TAG,"DiaryRepository - like() called")
-        val fireStore = FirebaseFirestore.getInstance()
         val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
         var diaryDto: DiaryDto? = null
 
@@ -115,7 +114,6 @@ class DiaryRepository(val application: Application) {
 
     suspend fun unlike(dno: String, uid: String): Boolean {
         Log.d(TAG,"DiaryRepository - unlike() called")
-        val fireStore = FirebaseFirestore.getInstance()
         val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
         var diaryDto: DiaryDto? = null
 
