@@ -5,10 +5,13 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.UserDto
+import com.goodee.cando_app.util.SocketLike
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 
@@ -59,6 +62,8 @@ class UserRepository(val application: Application) {
 
         if (authResult.user != null && authResult.user!!.isEmailVerified) {
             _userLiveData.postValue(authResult.user)
+            // Socket 설정
+            SocketLike.connectSocket()
             return true
         }
 
@@ -95,5 +100,16 @@ class UserRepository(val application: Application) {
         val result = firebaseAuth.sendPasswordResetEmail(email)
         result.await()
         return result.isSuccessful
+    }
+
+    fun autoLogin(firebaseUser: FirebaseUser) {
+        _userLiveData.postValue(firebaseUser)
+        SocketLike.connectSocket()
+    }
+
+    fun signOut() {
+        Firebase.auth.signOut()
+        _userLiveData.postValue(null)
+        SocketLike.disconnectSocket()
     }
 }

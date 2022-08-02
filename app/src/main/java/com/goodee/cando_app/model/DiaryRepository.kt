@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.DiaryDto
+import com.goodee.cando_app.util.SocketLike
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
@@ -89,13 +91,14 @@ class DiaryRepository(val application: Application) {
     }
 
     suspend fun like(dno: String, uid: String): Boolean {
-        Log.d(TAG,"DiaryRepository - like() called")
+        Log.d(TAG,"DiaryRepository - like($dno, $uid) called")
         val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
         var diaryDto: DiaryDto? = null
 
         val result = fireStore.runTransaction { transaction ->
             diaryDto = transaction.get(diaryRef).toObject(DiaryDto::class.java)
             diaryDto?.let {
+                SocketLike.connectSocket()
                 if (!diaryDto!!.favorites.contains(uid)) {
                     diaryDto!!.favorites.add(uid)
                     transaction.update(diaryRef, "favorites", diaryDto?.favorites)
@@ -107,6 +110,14 @@ class DiaryRepository(val application: Application) {
         if (!result.isSuccessful) {
             return false
         }
+
+//        Send the user's email who liked the diary and the user's email who will receive like.
+        val map = mutableMapOf<String, String>()
+        // user who like this diary.
+        map["sender"] = FirebaseAuth.getInstance().currentUser!!.email.toString()
+        // user who wrote this diary.
+        map["receiver"] = diaryDto!!.author
+        SocketLike.emitData("like", map)
 
         _diaryLiveData.postValue(diaryDto)
         return result.isSuccessful
