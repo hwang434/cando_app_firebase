@@ -5,10 +5,13 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.UserDto
+import com.goodee.cando_app.util.SocketLike
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 
@@ -41,8 +44,8 @@ class UserRepository(val application: Application) {
                 }
 
                 // 회원 정보 저장 성공하면 인증 이메일을 보내고 로그아웃
-                FirebaseAuth.getInstance().currentUser?.sendEmailVerification()?.await()
-                FirebaseAuth.getInstance().signOut()
+                firebaseAuth.currentUser?.sendEmailVerification()?.await()
+                firebaseAuth.signOut()
                 return true
             }
         } catch (e: Exception) {
@@ -59,10 +62,12 @@ class UserRepository(val application: Application) {
 
         if (authResult.user != null && authResult.user!!.isEmailVerified) {
             _userLiveData.postValue(authResult.user)
+            // Socket 설정
+            SocketLike.connectSocket()
             return true
         }
 
-        FirebaseAuth.getInstance().signOut()
+        firebaseAuth.signOut()
         return false
     }
 
@@ -79,19 +84,32 @@ class UserRepository(val application: Application) {
         Log.d(TAG,"UserRepository - isExistEmail() called")
         val result = firebaseAuth.fetchSignInMethodsForEmail(email).await()
 
-        // null이 아니고 비지 않았으면 존재하지 않는 이메일이므로 true를 리턴
+        // If this email is already registered. return true.
         return result?.signInMethods != null && result.signInMethods!!.isNotEmpty()
     }
 
     suspend fun isExistNameAndEmail(name: String, email: String): Boolean {
+        Log.d(TAG,"UserRepository - isExistNameAndEmail() called")
         val firebaseDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION)
         Log.d(TAG,"UserRepository - ${firebaseDatabase.whereEqualTo("name", name).whereEqualTo("email", email).get().await().documents}")
         return !firebaseDatabase.whereEqualTo("name", name).whereEqualTo("email", email).get().await().isEmpty
     }
 
     suspend fun sendPasswordResetEmail(email: String): Boolean {
-        val result = FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+        Log.d(TAG,"UserRepository - sendPasswordResetEmail() called")
+        val result = firebaseAuth.sendPasswordResetEmail(email)
         result.await()
         return result.isSuccessful
+    }
+
+    fun autoLogin(firebaseUser: FirebaseUser) {
+        _userLiveData.postValue(firebaseUser)
+        SocketLike.connectSocket()
+    }
+
+    fun signOut() {
+        Firebase.auth.signOut()
+        _userLiveData.postValue(null)
+        SocketLike.disconnectSocket()
     }
 }

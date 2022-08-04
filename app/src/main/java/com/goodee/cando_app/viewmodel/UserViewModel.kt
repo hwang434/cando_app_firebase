@@ -16,7 +16,6 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     companion object {
         private const val TAG: String = "로그"
     }
-
     private var userRepository: UserRepository
     private val _userLiveData: MutableLiveData<FirebaseUser>
     val userLiveData: LiveData<FirebaseUser>
@@ -70,13 +69,12 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
 
     // 중복 로그인 처리
     fun autoLogin(firebaseUser: FirebaseUser) {
-        _userLiveData.postValue(firebaseUser)
+        userRepository.autoLogin(firebaseUser)
     }
 
     // 로그 아웃
     fun signOut() {
-        Firebase.auth.signOut()
-        _userLiveData.postValue(null)
+        userRepository.signOut()
     }
 
     suspend fun sendPasswordResetEmail(email: String) : Boolean {

@@ -17,6 +17,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        buildConfigField "String", "SOCKET_ADDRESS", properties["socketServer.address"]
     }
     buildFeatures {
         dataBinding true
@@ -60,6 +63,7 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:1.12.0"
     // okhttp
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
+    implementation "io.grpc:grpc-okhttp:1.32.2"
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.0"
     // kapt
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
@@ -88,4 +92,10 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
     // Gson
     implementation 'com.google.code.gson:gson:2.8.8'
+    // Socket io: for like Notification
+    implementation ('io.socket:socket.io-client:2.0.0') {
+        exclude group: 'org.json', module: 'json'
+    }
+    // To Send data by Json Form
+    implementation 'com.google.code.gson:gson:2.9.1'
 }

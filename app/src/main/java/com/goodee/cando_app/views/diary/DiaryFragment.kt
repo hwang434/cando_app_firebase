@@ -33,10 +33,52 @@ class DiaryFragment : Fragment() {
     companion object {
         private const val TAG: String = "로그"
     }
-
     private lateinit var binding: FragmentDiaryBinding
     private val diaryViewModel: DiaryViewModel by lazy { ViewModelProvider(this).get(DiaryViewModel::class.java) }
     private var backPressedTime = System.currentTimeMillis()
+    // 2초 안에 2번 뒤로 누르면 어플리케이션 종료
+    private val callback by lazy { object: OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (backPressedTime + 2000 > System.currentTimeMillis()) {
+                requireActivity().finish()
+            } else {
+                Toast.makeText(requireActivity(),"앱 종료를 원하시면 뒤로 가기 버튼을 눌러주세요.", Toast.LENGTH_SHORT).show()
+            }
+
+            backPressedTime = System.currentTimeMillis()
+        }
+    }}
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.d(TAG,"DiaryFragment - onAttach() called")
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d(TAG,"DiaryFragment - onCreate() called")
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        Log.d(TAG,"DiaryFragment - onCreateView() called")
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
+        refreshDiaryList()
+        observeDiaryList()
+        setEvent()
+
+        return binding.root
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        Log.d(TAG,"DiaryFragment - onDetach() called")
+        callback.remove()
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.member_layout, menu)
@@ -69,37 +111,13 @@ class DiaryFragment : Fragment() {
         return false
     }
 
-    // 2초 안에 2번 뒤로 누르면 어플리케이션 종료
-    private val callback by lazy { object: OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            if (backPressedTime + 2000 > System.currentTimeMillis()) {
-                requireActivity().finish()
-            } else {
-                Toast.makeText(requireActivity(),"앱 종료를 원하시면 뒤로 가기 버튼을 눌러주세요.", Toast.LENGTH_SHORT).show()
-            }
-
-            backPressedTime = System.currentTimeMillis()
+    private fun setEvent() {
+        binding.floatingDiaryWritediary.setOnClickListener {
+            findNavController().navigate(R.id.action_diaryFragment_to_diaryWriteFragment)
         }
-    }}
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Log.d(TAG,"DiaryFragment - onAttach() called")
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG,"DiaryFragment - onCreate() called")
-        setHasOptionsMenu(true)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        Log.d(TAG,"DiaryFragment - onCreateView() called")
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
+    private fun refreshDiaryList() {
         lifecycleScope.launch(Dispatchers.IO) {
             // if : 글 목록을 읽어 오지 못하면
             if (!diaryViewModel.refreshDiaryList()) {
@@ -115,42 +133,6 @@ class DiaryFragment : Fragment() {
                 }
             }
         }
-
-        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner) { listOfDiaryDto ->
-            if (listOfDiaryDto != null) {
-                setRecyclerView(diaryViewModel.diaryListLiveData)
-                binding.progressbarDiaryLoading.visibility = View.GONE
-            }
-        }
-        setEvent()
-
-        return binding.root
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d(TAG,"DiaryFragment - onPause() called")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG,"DiaryFragment - onStop() called")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG,"DiaryFragment - onDestroy() called")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Log.d(TAG,"DiaryFragment - onDestroyView() called")
-    }
-    
-    override fun onDetach() {
-        super.onDetach()
-        Log.d(TAG,"DiaryFragment - onDetach() called")
-        callback.remove()
     }
 
     private fun setRecyclerView(diaryLiveData: LiveData<List<DiaryDto>>) {
@@ -170,9 +152,12 @@ class DiaryFragment : Fragment() {
         )
     }
 
-    private fun setEvent() {
-        binding.floatingDiaryWritediary.setOnClickListener {
-            findNavController().navigate(R.id.action_diaryFragment_to_diaryWriteFragment)
+    private fun observeDiaryList() {
+        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner) { listOfDiaryDto ->
+            if (listOfDiaryDto != null) {
+                setRecyclerView(diaryViewModel.diaryListLiveData)
+                binding.progressbarDiaryLoading.visibility = View.GONE
+            }
         }
     }
 }

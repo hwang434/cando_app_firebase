@@ -39,12 +39,14 @@ class DiaryWriteFragment : Fragment() {
         Log.d(TAG,"DiaryWriteFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_diary_write, container, false)
         arguments?.let { bundle ->
-            // if : 글 조회에서 넘어왔으면, 입력란을 초기화 해준다.
+            // if : 글 조회에서 넘어왔으면, 글 수정이므로 이전 입력 내용을 입력해준다.
             if (bundle.get("dno") != null) {
-                diaryViewModel.diaryLiveData.value?.run {
-                    binding.edittextDiarywriteTitleinput.setText(title)
-                    binding.edittextDiarywriteContentinput.setText(content)
-                    binding.progressbarDiarywriteLoading.visibility = View.GONE
+                diaryViewModel.diaryLiveData.value?.let { dto ->
+                    binding.apply {
+                        edittextDiarywriteTitleinput.setText(dto.title)
+                        edittextDiarywriteContentinput.setText(dto.content)
+                        progressbarDiarywriteLoading.visibility = View.GONE
+                    }
                 }
             }
             binding.progressbarDiarywriteLoading.visibility = View.GONE
@@ -57,32 +59,36 @@ class DiaryWriteFragment : Fragment() {
     private fun setEvent() {
         Log.d(TAG,"DiaryWriteFragment - setEvent() called")
         binding.buttonDiarywriteWritebutton.setOnClickListener {
-            binding.progressbarDiarywriteLoading.visibility = View.VISIBLE
+            writeDiary()
+        }
+    }
 
-            lifecycleScope.launch(Dispatchers.IO) {
-                val title = binding.edittextDiarywriteTitleinput.text.toString()
-                val content = binding.edittextDiarywriteContentinput.text.toString()
-                val author = FirebaseAuth.getInstance().currentUser?.email
-                val date = System.currentTimeMillis()
+    private fun writeDiary() {
+        Log.d(TAG,"DiaryWriteFragment - writeDiary() called")
+        binding.progressbarDiarywriteLoading.visibility = View.VISIBLE
+        lifecycleScope.launch(Dispatchers.IO) {
+            val title = binding.edittextDiarywriteTitleinput.text.toString()
+            val content = binding.edittextDiarywriteContentinput.text.toString()
+            val author = FirebaseAuth.getInstance().currentUser?.email
+            val date = System.currentTimeMillis()
 
-                try {
-                    val newDiaryDto = DiaryDto(dno = requireArguments().get("dno").toString(), title = title, content = content, author = author.toString(), date = date)
-                    // if : 네비게이션을 통해 dno를 받았으면(글 조회에서 넘어왔으면) -> 현재 글 수정
-                    // else : 새로 글 작성이면 -> 새로운 글 작성
-                    if (arguments?.get("dno") != null) {
-                        diaryViewModel.editDiary(newDiaryDto)
-                    } else {
-                        // 새로 작성
-                        diaryViewModel.writeDiary(newDiaryDto)
-                    }
-                } catch (e: Exception) {
-                    Log.w(TAG, "setEvent: 글 수정, 작성 실패", e)
+            try {
+                val newDiaryDto = DiaryDto(dno = requireArguments().get("dno").toString(), title = title, content = content, author = author.toString(), date = date)
+                // if : navigation gives dno, set init text box by given dno content.
+                // else : 새로 글 작성이면 -> 새로운 글 작성
+                if (arguments?.get("dno") != null) {
+                    diaryViewModel.editDiary(newDiaryDto)
+                } else {
+                    // 새로 작성
+                    diaryViewModel.writeDiary(newDiaryDto)
                 }
+            } catch (e: Exception) {
+                Log.w(TAG, "setEvent: 글 수정, 작성 실패", e)
+            }
 
-                // 게시판 목록 페이지로 이동
-                withContext(Dispatchers.Main) {
-                    findNavController().navigate(R.id.action_diaryWriteFragment_to_diaryFragment)
-                }
+            // 게시판 목록 페이지로 이동
+            withContext(Dispatchers.Main) {
+                findNavController().navigate(R.id.action_diaryWriteFragment_to_diaryFragment)
             }
         }
     }
