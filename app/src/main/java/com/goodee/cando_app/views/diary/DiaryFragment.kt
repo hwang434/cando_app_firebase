@@ -111,23 +111,6 @@ class DiaryFragment : Fragment() {
         return false
     }
 
-    private fun setRecyclerView(diaryLiveData: LiveData<List<DiaryDto>>) {
-        Log.d(TAG,"DiaryFragment - setRecyclerView() called")
-        val adapter = DiaryRecyclerViewAdapter(diaryLiveData)
-        binding.recyclerviewDiaryDiarylist.adapter = adapter
-        binding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
-        binding.recyclerviewDiaryDiarylist.addOnScrollListener(
-            object: RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    // When the scroll has arrived bottom of Entire scroll.
-                    if (!binding.recyclerviewDiaryDiarylist.canScrollVertically(1)) {
-                        Toast.makeText(requireActivity(), "Bottom",Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        )
-    }
-
     private fun setEvent() {
         binding.floatingDiaryWritediary.setOnClickListener {
             findNavController().navigate(R.id.action_diaryFragment_to_diaryWriteFragment)
@@ -150,6 +133,23 @@ class DiaryFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun setRecyclerView(diaryLiveData: LiveData<List<DiaryDto>>) {
+        Log.d(TAG,"DiaryFragment - setRecyclerView() called")
+        val adapter = DiaryRecyclerViewAdapter(diaryLiveData)
+        binding.recyclerviewDiaryDiarylist.adapter = adapter
+        binding.recyclerviewDiaryDiarylist.layoutManager = LinearLayoutManager(requireActivity())
+        binding.recyclerviewDiaryDiarylist.addOnScrollListener(
+            object: RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    // When the scroll has arrived bottom of Entire scroll.
+                    if (!binding.recyclerviewDiaryDiarylist.canScrollVertically(1)) {
+                        Toast.makeText(requireActivity(), "Bottom",Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        )
     }
 
     private fun observeDiaryList() {

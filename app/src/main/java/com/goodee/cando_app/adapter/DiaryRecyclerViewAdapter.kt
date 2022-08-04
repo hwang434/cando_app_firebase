@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class DiaryRecyclerViewAdapter(private val list: LiveData<List<DiaryDto>>) : RecyclerView.Adapter<DiaryRecyclerViewAdapter.ViewHolder>() {
-    private val sdf = SimpleDateFormat("yyyy-MM-dd a HH:mm", Locale.KOREA)
+    private val sdf = SimpleDateFormat("MM-dd a HH:mm", Locale.KOREA)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = DataBindingUtil.inflate<FragmentDiaryListBinding>(LayoutInflater.from(parent.context), R.layout.fragment_diary_list, parent, false)
         return ViewHolder(binding)
