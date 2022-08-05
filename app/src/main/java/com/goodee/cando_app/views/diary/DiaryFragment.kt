@@ -132,16 +132,22 @@ class DiaryFragment : Fragment() {
     private fun refreshDiaryList() {
         lifecycleScope.launch(Dispatchers.IO) {
             // if : 글 목록을 읽어 오지 못하면
-            if (!diaryViewModel.refreshDiaryList()) {
-                Log.d(TAG,"DiaryFragment - 실패")
-                withContext(Dispatchers.Main) {
-                    val alertDialog = AlertDialog.Builder(requireContext()).create()
-                    alertDialog.setTitle("서버 상태가 좋지 않습니다.")
-                    alertDialog.setMessage("나중에 다시 접속해주세요.")
-                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "확인") { _, _ ->
-                        findNavController().navigateUp()
+            var isSuccess = false
+            try {
+                isSuccess = diaryViewModel.refreshDiaryList()
+            } catch (e: Exception) {
+                Log.w(TAG, "refreshDiaryList: ", e)
+            } finally {
+                if (!isSuccess) {
+                    withContext(Dispatchers.Main) {
+                        val alertDialog = AlertDialog.Builder(requireContext()).create()
+                        alertDialog.setTitle("서버 상태가 좋지 않습니다.")
+                        alertDialog.setMessage("나중에 다시 접속해주세요.")
+                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "확인") { _, _ ->
+                            findNavController().navigateUp()
+                        }
+                        alertDialog.show()
                     }
-                    alertDialog.show()
                 }
             }
         }
