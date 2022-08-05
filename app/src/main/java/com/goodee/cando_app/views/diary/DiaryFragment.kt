@@ -75,12 +75,14 @@ class DiaryFragment : Fragment() {
     }
 
     override fun onDetach() {
+        Log.d(TAG,"DiaryFragment - onDetach() called")
         super.onDetach()
         Log.d(TAG,"DiaryFragment - onDetach() called")
         callback.remove()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        Log.d(TAG,"DiaryFragment - onCreateOptionsMenu() called")
         inflater.inflate(R.menu.member_layout, menu)
     }
 
@@ -117,6 +119,16 @@ class DiaryFragment : Fragment() {
         }
     }
 
+    private fun observeDiaryList() {
+        Log.d(TAG,"DiaryFragment - observeDiaryList() called")
+        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner) { listOfDiaryDto ->
+            if (listOfDiaryDto != null) {
+                setRecyclerView(diaryViewModel.diaryListLiveData)
+                binding.progressbarDiaryLoading.visibility = View.GONE
+            }
+        }
+    }
+
     private fun refreshDiaryList() {
         lifecycleScope.launch(Dispatchers.IO) {
             // if : 글 목록을 읽어 오지 못하면
@@ -150,14 +162,5 @@ class DiaryFragment : Fragment() {
                 }
             }
         )
-    }
-
-    private fun observeDiaryList() {
-        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner) { listOfDiaryDto ->
-            if (listOfDiaryDto != null) {
-                setRecyclerView(diaryViewModel.diaryListLiveData)
-                binding.progressbarDiaryLoading.visibility = View.GONE
-            }
-        }
     }
 }
