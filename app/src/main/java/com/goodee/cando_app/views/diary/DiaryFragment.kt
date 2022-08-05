@@ -77,7 +77,6 @@ class DiaryFragment : Fragment() {
     override fun onDetach() {
         Log.d(TAG,"DiaryFragment - onDetach() called")
         super.onDetach()
-        Log.d(TAG,"DiaryFragment - onDetach() called")
         callback.remove()
     }
 
@@ -87,6 +86,7 @@ class DiaryFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG,"DiaryFragment - onOptionsItemSelected() called")
         when (item.itemId) {
             R.id.item_menu_signout -> {
                 Toast.makeText(
