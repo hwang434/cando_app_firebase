@@ -8,8 +8,6 @@ import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -31,7 +29,6 @@ class LoginFragment : Fragment() {
     companion object {
         private const val TAG: String = "로그"
     }
-
     private lateinit var binding: FragmentLoginBinding
     private val userViewModel: UserViewModel by lazy {
         UserViewModel(requireActivity().application)

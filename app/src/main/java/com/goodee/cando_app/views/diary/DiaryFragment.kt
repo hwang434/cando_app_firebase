@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -34,6 +34,7 @@ class DiaryFragment : Fragment() {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentDiaryBinding
+    private val userViewModel: UserViewModel by activityViewModels()
     private val diaryViewModel: DiaryViewModel by lazy { ViewModelProvider(this).get(DiaryViewModel::class.java) }
     private var backPressedTime = System.currentTimeMillis()
     // 2초 안에 2번 뒤로 누르면 어플리케이션 종료
@@ -67,24 +68,26 @@ class DiaryFragment : Fragment() {
     ): View {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        refreshDiaryList()
         observeDiaryList()
+        refreshDiaryList()
         setEvent()
 
         return binding.root
     }
 
     override fun onDetach() {
-        super.onDetach()
         Log.d(TAG,"DiaryFragment - onDetach() called")
+        super.onDetach()
         callback.remove()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        Log.d(TAG,"DiaryFragment - onCreateOptionsMenu() called")
         inflater.inflate(R.menu.member_layout, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG,"DiaryFragment - onOptionsItemSelected() called")
         when (item.itemId) {
             R.id.item_menu_signout -> {
                 Toast.makeText(
@@ -92,13 +95,7 @@ class DiaryFragment : Fragment() {
                     "${Firebase.auth.currentUser?.email}님 안녕히 가세요.",
                     Toast.LENGTH_SHORT
                 ).show()
-                val userViewModel = ViewModelProvider(requireActivity(), object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                        return UserViewModel(requireActivity().application) as T
-                    }
-                }).get(UserViewModel::class.java)
                 userViewModel.signOut()
-
                 findNavController().navigate(R.id.action_diaryFragment_to_mainFragment)
                 return true
             }
@@ -117,19 +114,35 @@ class DiaryFragment : Fragment() {
         }
     }
 
+    private fun observeDiaryList() {
+        Log.d(TAG,"DiaryFragment - observeDiaryList() called")
+        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner) { listOfDiaryDto ->
+            if (listOfDiaryDto != null) {
+                setRecyclerView(diaryViewModel.diaryListLiveData)
+                binding.progressbarDiaryLoading.visibility = View.GONE
+            }
+        }
+    }
+
     private fun refreshDiaryList() {
         lifecycleScope.launch(Dispatchers.IO) {
             // if : 글 목록을 읽어 오지 못하면
-            if (!diaryViewModel.refreshDiaryList()) {
-                Log.d(TAG,"DiaryFragment - 실패")
-                withContext(Dispatchers.Main) {
-                    val alertDialog = AlertDialog.Builder(requireContext()).create()
-                    alertDialog.setTitle("서버 상태가 좋지 않습니다.")
-                    alertDialog.setMessage("나중에 다시 접속해주세요.")
-                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "확인") { _, _ ->
-                        findNavController().navigateUp()
+            var isSuccess = false
+            try {
+                isSuccess = diaryViewModel.refreshDiaryList()
+            } catch (e: Exception) {
+                Log.w(TAG, "refreshDiaryList: ", e)
+            } finally {
+                if (!isSuccess) {
+                    withContext(Dispatchers.Main) {
+                        val alertDialog = AlertDialog.Builder(requireContext()).create()
+                        alertDialog.setTitle("서버 상태가 좋지 않습니다.")
+                        alertDialog.setMessage("나중에 다시 접속해주세요.")
+                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "확인") { _, _ ->
+                            findNavController().navigateUp()
+                        }
+                        alertDialog.show()
                     }
-                    alertDialog.show()
                 }
             }
         }
@@ -150,14 +163,5 @@ class DiaryFragment : Fragment() {
                 }
             }
         )
-    }
-
-    private fun observeDiaryList() {
-        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner) { listOfDiaryDto ->
-            if (listOfDiaryDto != null) {
-                setRecyclerView(diaryViewModel.diaryListLiveData)
-                binding.progressbarDiaryLoading.visibility = View.GONE
-            }
-        }
     }
 }

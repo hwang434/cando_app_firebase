@@ -64,7 +64,7 @@ class MemberWithdrawFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             var isWithdrawSuccess = false
             try {
-                if (!diaryViewModel.deleteAllDiary()) {
+                if (!diaryViewModel.deleteAllDiary(email, password)) {
                     return@launch
                 }
                 isWithdrawSuccess = userViewModel.withdrawUser(email, password)

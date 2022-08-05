@@ -84,8 +84,8 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
         return false
     }
 
-    suspend fun deleteAllDiary(): Boolean {
+    suspend fun deleteAllDiary(email: String, password: String): Boolean {
         Log.d(TAG,"DiaryViewModel - deleteAllDiary() called")
-        return diaryRepository.deleteAllDiary()
+        return diaryRepository.deleteAllDiary(email, password)
     }
 }
