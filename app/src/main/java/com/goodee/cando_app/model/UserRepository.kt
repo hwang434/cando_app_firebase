@@ -14,7 +14,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
-import java.lang.Exception
 
 class UserRepository(val application: Application) {
     companion object {
@@ -33,28 +32,24 @@ class UserRepository(val application: Application) {
     // 회원가입
     suspend fun sendRegisterEmail(email: String, userDto: UserDto, password: String): Boolean {
         Log.d(TAG,"UserRepository - sendRegisterEmail() called")
-        try {
-            // 파이어 베이스 회원 가입
-            val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-            Log.d(TAG,"UserRepository - authResult : $authResult")
-            // if : 파이어 베이스 회원 가입 성공했으면
-            if (authResult.user != null) {
-                // 파이어스토어에 회원 정보를 저장
-                val saveUserToDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION).document(authResult!!.user!!.uid).set(userDto)
-                saveUserToDatabase.await()
-                // 회원 정보를 저장하는데 실패하면, 회원 탈퇴
-                if (!saveUserToDatabase.isSuccessful) {
-                    firebaseAuth.currentUser?.delete()?.await()
-                    return false
-                }
-
-                // 회원 정보 저장 성공하면 인증 이메일을 보내고 로그아웃
-                firebaseAuth.currentUser?.sendEmailVerification()?.await()
-                firebaseAuth.signOut()
-                return true
+        // 파이어 베이스 회원 가입
+        val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+        Log.d(TAG,"UserRepository - authResult : $authResult")
+        // if : 파이어 베이스 회원 가입 성공했으면
+        if (authResult.user != null) {
+            // 파이어스토어에 회원 정보를 저장
+            val saveUserToDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION).document(authResult!!.user!!.uid).set(userDto)
+            saveUserToDatabase.await()
+            // if : 회원 정보를 저장하는데 실패하면, 회원 탈퇴
+            if (!saveUserToDatabase.isSuccessful) {
+                firebaseAuth.currentUser?.delete()?.await()
+                return false
             }
-        } catch (e: Exception) {
-            throw e
+
+            // 회원 정보 저장 성공하면 인증 이메일을 보내고 로그아웃
+            firebaseAuth.currentUser?.sendEmailVerification()?.await()
+            firebaseAuth.signOut()
+            return true
         }
 
         return false
@@ -64,7 +59,6 @@ class UserRepository(val application: Application) {
     suspend fun login(email: String, password: String): Boolean {
         Log.d(TAG,"UserRepository - login() called")
         val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-
         if (authResult.user != null && authResult.user!!.isEmailVerified) {
             _userLiveData.postValue(authResult.user)
             // Socket 설정
