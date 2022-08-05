@@ -67,8 +67,8 @@ class DiaryFragment : Fragment() {
     ): View {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        refreshDiaryList()
         observeDiaryList()
+        refreshDiaryList()
         setEvent()
 
         return binding.root
