@@ -74,9 +74,7 @@ class UserRepository(val application: Application) {
     suspend fun findUserEmail(name: String, phone: String): QuerySnapshot {
         Log.d(TAG, "AppRepository - findUserId() called")
         val firebaseDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION)
-
-        return firebaseDatabase.whereEqualTo("name", name).whereEqualTo("phone", phone).get()
-            .await()
+        return firebaseDatabase.whereEqualTo("name", name).whereEqualTo("phone", phone).get().await()
     }
 
     suspend fun isExistEmail(email: String): Boolean {
