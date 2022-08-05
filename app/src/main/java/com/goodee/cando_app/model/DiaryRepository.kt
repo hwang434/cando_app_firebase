@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.util.SocketLike
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
@@ -145,5 +146,37 @@ class DiaryRepository(val application: Application) {
 
         _diaryLiveData.postValue(diaryDto)
         return result.isSuccessful
+    }
+
+    suspend fun deleteAllDiary(): Boolean {
+        Log.d(TAG,"DiaryRepository - deleteAllDiary() called")
+        // 트랜잭션으로 유저 정보도 다 삭제해야함.
+        val fs = FirebaseFirestore.getInstance()
+        val email = FirebaseAuth.getInstance().currentUser?.email ?: return false
+
+        // Read diary written by the user
+        val docOfUserDiary = fs.collection("diary").whereEqualTo("author", email).get().await()
+        // Delete Users diary then delete users info.
+        val transaction = fs.runTransaction { transaction ->
+            // 삭제해야할 유저 다이어리들
+            val listOfDiaryRef = Array<DocumentReference?>(docOfUserDiary.size()) { null }
+            docOfUserDiary.forEachIndexed { idx, diary ->
+                listOfDiaryRef[idx] = fs.collection("diary").document(diary.toObject(DiaryDto::class.java).dno)
+            }
+
+            // 유저의 다이어리들 삭제
+            listOfDiaryRef.forEach { documentReference ->
+                documentReference?.let { it ->
+                    transaction.delete(it)
+                }
+            }
+
+            // 삭제할 유저 문서
+            val userInfoRef = fs.collection("user").document(FirebaseAuth.getInstance().currentUser?.email.toString())
+            transaction.delete(userInfoRef)
+        }
+        transaction.await()
+
+        return transaction.isSuccessful
     }
 }

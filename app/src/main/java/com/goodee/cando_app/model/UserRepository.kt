@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.util.SocketLike
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -21,9 +22,13 @@ class UserRepository(val application: Application) {
         private const val USER_COLLECTION = "user"
     }
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val _userLiveData: MutableLiveData<FirebaseUser> = MutableLiveData()
+    private val _userLiveData: MutableLiveData<FirebaseUser> = MutableLiveData<FirebaseUser>()
     val userLiveData: LiveData<FirebaseUser>
         get() = _userLiveData
+
+    init {
+        _userLiveData.postValue(firebaseAuth.currentUser)
+    }
 
     // 회원가입
     suspend fun sendRegisterEmail(email: String, userDto: UserDto, password: String): Boolean {
@@ -35,7 +40,7 @@ class UserRepository(val application: Application) {
             // if : 파이어 베이스 회원 가입 성공했으면
             if (authResult.user != null) {
                 // 파이어스토어에 회원 정보를 저장
-                val saveUserToDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION).add(userDto)
+                val saveUserToDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION).document(authResult!!.user!!.uid).set(userDto)
                 saveUserToDatabase.await()
                 // 회원 정보를 저장하는데 실패하면, 회원 탈퇴
                 if (!saveUserToDatabase.isSuccessful) {
@@ -57,7 +62,7 @@ class UserRepository(val application: Application) {
 
     // Firebase Authentication 로그인
     suspend fun login(email: String, password: String): Boolean {
-        Log.d(TAG,"AppRepository - login() called")
+        Log.d(TAG,"UserRepository - login() called")
         val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
 
         if (authResult.user != null && authResult.user!!.isEmailVerified) {
@@ -103,6 +108,7 @@ class UserRepository(val application: Application) {
     }
 
     fun autoLogin(firebaseUser: FirebaseUser) {
+        Log.d(TAG,"UserRepository - autoLogin() called")
         _userLiveData.postValue(firebaseUser)
         SocketLike.connectSocket()
     }
@@ -111,5 +117,33 @@ class UserRepository(val application: Application) {
         Firebase.auth.signOut()
         _userLiveData.postValue(null)
         SocketLike.disconnectSocket()
+    }
+
+    suspend fun withdrawUser(email: String, password: String): Boolean {
+        Log.d(TAG,"UserRepository - withdrawUser() called")
+        val user = FirebaseAuth.getInstance().currentUser ?: return false
+
+        val deleteUserInfo = FirebaseFirestore.getInstance().collection("user").document(user.uid).delete()
+        deleteUserInfo.await()
+
+        // if : 유저 정보를 지우는데 실패하면 메서드 종료
+        if (!deleteUserInfo.isSuccessful) {
+            return false
+        }
+
+        val credential = EmailAuthProvider.getCredential(email, password)
+        val isAuthenticate = user.reauthenticate(credential)
+        isAuthenticate.await()
+
+        if (isAuthenticate.isSuccessful) {
+            val deleteJob = user.delete()
+            deleteJob.await()
+
+            if (deleteJob.isSuccessful) {
+                return true
+            }
+        }
+
+        return false
     }
 }
