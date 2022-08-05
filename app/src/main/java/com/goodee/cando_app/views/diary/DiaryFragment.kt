@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -34,6 +34,7 @@ class DiaryFragment : Fragment() {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentDiaryBinding
+    private val userViewModel: UserViewModel by activityViewModels()
     private val diaryViewModel: DiaryViewModel by lazy { ViewModelProvider(this).get(DiaryViewModel::class.java) }
     private var backPressedTime = System.currentTimeMillis()
     // 2초 안에 2번 뒤로 누르면 어플리케이션 종료
@@ -94,13 +95,7 @@ class DiaryFragment : Fragment() {
                     "${Firebase.auth.currentUser?.email}님 안녕히 가세요.",
                     Toast.LENGTH_SHORT
                 ).show()
-                val userViewModel = ViewModelProvider(requireActivity(), object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                        return UserViewModel(requireActivity().application) as T
-                    }
-                }).get(UserViewModel::class.java)
                 userViewModel.signOut()
-
                 findNavController().navigate(R.id.action_diaryFragment_to_mainFragment)
                 return true
             }

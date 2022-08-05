@@ -53,6 +53,7 @@ class RegisterFragment : Fragment() {
     }
 
     private fun setEvent() {
+        Log.d(TAG,"RegisterFragment - setEvent() called")
         // 회원가입과 정규식 처리
         binding.buttonRegisterRegisterButton.setOnClickListener {
             register()

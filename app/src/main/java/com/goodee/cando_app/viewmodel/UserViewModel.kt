@@ -30,7 +30,7 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
 
     // 회원가입
     suspend fun sendRegisterEmail(email: String, userDto: UserDto, password: String): Boolean {
-        Log.d(TAG,"User - register() called")
+        Log.d(TAG,"UserViewModel - sendRegisterEmail() called")
         return userRepository.sendRegisterEmail(email, userDto, password)
     }
 
@@ -65,16 +65,19 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 중복 로그인 처리
-    fun autoLogin(firebaseUser: FirebaseUser) {
+    fun autoSignIn(firebaseUser: FirebaseUser) {
+        Log.d(TAG,"UserViewModel - autoSignIn() called")
         userRepository.autoLogin(firebaseUser)
     }
 
     // 로그 아웃
     fun signOut() {
+        Log.d(TAG,"UserViewModel - signOut() called")
         userRepository.signOut()
     }
 
     suspend fun sendPasswordResetEmail(email: String) : Boolean {
+        Log.d(TAG,"UserViewModel - sendPasswordResetEmail() called")
         return userRepository.sendPasswordResetEmail(email)
     }
 }

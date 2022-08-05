@@ -112,7 +112,7 @@ class DiaryRepository(val application: Application) {
             return false
         }
 
-//        Send the user's email who liked the diary and the user's email who will receive like.
+        // Send the user's email who liked the diary and the user's email who will receive like.
         val map = mutableMapOf<String, String>()
         // user who like this diary.
         map["sender"] = FirebaseAuth.getInstance().currentUser!!.email.toString()
@@ -153,6 +153,39 @@ class DiaryRepository(val application: Application) {
         // 트랜잭션으로 유저 정보도 다 삭제해야함.
         val fs = FirebaseFirestore.getInstance()
         val email = FirebaseAuth.getInstance().currentUser?.email ?: return false
+
+        // Read diary written by the user
+        val docOfUserDiary = fs.collection("diary").whereEqualTo("author", email).get().await()
+        // Delete Users diary then delete users info.
+        val transaction = fs.runTransaction { transaction ->
+            // 삭제해야할 유저 다이어리들
+            val listOfDiaryRef = Array<DocumentReference?>(docOfUserDiary.size()) { null }
+            docOfUserDiary.forEachIndexed { idx, diary ->
+                listOfDiaryRef[idx] = fs.collection("diary").document(diary.toObject(DiaryDto::class.java).dno)
+            }
+
+            // 유저의 다이어리들 삭제
+            listOfDiaryRef.forEach { documentReference ->
+                documentReference?.let { it ->
+                    transaction.delete(it)
+                }
+            }
+
+            // 삭제할 유저 문서
+            val userInfoRef = fs.collection("user").document(FirebaseAuth.getInstance().currentUser?.email.toString())
+            transaction.delete(userInfoRef)
+        }
+        transaction.await()
+
+        return transaction.isSuccessful
+    }
+
+    suspend fun deleteAllDiary(email: String, password: String): Boolean {
+        Log.d(TAG,"DiaryRepository - deleteAllDiary() called")
+        // 트랜잭션으로 유저 정보도 다 삭제해야함.
+        val fs = FirebaseFirestore.getInstance()
+        val isUserSame = FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+        isUserSame.await()
 
         // Read diary written by the user
         val docOfUserDiary = fs.collection("diary").whereEqualTo("author", email).get().await()
