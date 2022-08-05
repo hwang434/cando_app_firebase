@@ -88,7 +88,6 @@ class UserRepository(val application: Application) {
     suspend fun isExistNameAndEmail(name: String, email: String): Boolean {
         Log.d(TAG,"UserRepository - isExistNameAndEmail() called")
         val firebaseDatabase = FirebaseFirestore.getInstance().collection(USER_COLLECTION)
-        Log.d(TAG,"UserRepository - ${firebaseDatabase.whereEqualTo("name", name).whereEqualTo("email", email).get().await().documents}")
         return !firebaseDatabase.whereEqualTo("name", name).whereEqualTo("email", email).get().await().isEmpty
     }
 
@@ -106,6 +105,7 @@ class UserRepository(val application: Application) {
     }
 
     fun signOut() {
+        Log.d(TAG,"UserRepository - signOut() called")
         Firebase.auth.signOut()
         _userLiveData.postValue(null)
         SocketLike.disconnectSocket()
@@ -114,10 +114,8 @@ class UserRepository(val application: Application) {
     suspend fun withdrawUser(email: String, password: String): Boolean {
         Log.d(TAG,"UserRepository - withdrawUser() called")
         val user = FirebaseAuth.getInstance().currentUser ?: return false
-
         val deleteUserInfo = FirebaseFirestore.getInstance().collection("user").document(user.uid).delete()
         deleteUserInfo.await()
-
         // if : 유저 정보를 지우는데 실패하면 메서드 종료
         if (!deleteUserInfo.isSuccessful) {
             return false
@@ -126,7 +124,6 @@ class UserRepository(val application: Application) {
         val credential = EmailAuthProvider.getCredential(email, password)
         val isAuthenticate = user.reauthenticate(credential)
         isAuthenticate.await()
-
         if (isAuthenticate.isSuccessful) {
             val deleteJob = user.delete()
             deleteJob.await()
