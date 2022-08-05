@@ -2,15 +2,11 @@ package com.goodee.cando_app.viewmodel
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.model.UserRepository
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.ktx.Firebase
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
     companion object {
@@ -34,7 +30,7 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
 
     // 회원가입
     suspend fun sendRegisterEmail(email: String, userDto: UserDto, password: String): Boolean {
-        Log.d(TAG,"User - register() called")
+        Log.d(TAG,"UserViewModel - sendRegisterEmail() called")
         return userRepository.sendRegisterEmail(email, userDto, password)
     }
 
@@ -63,21 +59,25 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 회원 삭제
-    fun withdrawUser(email: String, password: String) {
+    suspend fun withdrawUser(email: String, password: String): Boolean {
         Log.d(TAG,"UserViewModel - withdrawUser() called")
+        return userRepository.withdrawUser(email, password)
     }
 
     // 중복 로그인 처리
-    fun autoLogin(firebaseUser: FirebaseUser) {
+    fun autoSignIn(firebaseUser: FirebaseUser) {
+        Log.d(TAG,"UserViewModel - autoSignIn() called")
         userRepository.autoLogin(firebaseUser)
     }
 
     // 로그 아웃
     fun signOut() {
+        Log.d(TAG,"UserViewModel - signOut() called")
         userRepository.signOut()
     }
 
     suspend fun sendPasswordResetEmail(email: String) : Boolean {
+        Log.d(TAG,"UserViewModel - sendPasswordResetEmail() called")
         return userRepository.sendPasswordResetEmail(email)
     }
 }

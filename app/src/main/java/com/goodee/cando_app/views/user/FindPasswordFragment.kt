@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindPasswordBinding
@@ -23,7 +25,9 @@ class FindPasswordFragment : Fragment() {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentFindPasswordBinding
-    private val userViewModel by lazy { UserViewModel(application = requireActivity().application) }
+    private val userViewModel by lazy {
+        UserViewModel(requireActivity().application)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

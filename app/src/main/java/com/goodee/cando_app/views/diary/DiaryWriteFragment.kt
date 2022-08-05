@@ -59,7 +59,9 @@ class DiaryWriteFragment : Fragment() {
     private fun setEvent() {
         Log.d(TAG,"DiaryWriteFragment - setEvent() called")
         binding.buttonDiarywriteWritebutton.setOnClickListener {
+            it.isEnabled = false
             writeDiary()
+            it.isEnabled = true
         }
     }
 
