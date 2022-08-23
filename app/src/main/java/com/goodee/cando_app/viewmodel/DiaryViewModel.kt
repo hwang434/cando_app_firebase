@@ -5,8 +5,10 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.model.DiaryRepository
+import kotlinx.coroutines.launch
 
 class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
@@ -57,9 +59,11 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // refresh Diary List live data from Firestore.
-    suspend fun refreshDiaryList(): Boolean {
+    fun refreshDiaryList() {
         Log.d(TAG,"DiaryViewModel - refreshDiaryList() called")
-        return diaryRepository.refreshDiaryList()
+        viewModelScope.launch {
+            diaryRepository.refreshDiaryList()
+        }
     }
 
     // 좋아요 기능

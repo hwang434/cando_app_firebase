@@ -40,7 +40,7 @@ class DiaryRepository(val application: Application) {
     }
 
     // 게시글 목록 가져오기(로그인시 바로 보이는 게시글들)
-    suspend fun refreshDiaryList(): Boolean {
+    suspend fun refreshDiaryList() {
         Log.d(TAG,"DiaryRepository - refreshDiaryList() called")
         val qResult = fireStore.collection(DIARY_COLLECTION).orderBy("date").limitToLast(10).get().await()
         val diaryList = mutableListOf<DiaryDto>()
@@ -51,7 +51,6 @@ class DiaryRepository(val application: Application) {
             }
         }
         _diaryListLiveData.postValue(diaryList)
-        return true
     }
 
     // 게시글 작성
