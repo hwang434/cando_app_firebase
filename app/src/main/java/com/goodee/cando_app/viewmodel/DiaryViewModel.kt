@@ -53,9 +53,9 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 글 삭제하기
-    suspend fun deleteDiary(dno: String): Boolean {
+    fun deleteDiary(dno: String) {
         Log.d(TAG,"DiaryViewModel - deleteDiary() called")
-        return diaryRepository.deleteDiary(dno)
+        viewModelScope.launch { diaryRepository.deleteDiary(dno) }
     }
 
     // refresh Diary List live data from Firestore.

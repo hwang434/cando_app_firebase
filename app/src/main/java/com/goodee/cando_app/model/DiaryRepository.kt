@@ -83,11 +83,14 @@ class DiaryRepository(val application: Application) {
         return task.isSuccessful
     }
 
-    suspend fun deleteDiary(dno: String): Boolean {
+    suspend fun deleteDiary(dno: String) {
         Log.d(TAG,"AppRepository - deleteDiary(dno = $dno) called")
         val task = fireStore.collection("diary").document(dno).delete()
         task.await()
-        return task.isSuccessful
+
+        if (!task.isSuccessful) {
+            throw Exception("게시글 삭제 실패.")
+        }
     }
 
     suspend fun like(dno: String, uid: String): Boolean {

@@ -87,30 +87,22 @@ class DiaryViewFragment : Fragment() {
     private fun deleteDiary() {
         Log.d(TAG,"DiaryViewFragment - deleteDiary() called")
         val aBuilder = AlertDialog.Builder(requireContext())
+
         aBuilder.run {
             setTitle(getString(R.string.alert_diary_view_title))
             setMessage(getString(R.string.alert_diary_view_message))
             setPositiveButton(getString(R.string.alert_diary_view_postive_button)) { _, _ ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    try {
-                        if (diaryViewModel.deleteDiary(dno)) {
-                            withContext(Dispatchers.Main) {
-                                findNavController().navigateUp()
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.w(TAG, "setEvent: delete diary fail.", e)
-                        withContext(Dispatchers.Main) {
-                            AlertDialog.Builder(requireContext()).setTitle(getString(R.string.alert_diary_view_fail_title))
-                                .setMessage(getString(R.string.alert_diary_view_fail_message)).create().show()
-                        }
-                    }
+                try {
+                    diaryViewModel.deleteDiary(dno)
+                    findNavController().navigateUp()
+                } catch (e: Exception) {
+                    Log.w(TAG, "setEvent: delete diary fail.", e)
+                    AlertDialog.Builder(requireContext()).setTitle(getString(R.string.alert_diary_view_fail_title)).setMessage(getString(R.string.alert_diary_view_fail_message)).create().show()
                 }
             }
-            setNegativeButton("취소") { _, _ ->
-                Log.d(TAG,"DiaryDeleteDialogFragment - Dialog Negative Button is clicked")
-            }
+            setNegativeButton("취소") { _, _ -> }
         }
+
         aBuilder.create().show()
     }
 
