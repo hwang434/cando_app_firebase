@@ -67,14 +67,10 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 좋아요 기능
-    suspend fun like(dno: String, uid: String): Boolean {
+    fun like(dno: String, uid: String) {
         Log.d(TAG,"DiaryViewModel - like() called")
         // if : 좋아요 성공하면
-        if (diaryRepository.like(dno, uid)) {
-            return true
-        }
-
-        return false
+        viewModelScope.launch { diaryRepository.like(dno, uid) }
     }
 
     // 좋아요 취소

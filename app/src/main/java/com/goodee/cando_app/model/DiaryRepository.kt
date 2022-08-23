@@ -93,7 +93,7 @@ class DiaryRepository(val application: Application) {
         }
     }
 
-    suspend fun like(dno: String, uid: String): Boolean {
+    suspend fun like(dno: String, uid: String) {
         Log.d(TAG,"DiaryRepository - like($dno, $uid) called")
         val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
         var diaryDto: DiaryDto? = null
@@ -111,7 +111,7 @@ class DiaryRepository(val application: Application) {
 
         result.await()
         if (!result.isSuccessful) {
-            return false
+            throw Exception("글 좋아요 실패")
         }
 
         // Send the user's email who liked the diary and the user's email who will receive like.
@@ -123,7 +123,6 @@ class DiaryRepository(val application: Application) {
         SocketLike.emitData("like", map)
 
         _diaryLiveData.postValue(diaryDto)
-        return result.isSuccessful
     }
 
     suspend fun unlike(dno: String, uid: String): Boolean {

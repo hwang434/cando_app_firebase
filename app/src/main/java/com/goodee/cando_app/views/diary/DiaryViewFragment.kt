@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.Exception
+import kotlin.Exception
 
 class DiaryViewFragment : Fragment() {
     companion object {
@@ -44,7 +44,7 @@ class DiaryViewFragment : Fragment() {
 
         // if : dno is received Successfully, read the diary that has a dno given from preview fragment.
         dno = arguments?.get("dno").toString()
-        if (!dno.isEmpty()) {
+        if (dno.isNotEmpty()) {
             readDiary(dno)
         }
 
@@ -116,20 +116,16 @@ class DiaryViewFragment : Fragment() {
                 return
             }
 
-            lifecycleScope.launch(Dispatchers.IO) {
-                val isSuccess = diaryViewModel.like(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
-                withContext(Dispatchers.Main) {
-                    // if : like is fail
-                    if (!isSuccess) {
-                        val alertDialog = AlertDialog.Builder(requireContext()).create()
-                        alertDialog.apply {
-                            setTitle(getString(R.string.alert_diary_view_like_fail_title))
-                            setMessage(getString(R.string.alert_diary_view_error_message))
-                        }
-                    }
-                    binding.progressbarDiaryviewLoading.visibility = View.GONE
+            try {
+                diaryViewModel.like(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
+            } catch (e: Exception) {
+                val alertDialog = AlertDialog.Builder(requireContext()).create()
+                alertDialog.apply {
+                    setTitle(getString(R.string.alert_diary_view_like_fail_title))
+                    setMessage(getString(R.string.alert_diary_view_error_message))
                 }
             }
+            binding.progressbarDiaryviewLoading.visibility = View.GONE
         }
     }
 
