@@ -74,14 +74,10 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 좋아요 취소
-    suspend fun unlike(dno: String, uid: String): Boolean {
+    fun unlike(dno: String, uid: String) {
         Log.d(TAG,"DiaryViewModel - unlike() called")
         // if : 좋아요 취소 성공하면
-        if (diaryRepository.unlike(dno, uid)) {
-            return true
-        }
-
-        return false
+        viewModelScope.launch { diaryRepository.unlike(dno, uid) }
     }
 
     suspend fun deleteAllDiary(email: String, password: String): Boolean {

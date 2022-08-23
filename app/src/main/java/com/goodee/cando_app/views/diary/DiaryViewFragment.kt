@@ -139,20 +139,17 @@ class DiaryViewFragment : Fragment() {
                 return
             }
 
-            lifecycleScope.launch(Dispatchers.IO) {
-                val isSuccess = diaryViewModel.unlike(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
-                withContext(Dispatchers.Main) {
-                    // if : like is fail
-                    if (!isSuccess) {
-                        val alertDialog = AlertDialog.Builder(requireContext()).create()
-                        alertDialog.apply {
-                            setTitle("좋아요 취소에 실패했습니다.")
-                            setMessage(getString(R.string.alert_diary_view_fail_message))
-                        }
-                    }
-                    binding.progressbarDiaryviewLoading.visibility = View.GONE
+            try {
+                diaryViewModel.unlike(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
+            } catch (e: Exception) {
+                val alertDialog = AlertDialog.Builder(requireContext()).create()
+                alertDialog.apply {
+                    setTitle("좋아요 취소에 실패했습니다.")
+                    setMessage(getString(R.string.alert_diary_view_fail_message))
                 }
             }
+
+            binding.progressbarDiaryviewLoading.visibility = View.GONE
         }
     }
 
