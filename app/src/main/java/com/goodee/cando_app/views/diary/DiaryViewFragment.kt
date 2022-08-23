@@ -9,15 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryViewBinding
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.Exception
 
 class DiaryViewFragment : Fragment() {
@@ -119,6 +115,7 @@ class DiaryViewFragment : Fragment() {
             try {
                 diaryViewModel.like(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
             } catch (e: Exception) {
+                Log.w(TAG, "like: ", e)
                 val alertDialog = AlertDialog.Builder(requireContext()).create()
                 alertDialog.apply {
                     setTitle(getString(R.string.alert_diary_view_like_fail_title))
@@ -142,6 +139,7 @@ class DiaryViewFragment : Fragment() {
             try {
                 diaryViewModel.unlike(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
             } catch (e: Exception) {
+                Log.w(TAG, "unlike: ", e)
                 val alertDialog = AlertDialog.Builder(requireContext()).create()
                 alertDialog.apply {
                     setTitle("좋아요 취소에 실패했습니다.")
@@ -181,18 +179,18 @@ class DiaryViewFragment : Fragment() {
 
     // 글을 조회하여 현재 페이지를 최신화
     private fun readDiary(dno: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccess = diaryViewModel.refreshDiaryLiveData(dno)
-            withContext(Dispatchers.Main) {
-                if (!isSuccess) {
-                    val alertDialog = AlertDialog.Builder(requireContext()).create()
-                    alertDialog.setTitle("오류")
-                    alertDialog.setMessage("이미 삭제 된 글입니다.")
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "확인") { _, _ ->
-                        findNavController().navigateUp()
-                    }
-                    alertDialog.show()
+        try {
+            diaryViewModel.refreshDiaryLiveData(dno)
+        } catch (e: Exception) {
+            Log.w(TAG, "readDiary: ", e)
+            val alertDialog = AlertDialog.Builder(requireContext()).create()
+            alertDialog.apply {
+                setTitle("오류")
+                setMessage("이미 삭제 된 글입니다.")
+                setButton(AlertDialog.BUTTON_NEUTRAL, "확인") { _, _ ->
+                    findNavController().navigateUp()
                 }
+                show()
             }
         }
     }

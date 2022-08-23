@@ -35,9 +35,11 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 게시글 1개 가져오기
-    suspend fun refreshDiaryLiveData(dno: String): Boolean {
+    fun refreshDiaryLiveData(dno: String) {
         Log.d(TAG,"DiaryViewModel - refreshDiaryLiveData() called")
-        return diaryRepository.refreshDiaryLiveData(dno)
+        viewModelScope.launch {
+            diaryRepository.refreshDiaryLiveData(dno)
+        }
     }
 
     // 글 작성하기
