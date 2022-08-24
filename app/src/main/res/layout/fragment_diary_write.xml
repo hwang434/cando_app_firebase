@@ -4,11 +4,6 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <ProgressBar
-            android:id="@+id/progressbar_diarywrite_loading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible"/>
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,5 +62,10 @@
                     android:layout_marginTop="10dp"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
+        <ProgressBar
+            android:id="@+id/progressbar_diarywrite_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
     </FrameLayout>
 </layout>

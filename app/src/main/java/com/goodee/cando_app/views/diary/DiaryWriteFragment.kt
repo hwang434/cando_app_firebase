@@ -27,6 +27,8 @@ class DiaryWriteFragment : Fragment() {
     }
     private lateinit var binding: FragmentDiaryWriteBinding
     private val diaryViewModel: DiaryViewModel by lazy { ViewModelProvider(this).get(DiaryViewModel::class.java) }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"DiaryWriteFragment - onCreate() called")
         super.onCreate(savedInstanceState)
@@ -65,15 +67,17 @@ class DiaryWriteFragment : Fragment() {
     private fun setEvent() {
         Log.d(TAG,"DiaryWriteFragment - setEvent() called")
         binding.buttonDiarywriteWritebutton.setOnClickListener {
-            it.isEnabled = false
             writeDiary()
-            it.isEnabled = true
         }
     }
 
     private fun writeDiary() {
         Log.d(TAG,"DiaryWriteFragment - writeDiary() called")
-        binding.progressbarDiarywriteLoading.visibility = View.VISIBLE
+        binding.apply {
+            buttonDiarywriteWritebutton.isEnabled = false
+            progressbarDiarywriteLoading.visibility = View.VISIBLE
+        }
+
         val title = binding.edittextDiarywriteTitleinput.text.toString()
         val content = binding.edittextDiarywriteContentinput.text.toString()
         val author = FirebaseAuth.getInstance().currentUser?.email
@@ -96,6 +100,16 @@ class DiaryWriteFragment : Fragment() {
             }
         } catch (e: Exception) {
             Log.w(TAG, "setEvent: 글 수정, 작성 실패", e)
+            AlertDialog.Builder(requireContext())
+                .setTitle("글 작성에 실패했습니다.")
+                .setMessage("잠시 후에 다시 시도해주세요.")
+                .create()
+                .show()
+
+            binding.apply {
+                buttonDiarywriteWritebutton.isEnabled = true
+                progressbarDiarywriteLoading.visibility = View.GONE
+            }
         }
     }
 
