@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryViewBinding
@@ -23,7 +23,7 @@ class DiaryViewFragment : Fragment() {
 
     private lateinit var binding: FragmentDiaryViewBinding
     private lateinit var dno: String
-    private val diaryViewModel: DiaryViewModel by activityViewModels()
+    private val diaryViewModel: DiaryViewModel by lazy { ViewModelProvider(this).get(DiaryViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,21 +38,15 @@ class DiaryViewFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary_view, container, false)
         observeDiaryLiveData()
 
-        // if : dno is received Successfully, read the diary that has a dno given from preview fragment.
+        // if : dno is Empty. then navigate up to DiaryFragment.
         dno = arguments?.get("dno").toString()
-        if (dno.isNotEmpty()) {
-            readDiary(dno)
+        if (dno.isEmpty()) {
+            findNavController().navigateUp()
         }
 
+        readDiary(dno)
         setEvent()
         return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        // When you leave fragment or navigate to next fragment.
-        // It will clear ViewModel.
-        activity?.viewModelStore?.clear()
     }
 
     private fun setEvent() {
