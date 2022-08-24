@@ -1,5 +1,6 @@
 package com.goodee.cando_app.views.diary
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,7 +15,7 @@ import com.goodee.cando_app.databinding.FragmentDiaryWriteBinding
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.google.firebase.auth.FirebaseAuth
-import java.lang.Exception
+import kotlin.Exception
 
 class DiaryWriteFragment : Fragment() {
     companion object {
@@ -32,25 +33,25 @@ class DiaryWriteFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         Log.d(TAG,"DiaryWriteFragment - onCreateView() called")
+        setObserver()
         binding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_diary_write, container, false)
-        // if arguments is not null and
+        // if arguments is not null. refresh the diary editText.
         arguments?.let { bundle ->
-            // if : 글 조회에서 넘어왔으면, 글 수정이므로 이전 입력 내용을 입력해준다.
-//            Log.d(TAG,"DiaryWriteFragment - bundle.get() : ${bundle.get("dno")}")
-//            if (bundle.get("dno") != null) {
-//                diaryViewModel.diaryLiveData.value?.let { dto ->
-//                    binding.apply {
-//                        edittextDiarywriteTitleinput.setText(dto.title)
-//                        edittextDiarywriteContentinput.setText(dto.content)
-//                        progressbarDiarywriteLoading.visibility = View.GONE
-//                    }
-//                }
-//            }
-
-
             // 게시글 조회 후, 게시글 입력 화면 최신화
-            //
-            binding.progressbarDiarywriteLoading.visibility = View.GONE
+            try {
+                diaryViewModel.refreshDiaryLiveData(bundle.get("dno").toString())
+            } catch (e: Exception) {
+                Log.w(TAG, "onCreateView: ", e)
+                AlertDialog
+                    .Builder(requireContext())
+                    .setTitle("글 조회에 실패했습니다.")
+                    .setMessage("나중에 다시 시도해주세요.")
+                    .setPositiveButton("예") { _, _ ->
+                        findNavController().navigateUp()
+                    }
+                    .create()
+                    .show()
+            }
         }
         setEvent()
 
@@ -90,7 +91,13 @@ class DiaryWriteFragment : Fragment() {
         }
     }
 
-    // if : diary is edited then refresh input.
-//    fun refreshInput() {
-//    }
+    private fun setObserver() {
+        diaryViewModel.diaryLiveData.observe(viewLifecycleOwner) { diaryDto ->
+            binding.apply {
+                edittextDiarywriteTitleinput.setText(diaryDto.title)
+                edittextDiarywriteContentinput.setText(diaryDto.content)
+                progressbarDiarywriteLoading.visibility = View.GONE
+            }
+        }
+    }
 }
