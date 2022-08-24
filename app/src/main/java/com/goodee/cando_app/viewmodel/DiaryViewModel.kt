@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.model.DiaryRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class DiaryViewModel(application: Application) : AndroidViewModel(application) {
@@ -44,13 +45,17 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     // 글 작성하기
     fun writeDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"DiaryViewModel - writeDiary() called")
-        viewModelScope.launch(Dispatchers.IO) { diaryRepository.writeDiary(diaryDto) }
+        viewModelScope.launch(Dispatchers.IO) {
+            delay(1000)
+            diaryRepository.writeDiary(diaryDto)
+        }
     }
 
     // 글 수정하기
-    fun editDiary(diaryDto: DiaryDto) {
+    suspend fun editDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"DiaryViewModel - editDiary(${diaryDto.dno}) called")
-        viewModelScope.launch(Dispatchers.IO) { diaryRepository.editDiary(diaryDto) }
+        delay(1000)
+        diaryRepository.editDiary(diaryDto)
     }
 
     // 글 삭제하기
