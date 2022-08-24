@@ -43,18 +43,16 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 글 작성하기
-    fun writeDiary(diaryDto: DiaryDto) {
+    suspend fun writeDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"DiaryViewModel - writeDiary() called")
-        viewModelScope.launch(Dispatchers.IO) {
-            delay(1000)
-            diaryRepository.writeDiary(diaryDto)
-        }
+        delay(3000)
+        diaryRepository.writeDiary(diaryDto)
     }
 
     // 글 수정하기
     suspend fun editDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"DiaryViewModel - editDiary(${diaryDto.dno}) called")
-        delay(1000)
+        delay(3000)
         diaryRepository.editDiary(diaryDto)
     }
 
