@@ -38,9 +38,7 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     // 게시글 1개 가져오기
     fun refreshDiaryLiveData(dno: String) {
         Log.d(TAG,"DiaryViewModel - refreshDiaryLiveData() called")
-        viewModelScope.launch {
-            diaryRepository.refreshDiaryLiveData(dno)
-        }
+        viewModelScope.launch(Dispatchers.IO) { diaryRepository.refreshDiaryLiveData(dno) }
     }
 
     // 글 작성하기
@@ -58,29 +56,27 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     // 글 삭제하기
     fun deleteDiary(dno: String) {
         Log.d(TAG,"DiaryViewModel - deleteDiary() called")
-        viewModelScope.launch { diaryRepository.deleteDiary(dno) }
+        viewModelScope.launch(Dispatchers.IO) { diaryRepository.deleteDiary(dno) }
     }
 
     // refresh Diary List live data from Firestore.
     fun refreshDiaryList() {
         Log.d(TAG,"DiaryViewModel - refreshDiaryList() called")
-        viewModelScope.launch {
-            diaryRepository.refreshDiaryList()
-        }
+        viewModelScope.launch(Dispatchers.IO){ diaryRepository.refreshDiaryList() }
     }
 
     // 좋아요 기능
     fun like(dno: String, uid: String) {
         Log.d(TAG,"DiaryViewModel - like() called")
         // if : 좋아요 성공하면
-        viewModelScope.launch { diaryRepository.like(dno, uid) }
+        viewModelScope.launch(Dispatchers.IO) { diaryRepository.like(dno, uid) }
     }
 
     // 좋아요 취소
     fun unlike(dno: String, uid: String) {
         Log.d(TAG,"DiaryViewModel - unlike() called")
         // if : 좋아요 취소 성공하면
-        viewModelScope.launch { diaryRepository.unlike(dno, uid) }
+        viewModelScope.launch(Dispatchers.IO) { diaryRepository.unlike(dno, uid) }
     }
 
     suspend fun deleteAllDiary(email: String, password: String): Boolean {
