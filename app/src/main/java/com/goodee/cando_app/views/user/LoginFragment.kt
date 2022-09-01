@@ -8,30 +8,43 @@ import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentLoginBinding
-import com.goodee.cando_app.listener.SingleClickListener
 import com.goodee.cando_app.util.RegexChecker
+import com.goodee.cando_app.util.Resource
 import com.goodee.cando_app.viewmodel.UserViewModel
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 class LoginFragment : Fragment() {
     companion object {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentLoginBinding
-    private val userViewModel: UserViewModel by lazy {
-        UserViewModel(requireActivity().application)
+    private val userViewModel by viewModels<UserViewModel>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG,"LoginFragment - onCreate() called")
+        super.onCreate(savedInstanceState)
+        userViewModel.userLiveData.observe(this) {
+            when (it) {
+                is Resource.Success -> {
+                    hideProgressBar()
+                    Toast.makeText(requireContext(), "${it.data?.email}님 환영합니다.", Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
+                }
+                is Resource.Error -> {
+                    hideProgressBar()
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> {
+                    showProgressBar()
+                }
+            }
+        }
     }
 
     override fun onStart() {
@@ -80,66 +93,46 @@ class LoginFragment : Fragment() {
             }
 
             // 정규식과 로그인 처리
-            buttonLoginLoginbutton.setOnClickListener(getLoginSingleClickListener())
-        }
-    }
-
-    private fun getLoginSingleClickListener(): SingleClickListener {
-        val singleClickListener = object: SingleClickListener() {
-            override fun onSingleClick(view: View?) {
-                binding.apply {
-                    val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    val email = edittextLoginEmailinput.text.trim().toString()
-                    val password = edittextLoginPasswordinput.text.trim().toString()
-                    if (!RegexChecker.isValidEmail(email)) {
-                        Toast.makeText(requireActivity(),getString(R.string.toast_id_check),Toast.LENGTH_SHORT).show()
-                        edittextLoginEmailinput.requestFocus()
-                        imm.showSoftInput(edittextLoginEmailinput,0)
-                        return
-                    }
-
-                    if (password.isBlank() || password.isEmpty()) {
-                        Toast.makeText(requireActivity(),getString(R.string.toast_check_password),Toast.LENGTH_SHORT).show()
-                        edittextLoginPasswordinput.requestFocus()
-                        imm.showSoftInput(edittextLoginPasswordinput,0)
-                        return
-                    }
-
-                    // 정규식을 만족했으므로 존재하는 데이터인지 확인.
-                    progressbarLoginLoading.visibility = View.VISIBLE
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        try {
-                            val isLoginSuccess = userViewModel.login(email, password)
-                            withContext(Dispatchers.Main) {
-                                if (isLoginSuccess) {
-                                    findNavController().navigate(R.id.action_loginFragment_to_diaryFragment)
-                                } else {
-                                    Toast.makeText(requireContext(), "해당 아이디로 이메일 인증을 해주세요.", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        } catch (e: FirebaseAuthInvalidCredentialsException) {
-                            // 비밀번호 잘못 입력
-                            Log.w(TAG, "onSingleClick: ", e)
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(requireContext(), getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show()
-                            }
-                        } catch (e: FirebaseAuthInvalidUserException) {
-                            // 존재하지 않는 유저
-                            Log.w(TAG, "onSingleClick: ", e)
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(requireContext(), getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show()
-                            }
-                        } catch (e: Exception) {
-                            Log.w(TAG, "onSingleClick: ", e)
-                        } finally {
-                            withContext(Dispatchers.Main) {
-                                progressbarLoginLoading.visibility = View.GONE
-                            }
-                        }
-                    }
+            buttonLoginLoginbutton.setOnClickListener {
+                val email = binding.edittextLoginEmailinput.text.trim().toString()
+                val password = binding.edittextLoginPasswordinput.text.trim().toString()
+                if (isInputOkay(email, password)) {
+                    login(email, password)
                 }
             }
         }
-        return singleClickListener
+    }
+
+    private fun isInputOkay(email: String, password: String): Boolean {
+        binding.apply {
+            val imm = requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            if (!RegexChecker.isValidEmail(email)) {
+                Toast.makeText(requireActivity(),getString(R.string.toast_id_check),Toast.LENGTH_SHORT).show()
+                edittextLoginEmailinput.requestFocus()
+                imm.showSoftInput(edittextLoginEmailinput,0)
+                return false
+            }
+
+            if (password.isBlank() || password.isEmpty()) {
+                Toast.makeText(requireActivity(),getString(R.string.toast_check_password),Toast.LENGTH_SHORT).show()
+                edittextLoginPasswordinput.requestFocus()
+                imm.showSoftInput(edittextLoginPasswordinput,0)
+                return false
+            }
+        }
+
+        return true
+    }
+
+    private fun login(email: String, password: String) {
+        userViewModel.login(email, password)
+    }
+
+    private fun showProgressBar() {
+        binding.progressbarLoginLoading.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        binding.progressbarLoginLoading.visibility = View.GONE
     }
 }

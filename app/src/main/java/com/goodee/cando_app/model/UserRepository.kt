@@ -2,13 +2,10 @@ package com.goodee.cando_app.model
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.goodee.cando_app.dto.UserDto
+import com.goodee.cando_app.util.Resource
 import com.goodee.cando_app.util.SocketLike
-import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -21,13 +18,6 @@ class UserRepository(val application: Application) {
         private const val USER_COLLECTION = "user"
     }
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val _userLiveData: MutableLiveData<FirebaseUser> = MutableLiveData<FirebaseUser>()
-    val userLiveData: LiveData<FirebaseUser>
-        get() = _userLiveData
-
-    init {
-        _userLiveData.postValue(firebaseAuth.currentUser)
-    }
 
     // 회원가입
     suspend fun sendRegisterEmail(email: String, userDto: UserDto, password: String): Boolean {
@@ -56,18 +46,29 @@ class UserRepository(val application: Application) {
     }
 
     // Firebase Authentication 로그인
-    suspend fun login(email: String, password: String): Boolean {
+    suspend fun login(email: String, password: String): Resource<FirebaseUser> {
         Log.d(TAG,"UserRepository - login() called")
-        val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-        if (authResult.user != null && authResult.user!!.isEmailVerified) {
-            _userLiveData.postValue(authResult.user)
-            // Socket 설정
-            SocketLike.connectSocket()
-            return true
+        try {
+            val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+            if (authResult.user != null && authResult.user!!.isEmailVerified) {
+                // Socket 설정
+                SocketLike.connectSocket()
+                return Resource.Success(data = authResult.user!!)
+            }
+
+            firebaseAuth.signOut()
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+            Log.w(TAG, "login: ", e)
+            return Resource.Error(null, "비밀번호가 일치하지 않습니다.")
+        } catch (e: FirebaseAuthInvalidUserException) {
+            Log.w(TAG, "login: ", e)
+            return Resource.Error(null, "존재하지 않는 회원입니다.")
+        } catch (e: Exception) {
+            Log.w(TAG, "login: ", e)
+            return Resource.Error(null, "시스템에 문제가 발생하였습니다.")
         }
 
-        firebaseAuth.signOut()
-        return false
+        return Resource.Error(null, "로그인 실패")
     }
 
     // 유저 아이디 찾기
@@ -100,14 +101,12 @@ class UserRepository(val application: Application) {
 
     fun autoLogin(firebaseUser: FirebaseUser) {
         Log.d(TAG,"UserRepository - autoLogin() called")
-        _userLiveData.postValue(firebaseUser)
         SocketLike.connectSocket()
     }
 
     fun signOut() {
         Log.d(TAG,"UserRepository - signOut() called")
         Firebase.auth.signOut()
-        _userLiveData.postValue(null)
         SocketLike.disconnectSocket()
     }
 

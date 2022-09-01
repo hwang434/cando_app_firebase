@@ -5,22 +5,23 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.model.UserRepository
+import com.goodee.cando_app.util.Resource
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.QuerySnapshot
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
     companion object {
         private const val TAG: String = "로그"
     }
     private var userRepository: UserRepository
-    private val _userLiveData: MutableLiveData<FirebaseUser>
-    val userLiveData: LiveData<FirebaseUser>
+    private val _userLiveData: MutableLiveData<Resource<FirebaseUser>> = MutableLiveData()
+    val userLiveData: LiveData<Resource<FirebaseUser>>
         get() = _userLiveData
-    
+
     init {
-        Log.d(TAG,"UserViewModel - init called")
         userRepository = UserRepository(application)
-        _userLiveData = userRepository.userLiveData as MutableLiveData<FirebaseUser>
     }
 
     override fun onCleared() {
@@ -35,9 +36,17 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 로그인
-    suspend fun login(email: String, password: String): Boolean {
+    fun login(email: String, password: String) {
         Log.d(TAG,"User - login() called")
-        return userRepository.login(email, password)
+        _userLiveData.postValue(Resource.Loading())
+
+        viewModelScope.launch(Dispatchers.IO) {
+            handleLogin(userRepository.login(email, password))
+        }
+    }
+
+    fun handleLogin(resource: Resource<FirebaseUser>) {
+        _userLiveData.postValue(resource)
     }
 
     // 아이디 찾기

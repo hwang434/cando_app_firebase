@@ -51,7 +51,8 @@ class MemberWithdrawFragment : Fragment() {
         binding.buttonMemberwithdrawWithdrawbutton.setOnClickListener {
             it.isEnabled = false
             val password = binding.edittextMemberwithdrawPasswordinput.text.toString().trim()
-            val email = userViewModel.userLiveData.value?.email.toString().trim()
+
+            val email = userViewModel.userLiveData.value?.data?.email.toString().trim()
             if (RegexChecker.isValidEmail(email) && password.isNotEmpty()) {
                 withdrawMember(email, password)
             }
