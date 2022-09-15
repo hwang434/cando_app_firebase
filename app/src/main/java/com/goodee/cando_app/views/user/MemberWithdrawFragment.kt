@@ -8,24 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.activityViewModels
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentMemberWithdrawBinding
-import com.goodee.cando_app.util.RegexChecker
+import com.goodee.cando_app.util.Resource
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.goodee.cando_app.viewmodel.UserViewModel
-import com.google.firebase.auth.FirebaseAuthException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 class MemberWithdrawFragment : Fragment() {
     companion object {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentMemberWithdrawBinding
-    private lateinit var userViewModel: UserViewModel
+    private val userViewModel: UserViewModel by activityViewModels()
     private lateinit var diaryViewModel: DiaryViewModel
     
     override fun onCreateView(

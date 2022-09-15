@@ -9,13 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewModelScope
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindPasswordBinding
 import com.goodee.cando_app.util.RegexChecker
 import com.goodee.cando_app.viewmodel.UserViewModel
-import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,7 +24,7 @@ class FindPasswordFragment : Fragment() {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentFindPasswordBinding
-    private val userViewModel by viewModels<UserViewModel>()
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

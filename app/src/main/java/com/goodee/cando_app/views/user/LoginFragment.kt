@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
@@ -24,7 +24,7 @@ class LoginFragment : Fragment() {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentLoginBinding
-    private val userViewModel by viewModels<UserViewModel>()
+    private val userViewModel by activityViewModels<UserViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"LoginFragment - onCreate() called")

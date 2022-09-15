@@ -9,9 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewModelScope
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindIdBinding
@@ -26,7 +24,7 @@ class FindEmailFragment : Fragment() {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentFindIdBinding
-    private val userViewModel by viewModels<UserViewModel>()
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
