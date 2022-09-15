@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.model.DiaryRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -82,8 +83,10 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) { diaryRepository.unlike(dno, uid) }
     }
 
-    suspend fun deleteAllDiary(email: String, password: String): Boolean {
+    fun deleteAllDiary(email: String, password: String) {
         Log.d(TAG,"DiaryViewModel - deleteAllDiary() called")
-        return diaryRepository.deleteAllDiary(email, password)
+        viewModelScope.launch(Dispatchers.IO) {
+            diaryRepository.deleteAllDiary(email, password)
+        }
     }
 }
