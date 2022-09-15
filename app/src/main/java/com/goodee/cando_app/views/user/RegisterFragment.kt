@@ -19,6 +19,7 @@ import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.util.RegexChecker
+import com.goodee.cando_app.util.Resource
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
@@ -45,6 +46,7 @@ class RegisterFragment : Fragment() {
         Log.d(TAG,"registerFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
         setEvent()
+        setObserver()
 
         return binding.root
     }
@@ -76,6 +78,38 @@ class RegisterFragment : Fragment() {
         }
     }
 
+    private fun setObserver() {
+        userViewModel.isExistEmail.observe(viewLifecycleOwner) {
+            binding.progressbarRegisterLoading.visibility = View.GONE
+            when (it) {
+                is Resource.Success -> {
+                    val dialog = AlertDialog.Builder(requireContext()).create()
+                    if (it.data == true) {
+                        dialog.setTitle(getString(R.string.toast_is_exist_email))
+                        dialog.setMessage(getString(R.string.dialog_change_email_message))
+                        dialog.setButton(Dialog.BUTTON_NEUTRAL, getString(R.string.yes)) { _, _ -> }
+                    } else {
+                        dialog.setTitle(getString(R.string.dialog_is_valid_email_title))
+                        dialog.setMessage(getString(R.string.dialog_is_valid_email_message))
+                        dialog.setButton(Dialog.BUTTON_POSITIVE, getString(R.string.yes)) { _, _ ->
+                            binding.edittextRegisterEmailinput.isEnabled = false
+                            binding.buttonRegisterDuplicatecheck.isEnabled = false
+                        }
+                        dialog.setButton(Dialog.BUTTON_NEGATIVE, getString(R.string.no)) { _, _ -> }
+                    }
+                    dialog.show()
+                }
+                is Resource.Error -> {
+
+                }
+
+                is Resource.Loading -> {
+                    binding.progressbarRegisterLoading.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
     private fun isEmailRegexMatch(email: String): Boolean {
         Log.d(TAG,"RegisterFragment - isEmailRegexMatch() called")
         if (!RegexChecker.isValidEmail(email)) {
@@ -91,33 +125,7 @@ class RegisterFragment : Fragment() {
 
     private fun checkIsExistEmail(email: String) {
         Log.d(TAG,"RegisterFragment - checkIsExistEmail() called")
-        lifecycleScope.launch(Dispatchers.IO) {
-            // if : 존재하지 않는 이메일
-            var isExistEmail = false
-            try {
-                isExistEmail = userViewModel.isExistEmail(email)
-            } catch (e: Exception) {
-                Log.w(TAG, "isExistEmail: ", e)
-            }
-
-            withContext(Dispatchers.Main) {
-                val dialog = AlertDialog.Builder(requireContext()).create()
-                if (isExistEmail) {
-                    dialog.setTitle(getString(R.string.toast_is_exist_email))
-                    dialog.setMessage(getString(R.string.dialog_change_email_message))
-                    dialog.setButton(Dialog.BUTTON_NEUTRAL, getString(R.string.yes)) { _, _ -> }
-                } else {
-                    dialog.setTitle(getString(R.string.dialog_is_valid_email_title))
-                    dialog.setMessage(getString(R.string.dialog_is_valid_email_message))
-                    dialog.setButton(Dialog.BUTTON_POSITIVE, getString(R.string.yes)) { _, _ ->
-                        binding.edittextRegisterEmailinput.isEnabled = false
-                        binding.buttonRegisterDuplicatecheck.isEnabled = false
-                    }
-                    dialog.setButton(Dialog.BUTTON_NEGATIVE, getString(R.string.no)) { _, _ -> }
-                }
-                dialog.show()
-            }
-        }
+        userViewModel.isExistEmail(email)
     }
 
     private fun isUserInfoRegexMatch(

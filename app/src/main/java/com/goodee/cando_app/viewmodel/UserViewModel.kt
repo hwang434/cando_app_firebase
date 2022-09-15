@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.handleCoroutineException
 import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
@@ -26,6 +27,10 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     private val _isWithdrawSuccess: MutableLiveData<Resource<Boolean>> = MutableLiveData()
     val isWithdrawSuccess: LiveData<Resource<Boolean>>
         get() = _isWithdrawSuccess
+
+    private val _isExistEmail: MutableLiveData<Resource<Boolean>> = MutableLiveData()
+    val isExistEmail: LiveData<Resource<Boolean>>
+        get() = _isExistEmail
 
     init {
         userRepository = UserRepository(application)
@@ -69,9 +74,22 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
     
     // 중복 회원 찾기
-    suspend fun isExistEmail(email: String): Boolean {
+    fun isExistEmail(email: String) {
         Log.d(TAG,"UserViewModel - isExistEmail() called")
-        return userRepository.isExistEmail(email)
+        val handler = CoroutineExceptionHandler { _, error ->
+            _isExistEmail.postValue(Resource.Error(message = "${error.message}"))
+            Log.w(TAG, "isExistEmail: ", error)
+        }
+        
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            _isExistEmail.postValue(Resource.Loading())
+            if (!userRepository.isExistEmail(email)) {
+                _isExistEmail.postValue(Resource.Success(false))
+                return@launch
+            }
+
+            _isExistEmail.postValue(Resource.Success(true))
+        }
     }
 
     // 회원 삭제
