@@ -9,9 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.viewModelScope
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindPasswordBinding
 import com.goodee.cando_app.util.RegexChecker
@@ -25,9 +24,7 @@ class FindPasswordFragment : Fragment() {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentFindPasswordBinding
-    private val userViewModel by lazy {
-        UserViewModel(requireActivity().application)
-    }
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,7 +58,7 @@ class FindPasswordFragment : Fragment() {
 
             val alertDialogBuilder = AlertDialog.Builder(requireContext()).create()
             alertDialogBuilder.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.confirm)) { _, _ -> }
-            lifecycleScope.launch(Dispatchers.IO) {
+            userViewModel.viewModelScope.launch(Dispatchers.IO) {
                 // if : 존재하는 이름과 이메일이라면
                 if (userViewModel.isExistNameAndEmail(name = name, email = email)) {
                     // 비밀번호 리셋용 이메일 전송

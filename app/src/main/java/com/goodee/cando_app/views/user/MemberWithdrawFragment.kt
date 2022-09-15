@@ -8,24 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.activityViewModels
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentMemberWithdrawBinding
-import com.goodee.cando_app.util.RegexChecker
+import com.goodee.cando_app.util.Resource
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.goodee.cando_app.viewmodel.UserViewModel
-import com.google.firebase.auth.FirebaseAuthException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 class MemberWithdrawFragment : Fragment() {
     companion object {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentMemberWithdrawBinding
-    private lateinit var userViewModel: UserViewModel
+    private val userViewModel: UserViewModel by activityViewModels()
     private lateinit var diaryViewModel: DiaryViewModel
     
     override fun onCreateView(
@@ -39,11 +34,29 @@ class MemberWithdrawFragment : Fragment() {
         return binding.root
     }
 
+    private fun setObserver() {
+        userViewModel.isWithdrawSuccess.observe(viewLifecycleOwner) { resouce ->
+            when (resouce) {
+                is Resource.Success -> {
+                    Toast.makeText(context, "그동안 이용해주셔서 감사합니다.", Toast.LENGTH_LONG).show()
+                    requireActivity().finish()
+                }
+                is Resource.Error -> {
+                    Log.w(TAG, "setObserver: ", Throwable(message = resouce.message))
+                    Toast.makeText(requireContext(), "${resouce.message}", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.d(TAG,"MemberWithdrawFragment - onViewCreated() called")
         super.onViewCreated(view, savedInstanceState)
-        userViewModel = UserViewModel(requireActivity().application)
         diaryViewModel = DiaryViewModel(requireActivity().application)
+        setObserver()
     }
 
     private fun setEvent() {
@@ -51,39 +64,21 @@ class MemberWithdrawFragment : Fragment() {
         binding.buttonMemberwithdrawWithdrawbutton.setOnClickListener {
             it.isEnabled = false
             val password = binding.edittextMemberwithdrawPasswordinput.text.toString().trim()
-            val email = userViewModel.userLiveData.value?.email.toString().trim()
-            if (RegexChecker.isValidEmail(email) && password.isNotEmpty()) {
+            val email = userViewModel.userLiveData.value?.data?.email.toString().trim()
+
+            if (password.isNotEmpty()) {
                 withdrawMember(email, password)
+            } else {
+                Toast.makeText(requireContext(), "This is Invalid password.", Toast.LENGTH_SHORT).show()
             }
+            it.isEnabled = true
         }
     }
 
     // 회원 삭제
     private fun withdrawMember(email: String, password: String) {
         Log.d(TAG,"MemberWithdrawFragment - withdrawMember() called")
-        lifecycleScope.launch(Dispatchers.IO) {
-            var isWithdrawSuccess = false
-            try {
-                if (!diaryViewModel.deleteAllDiary(email, password)) {
-                    return@launch
-                }
-                isWithdrawSuccess = userViewModel.withdrawUser(email, password)
-            } catch (e: FirebaseAuthException) {
-                Log.w(TAG, "withdrawMember: firebase auth Exception", e)
-            } catch (e: Exception) {
-                Log.w(TAG, "withdrawMember: fail", e)
-            }
-
-            withContext(Dispatchers.Main) {
-                if (isWithdrawSuccess) {
-                    // 회원 탈퇴 성공
-                    Toast.makeText(context, "그동안 이용해주셔서 감사합니다.", Toast.LENGTH_LONG).show()
-                    requireActivity().finish()
-                } else {
-                    Toast.makeText(context, "회원 탈퇴에 실패했습니다.", Toast.LENGTH_LONG).show()
-                }
-                binding.buttonMemberwithdrawWithdrawbutton.isEnabled = true
-            }
-        }
+        diaryViewModel.deleteAllDiary(email, password)
+        userViewModel.withdrawUser(email, password)
     }
 }

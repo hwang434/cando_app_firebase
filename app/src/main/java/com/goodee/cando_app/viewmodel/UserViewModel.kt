@@ -5,22 +5,30 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.model.UserRepository
+import com.goodee.cando_app.util.Resource
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.QuerySnapshot
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
     companion object {
         private const val TAG: String = "로그"
     }
     private var userRepository: UserRepository
-    private val _userLiveData: MutableLiveData<FirebaseUser>
-    val userLiveData: LiveData<FirebaseUser>
+    private val _userLiveData: MutableLiveData<Resource<FirebaseUser>> = MutableLiveData()
+    val userLiveData: LiveData<Resource<FirebaseUser>>
         get() = _userLiveData
-    
+
+    private val _isWithdrawSuccess: MutableLiveData<Resource<Boolean>> = MutableLiveData()
+    val isWithdrawSuccess: LiveData<Resource<Boolean>>
+        get() = _isWithdrawSuccess
+
     init {
-        Log.d(TAG,"UserViewModel - init called")
         userRepository = UserRepository(application)
-        _userLiveData = userRepository.userLiveData as MutableLiveData<FirebaseUser>
     }
 
     override fun onCleared() {
@@ -35,9 +43,17 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 로그인
-    suspend fun login(email: String, password: String): Boolean {
+    fun login(email: String, password: String) {
         Log.d(TAG,"User - login() called")
-        return userRepository.login(email, password)
+        _userLiveData.postValue(Resource.Loading())
+
+        viewModelScope.launch(Dispatchers.IO) {
+            handleLogin(userRepository.login(email, password))
+        }
+    }
+
+    fun handleLogin(resource: Resource<FirebaseUser>) {
+        _userLiveData.postValue(resource)
     }
 
     // 아이디 찾기
@@ -59,14 +75,35 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 회원 삭제
-    suspend fun withdrawUser(email: String, password: String): Boolean {
+    fun withdrawUser(email: String, password: String) {
         Log.d(TAG,"UserViewModel - withdrawUser() called")
-        return userRepository.withdrawUser(email, password)
+        val withdrawExceptionHandler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "withdrawUser: ", error)
+            val errorMessage = when (error) {
+                is FirebaseAuthInvalidCredentialsException -> {
+                    "Password is not matched."
+                }
+                else -> {
+                    "System has a Error."
+                }
+            }
+            _isWithdrawSuccess.postValue(Resource.Error(false, errorMessage))
+        }
+
+        viewModelScope.launch(withdrawExceptionHandler) {
+            _isWithdrawSuccess.postValue(Resource.Loading())
+            if (userRepository.withdrawUser(email, password)) {
+                _isWithdrawSuccess.postValue(Resource.Success(true))
+            } else {
+                _isWithdrawSuccess.postValue(Resource.Error(false, "Fail to Withdraw."))
+            }
+        }
     }
 
     // 중복 로그인 처리
     fun autoSignIn(firebaseUser: FirebaseUser) {
         Log.d(TAG,"UserViewModel - autoSignIn() called")
+        _userLiveData.postValue(Resource.Success(FirebaseAuth.getInstance().currentUser!!))
         userRepository.autoLogin(firebaseUser)
     }
 

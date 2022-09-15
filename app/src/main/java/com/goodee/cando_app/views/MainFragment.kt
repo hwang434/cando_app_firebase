@@ -8,8 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
@@ -24,7 +23,7 @@ class MainFragment : Fragment() {
     }
     private lateinit var binding: FragmentMainBinding
     private val auth by lazy { Firebase.auth }
-    private val userViewModel by lazy { UserViewModel(requireActivity().application) }
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View {
         Log.d(TAG,"MainFragment - onCreateView() called")

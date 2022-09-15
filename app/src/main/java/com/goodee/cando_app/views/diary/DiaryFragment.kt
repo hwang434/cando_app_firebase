@@ -13,7 +13,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.goodee.cando_app.R
@@ -24,15 +23,14 @@ import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class DiaryFragment : Fragment() {
+
     companion object {
         private const val TAG: String = "로그"
     }
+
     private lateinit var binding: FragmentDiaryBinding
     private val userViewModel: UserViewModel by activityViewModels()
     private val diaryViewModel: DiaryViewModel by lazy { ViewModelProvider(this).get(DiaryViewModel::class.java) }
@@ -125,26 +123,17 @@ class DiaryFragment : Fragment() {
     }
 
     private fun refreshDiaryList() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            // if : 글 목록을 읽어 오지 못하면
-            var isSuccess = false
-            try {
-                isSuccess = diaryViewModel.refreshDiaryList()
-            } catch (e: Exception) {
-                Log.w(TAG, "refreshDiaryList: ", e)
-            } finally {
-                if (!isSuccess) {
-                    withContext(Dispatchers.Main) {
-                        val alertDialog = AlertDialog.Builder(requireContext()).create()
-                        alertDialog.setTitle("서버 상태가 좋지 않습니다.")
-                        alertDialog.setMessage("나중에 다시 접속해주세요.")
-                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "확인") { _, _ ->
-                            findNavController().navigateUp()
-                        }
-                        alertDialog.show()
-                    }
-                }
+        try {
+            diaryViewModel.refreshDiaryList()
+        } catch (e: Exception) {
+            Log.w(TAG, "refreshDiaryList: ", e)
+            val alertDialog = AlertDialog.Builder(requireContext()).create()
+            alertDialog.setTitle("서버 상태가 좋지 않습니다.")
+            alertDialog.setMessage("나중에 다시 접속해주세요.")
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "확인") { _, _ ->
+                findNavController().navigateUp()
             }
+            alertDialog.show()
         }
     }
 

@@ -40,7 +40,7 @@ class DiaryRepository(val application: Application) {
     }
 
     // 게시글 목록 가져오기(로그인시 바로 보이는 게시글들)
-    suspend fun refreshDiaryList(): Boolean {
+    suspend fun refreshDiaryList() {
         Log.d(TAG,"DiaryRepository - refreshDiaryList() called")
         val qResult = fireStore.collection(DIARY_COLLECTION).orderBy("date").limitToLast(10).get().await()
         val diaryList = mutableListOf<DiaryDto>()
@@ -51,11 +51,10 @@ class DiaryRepository(val application: Application) {
             }
         }
         _diaryListLiveData.postValue(diaryList)
-        return true
     }
 
     // 게시글 작성
-    suspend fun writeDiary(diaryDto: DiaryDto): Boolean {
+    suspend fun writeDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"AppRepository - writeDiary(diaryDto : $diaryDto) called")
         diaryDto.dno = fireStore.collection(DIARY_COLLECTION).document().id
         val task = fireStore.collection(DIARY_COLLECTION).document(diaryDto.dno).set(diaryDto)
@@ -64,11 +63,10 @@ class DiaryRepository(val application: Application) {
         if (!task.isSuccessful) {
             throw Exception("글 작성 실패")
         }
-        return task.isSuccessful
     }
 
     // 게시글 수정하기
-    suspend fun editDiary(diaryDto: DiaryDto): Boolean {
+    suspend fun editDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"AppRepository - editDiary(diaryDto : $diaryDto) called")
         val map = mutableMapOf<String, Any>()
         map["title"] = diaryDto.title
@@ -81,17 +79,19 @@ class DiaryRepository(val application: Application) {
         if (!task.isSuccessful) {
             throw Exception("글 수정 실패")
         }
-        return task.isSuccessful
     }
 
-    suspend fun deleteDiary(dno: String): Boolean {
+    suspend fun deleteDiary(dno: String) {
         Log.d(TAG,"AppRepository - deleteDiary(dno = $dno) called")
         val task = fireStore.collection("diary").document(dno).delete()
         task.await()
-        return task.isSuccessful
+
+        if (!task.isSuccessful) {
+            throw Exception("게시글 삭제 실패.")
+        }
     }
 
-    suspend fun like(dno: String, uid: String): Boolean {
+    suspend fun like(dno: String, uid: String) {
         Log.d(TAG,"DiaryRepository - like($dno, $uid) called")
         val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
         var diaryDto: DiaryDto? = null
@@ -109,7 +109,7 @@ class DiaryRepository(val application: Application) {
 
         result.await()
         if (!result.isSuccessful) {
-            return false
+            throw Exception("글 좋아요 실패")
         }
 
         // Send the user's email who liked the diary and the user's email who will receive like.
@@ -121,10 +121,9 @@ class DiaryRepository(val application: Application) {
         SocketLike.emitData("like", map)
 
         _diaryLiveData.postValue(diaryDto)
-        return result.isSuccessful
     }
 
-    suspend fun unlike(dno: String, uid: String): Boolean {
+    suspend fun unlike(dno: String, uid: String) {
         Log.d(TAG,"DiaryRepository - unlike() called")
         val diaryRef = fireStore.collection(DIARY_COLLECTION).document(dno)
         var diaryDto: DiaryDto? = null
@@ -141,11 +140,10 @@ class DiaryRepository(val application: Application) {
 
         result.await()
         if (!result.isSuccessful) {
-            return false
+            throw Exception("좋아요 취소 실패")
         }
 
         _diaryLiveData.postValue(diaryDto)
-        return result.isSuccessful
     }
 
     suspend fun deleteAllDiary(): Boolean {

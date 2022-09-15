@@ -9,9 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.viewModelScope
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindIdBinding
 import com.goodee.cando_app.util.RegexChecker
@@ -25,13 +24,7 @@ class FindEmailFragment : Fragment() {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentFindIdBinding
-    private val userViewModel by lazy {
-        ViewModelProvider(requireActivity(), object: ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return UserViewModel(requireActivity().application) as T
-            }
-        }).get(UserViewModel::class.java)
-    }
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,27 +54,27 @@ class FindEmailFragment : Fragment() {
         } else if (phone.isEmpty() || !RegexChecker.isValidPhone(phone)) {
             Toast.makeText(requireActivity(), getString(R.string.toast_find_id_check_phone), Toast.LENGTH_SHORT).show()
         } else {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val qResult = userViewModel.findUserEmail(phone = phone, name = name)
-                withContext(Dispatchers.Main) {
-                    if (qResult.isEmpty) {
-                        Toast.makeText(requireContext(), getString(R.string.toast_find_id_not_exist_info), Toast.LENGTH_SHORT).show()
-                    } else {
-                        val alertDialogBuilder = AlertDialog.Builder(requireContext()).create()
-                        // if : 입력한 정보와 일치하는 회원이 여러 명
-                        if (qResult.documents.size == 1) {
-                            alertDialogBuilder.apply {
-                                setTitle(getString(R.string.alert_find_email_title))
-                                setMessage(qResult.documents[0].get("email").toString())
+            userViewModel.viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val qResult = userViewModel.findUserEmail(phone = phone, name = name)
+                    withContext(Dispatchers.Main) {
+                        if (qResult.isEmpty) {
+                            Toast.makeText(requireContext(), getString(R.string.toast_find_id_not_exist_info), Toast.LENGTH_SHORT).show()
+                        } else {
+                            val alertDialog = AlertDialog.Builder(requireContext()).create()
+                            // if : 입력한 정보와 일치하는 회원이 여러 명
+                            if (qResult.documents.size == 1) {
+                                alertDialog.apply {
+                                    setTitle(getString(R.string.alert_find_email_title))
+                                    setMessage(qResult.documents[0].get("email").toString())
+                                }
                             }
-                        } else if (qResult.documents.size > 1) {
-                            alertDialogBuilder.apply {
-                                setTitle(getString(R.string.error_title))
-                                setMessage(getString(R.string.error_message))
-                            }
+                            alertDialog.show()
                         }
-                        alertDialogBuilder.show()
                     }
+                } catch (e: Exception) {
+                    Log.w(TAG, "findId: ", e)
+                    Toast.makeText(requireContext(), "에러가 발생했습니다.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
