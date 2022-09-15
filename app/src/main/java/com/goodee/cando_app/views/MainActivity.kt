@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
             it.forEach {
                 jsonString.append(it.toString())
             }
+
             val jsonElement = JsonParser.parseString(jsonString.toString())
             val jsonObject = jsonElement.asJsonObject
             val userEmail = FirebaseAuth.getInstance().currentUser?.email
@@ -44,7 +45,6 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG,"MainActivity - 좋아요를 받았습니다.")
                 lifecycleScope.launch(Dispatchers.Main) {
                     Toast.makeText(this@MainActivity, "$sender likes your Diary.", Toast.LENGTH_SHORT).show()
-                    // Make the Notification.
                 }
             }
         }
