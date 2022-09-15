@@ -111,18 +111,21 @@ class UserRepository(val application: Application) {
     }
 
     suspend fun withdrawUser(email: String, password: String): Boolean {
-        Log.d(TAG,"UserRepository - withdrawUser() called")
+        Log.d(TAG,"UserRepository - withdrawUser(email = $email, password = $password) called")
         val user = FirebaseAuth.getInstance().currentUser ?: return false
         val deleteUserInfo = FirebaseFirestore.getInstance().collection("user").document(user.uid).delete()
         deleteUserInfo.await()
+
         // if : 유저 정보를 지우는데 실패하면 메서드 종료
         if (!deleteUserInfo.isSuccessful) {
             return false
         }
 
         val credential = EmailAuthProvider.getCredential(email, password)
-        val isAuthenticate = user.reauthenticate(credential)
+        val isAuthenticate = firebaseAuth.currentUser!!.reauthenticate(credential)
         isAuthenticate.await()
+        Log.d(TAG,"UserRepository - isAuthenticate.isSuccessful ${isAuthenticate.isSuccessful}() called")
+
         if (isAuthenticate.isSuccessful) {
             val deleteJob = user.delete()
             deleteJob.await()
