@@ -41,6 +41,7 @@ class RegisterFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
         setEvent()
         setObserver()
+
         return binding.root
     }
 

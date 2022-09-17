@@ -11,6 +11,7 @@ import com.google.firebase.auth.*
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.handleCoroutineException
 import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
@@ -98,18 +99,19 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     // 중복 회원 찾기
     fun isExistEmail(email: String) {
         Log.d(TAG,"UserViewModel - isExistEmail() called")
-        val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
-            Log.w(TAG, "isExistEmail: ", throwable)
-        }
-
         _isExistEmail.postValue(Resource.Loading())
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            if (userRepository.isExistEmail(email)) {
-                _isExistEmail.postValue(Resource.Success(true))
+        
+        val handler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "isExistEmail: ", error)
+        }
+        
+        viewModelScope.launch(Dispatchers.IO + handler) {    
+            if (!userRepository.isExistEmail(email)) {
+                _isExistEmail.postValue(Resource.Success(false))
                 return@launch
             }
 
-            _isExistEmail.postValue(Resource.Success(false))
+            _isExistEmail.postValue(Resource.Success(true))
         }
     }
 
