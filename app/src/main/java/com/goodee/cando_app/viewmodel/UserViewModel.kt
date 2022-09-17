@@ -146,7 +146,7 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     fun autoSignIn(firebaseUser: FirebaseUser) {
         Log.d(TAG,"UserViewModel - autoSignIn() called")
         _userLiveData.postValue(Resource.Success(FirebaseAuth.getInstance().currentUser!!))
-        userRepository.autoLogin(firebaseUser)
+        userRepository.autoLogin()
     }
 
     // 로그 아웃

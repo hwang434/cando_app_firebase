@@ -101,7 +101,7 @@ class UserRepository(val application: Application) {
         return result.isSuccessful
     }
 
-    fun autoLogin(firebaseUser: FirebaseUser) {
+    fun autoLogin() {
         Log.d(TAG,"UserRepository - autoLogin() called")
         SocketLike.connectSocket()
     }
