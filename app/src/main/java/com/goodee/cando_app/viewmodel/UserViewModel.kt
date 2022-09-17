@@ -11,7 +11,6 @@ import com.google.firebase.auth.*
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.handleCoroutineException
 import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
@@ -143,7 +142,7 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 중복 로그인 처리
-    fun autoSignIn(firebaseUser: FirebaseUser) {
+    fun autoSignIn() {
         Log.d(TAG,"UserViewModel - autoSignIn() called")
         _userLiveData.postValue(Resource.Success(FirebaseAuth.getInstance().currentUser!!))
         userRepository.autoLogin()
@@ -152,6 +151,7 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     // 로그 아웃
     fun signOut() {
         Log.d(TAG,"UserViewModel - signOut() called")
+        _userLiveData.postValue(null)
         userRepository.signOut()
     }
 

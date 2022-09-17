@@ -125,6 +125,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun login(email: String, password: String) {
+        Log.d(TAG,"LoginFragment - login() called")
         userViewModel.login(email, password)
     }
 
