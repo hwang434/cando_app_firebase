@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -14,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryWriteBinding
 import com.goodee.cando_app.dto.DiaryDto
+import com.goodee.cando_app.util.Resource
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
@@ -85,18 +87,12 @@ class DiaryWriteFragment : Fragment() {
 
         try {
             val newDiaryDto = DiaryDto(dno = requireArguments().get("dno").toString(), title = title, content = content, author = author.toString(), date = date)
-            diaryViewModel.viewModelScope.launch(Dispatchers.IO) {
-                // if : navigation gives dno, set init text box by given dno content.
-                // else : 새로 글 작성이면 -> 새로운 글 작성
-                if (arguments?.get("dno") != null) {
-                    diaryViewModel.editDiary(newDiaryDto)
-                } else {
-                    diaryViewModel.writeDiary(newDiaryDto)
-                }
-
-                withContext(Dispatchers.Main) {
-                    findNavController().navigate(R.id.action_diaryWriteFragment_to_diaryFragment)
-                }
+            // if : navigation gives dno, set init text box by given dno content.
+            // else : 새로 글 작성이면 -> 새로운 글 작성
+            if (arguments?.get("dno") != null) {
+                diaryViewModel.editDiary(newDiaryDto)
+            } else {
+                diaryViewModel.writeDiary(newDiaryDto)
             }
         } catch (e: Exception) {
             Log.w(TAG, "setEvent: 글 수정, 작성 실패", e)
@@ -119,6 +115,23 @@ class DiaryWriteFragment : Fragment() {
                 edittextDiarywriteTitleinput.setText(diaryDto.title)
                 edittextDiarywriteContentinput.setText(diaryDto.content)
                 progressbarDiarywriteLoading.visibility = View.GONE
+            }
+        }
+
+        diaryViewModel.isWriteDone.observe(viewLifecycleOwner) { it ->
+            binding.progressbarDiarywriteLoading.visibility = View.GONE
+
+            when (it) {
+                is Resource.Success -> {
+                    findNavController().navigate(R.id.action_diaryWriteFragment_to_diaryFragment)
+                }
+                is Resource.Loading -> {
+                    binding.progressbarDiarywriteLoading.visibility = View.VISIBLE
+                }
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                    findNavController().navigateUp()
+                }
             }
         }
     }
