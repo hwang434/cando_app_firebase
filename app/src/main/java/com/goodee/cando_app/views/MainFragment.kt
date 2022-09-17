@@ -30,7 +30,7 @@ class MainFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_main,container,false)
         // 로그인 상태면 바로 다이어리 화면으로 이동
         auth.currentUser?.let { user ->
-            userViewModel.autoSignIn(user)
+            userViewModel.autoSignIn()
 
             Toast.makeText(requireActivity(), "${user.email}님 환영합니다.",Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_mainFragment_to_diaryFragment)
