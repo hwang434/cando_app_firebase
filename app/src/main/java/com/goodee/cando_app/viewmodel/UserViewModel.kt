@@ -3,12 +3,11 @@ package com.goodee.cando_app.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import com.goodee.cando_app.R
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.model.UserRepository
 import com.goodee.cando_app.util.Resource
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.*
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +27,10 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     val isWithdrawSuccess: LiveData<Resource<Boolean>>
         get() = _isWithdrawSuccess
 
+    private val _isRegisterEmailSent: MutableLiveData<Resource<Boolean>> = MutableLiveData()
+    val isRegisterEmailSent: LiveData<Resource<Boolean>>
+        get() = _isRegisterEmailSent
+
     private val _isExistEmail: MutableLiveData<Resource<Boolean>> = MutableLiveData()
     val isExistEmail: LiveData<Resource<Boolean>>
         get() = _isExistEmail
@@ -42,9 +45,29 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 회원가입
-    suspend fun sendRegisterEmail(email: String, userDto: UserDto, password: String): Boolean {
+    fun sendRegisterEmail(email: String, userDto: UserDto, password: String) {
         Log.d(TAG,"UserViewModel - sendRegisterEmail() called")
-        return userRepository.sendRegisterEmail(email, userDto, password)
+        val handler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "sendRegisterEmail: ", error)
+            when (error) {
+                is FirebaseAuthUserCollisionException -> {
+                    _isRegisterEmailSent.postValue(Resource.Error(false, getApplication<Application>().getString(R.string.toast_is_exist_email)))
+                }
+                is FirebaseAuthWeakPasswordException -> {
+                    _isRegisterEmailSent.postValue(Resource.Error(false, getApplication<Application>().getString(R.string.toast_password_too_easy)))
+                }
+                else -> {
+                    _isRegisterEmailSent.postValue(Resource.Error(false, "System has a error"))
+                }
+            }
+        }
+        
+        _isRegisterEmailSent.postValue(Resource.Loading())
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            if (userRepository.sendRegisterEmail(email, userDto, password)) {
+                _isRegisterEmailSent.postValue(Resource.Success(true))
+            }
+        }
     }
 
     // 로그인
@@ -76,13 +99,13 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     // 중복 회원 찾기
     fun isExistEmail(email: String) {
         Log.d(TAG,"UserViewModel - isExistEmail() called")
+        _isExistEmail.postValue(Resource.Loading())
+        
         val handler = CoroutineExceptionHandler { _, error ->
-            _isExistEmail.postValue(Resource.Error(message = "${error.message}"))
             Log.w(TAG, "isExistEmail: ", error)
         }
         
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            _isExistEmail.postValue(Resource.Loading())
+        viewModelScope.launch(Dispatchers.IO + handler) {    
             if (!userRepository.isExistEmail(email)) {
                 _isExistEmail.postValue(Resource.Success(false))
                 return@launch
