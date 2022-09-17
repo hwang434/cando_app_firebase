@@ -50,13 +50,15 @@ class UserRepository(val application: Application) {
         Log.d(TAG,"UserRepository - login() called")
         try {
             val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            if (authResult.user != null && authResult.user!!.isEmailVerified) {
-                // Socket 설정
+            Log.d(TAG,"UserRepository - authResult.user : ${authResult.user}, authResult.user.isEmailVerified : ${authResult.user?.isEmailVerified}  called")
+            authResult.user?.let { user ->
+                if (!user.isEmailVerified) {
+                    return Resource.Error(null, "Verify the Email")
+                }
+
                 SocketLike.connectSocket()
                 return Resource.Success(data = authResult.user!!)
             }
-
-            firebaseAuth.signOut()
         } catch (e: FirebaseAuthInvalidCredentialsException) {
             Log.w(TAG, "login: ", e)
             return Resource.Error(null, "비밀번호가 일치하지 않습니다.")
