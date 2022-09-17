@@ -44,11 +44,6 @@ class RegisterFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(TAG,"RegisterFragment - onViewCreated() called")
-        setObserver()
-    }
-
     private fun setEvent() {
         Log.d(TAG,"RegisterFragment - setEvent() called")
         // 회원가입과 정규식 처리
@@ -59,9 +54,10 @@ class RegisterFragment : Fragment() {
                 val name = edittextRegisterNameInput.text.toString().trim()
                 val password = edittextRegisterPasswordinput.text.toString().trim()
                 val rePassword = edittextRegisterPasswordcheckinput.text.toString().trim()
+                // todo() 나중에 전화번호 인증이나 중복이면 회원 가입 못하게 기능 추가 예정
                 val phone = edittextPhoneInput.text.toString().trim()
 
-                if (isUserInfoRegexMatch(email, name, password, rePassword, phone)) {
+                if (isUserInfoRegexMatch(email, name, password, rePassword)) {
                     register(email, name, phone, password)
                 }
             }
@@ -77,6 +73,7 @@ class RegisterFragment : Fragment() {
     }
 
     private fun setObserver() {
+        Log.d(TAG,"RegisterFragment - setObserver() called")
         userViewModel.isRegisterEmailSent.observe(viewLifecycleOwner) {
             when (it) {
                 is Resource.Success -> {
