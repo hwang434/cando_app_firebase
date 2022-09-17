@@ -72,16 +72,17 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
 
     // 로그인
     fun login(email: String, password: String) {
-        Log.d(TAG,"User - login() called")
+        Log.d(TAG,"UserViewModel - login() called")
+        val handler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "login: ", error)
+            _userLiveData.postValue(Resource.Error(null, error.message.toString()))
+        }
         _userLiveData.postValue(Resource.Loading())
 
-        viewModelScope.launch(Dispatchers.IO) {
-            handleLogin(userRepository.login(email, password))
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            val result = userRepository.login(email, password)
+            _userLiveData.postValue(result)
         }
-    }
-
-    fun handleLogin(resource: Resource<FirebaseUser>) {
-        _userLiveData.postValue(resource)
     }
 
     // 아이디 찾기
