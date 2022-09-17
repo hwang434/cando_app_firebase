@@ -30,6 +30,10 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     val isRegisterEmailSent: LiveData<Resource<Boolean>>
         get() = _isRegisterEmailSent
 
+    private val _isExistEmail: MutableLiveData<Resource<Boolean>> = MutableLiveData()
+    val isExistEmail: LiveData<Resource<Boolean>>
+        get() = _isExistEmail
+
     init {
         userRepository = UserRepository(application)
     }
@@ -92,9 +96,21 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
     
     // 중복 회원 찾기
-    suspend fun isExistEmail(email: String): Boolean {
+    fun isExistEmail(email: String) {
         Log.d(TAG,"UserViewModel - isExistEmail() called")
-        return userRepository.isExistEmail(email)
+        val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
+            Log.w(TAG, "isExistEmail: ", throwable)
+        }
+
+        _isExistEmail.postValue(Resource.Loading())
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            if (userRepository.isExistEmail(email)) {
+                _isExistEmail.postValue(Resource.Success(true))
+                return@launch
+            }
+
+            _isExistEmail.postValue(Resource.Success(false))
+        }
     }
 
     // 회원 삭제

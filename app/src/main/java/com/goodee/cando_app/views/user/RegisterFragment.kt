@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
@@ -21,9 +20,6 @@ import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.util.RegexChecker
 import com.goodee.cando_app.util.Resource
 import com.goodee.cando_app.viewmodel.UserViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class RegisterFragment : Fragment() {
     companion object {
@@ -44,7 +40,7 @@ class RegisterFragment : Fragment() {
         Log.d(TAG,"registerFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
         setEvent()
-
+        setObserver()
         return binding.root
     }
 
@@ -99,6 +95,41 @@ class RegisterFragment : Fragment() {
 
             binding.buttonRegisterRegisterButton.isEnabled = true
         }
+
+        userViewModel.isExistEmail.observe(viewLifecycleOwner) {
+            binding.progressbarRegisterLoading.visibility = View.GONE
+
+            when (it) {
+                is Resource.Success -> {
+                    val dialog = AlertDialog.Builder(requireContext()).create()
+                    dialog.apply {
+                        if (it.data == true) {
+                            setTitle(getString(R.string.toast_is_exist_email))
+                            setMessage(getString(R.string.dialog_change_email_message))
+                            setButton(Dialog.BUTTON_NEUTRAL, getString(R.string.yes)) { _, _ -> }
+                        } else {
+                            setTitle(getString(R.string.dialog_is_valid_email_title))
+                            setMessage(getString(R.string.dialog_is_valid_email_message))
+                            setButton(Dialog.BUTTON_POSITIVE, getString(R.string.yes)) { _, _ ->
+                                binding.edittextRegisterEmailinput.isEnabled = false
+                                binding.buttonRegisterDuplicatecheck.isEnabled = false
+                            }
+                            setButton(Dialog.BUTTON_NEGATIVE, getString(R.string.no)) { _, _ -> }
+                        }
+
+                        show()
+                    }
+                }
+
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is Resource.Loading -> {
+                    binding.progressbarRegisterLoading.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     private fun showEmailSentDialog() {
@@ -127,33 +158,7 @@ class RegisterFragment : Fragment() {
 
     private fun checkIsExistEmail(email: String) {
         Log.d(TAG,"RegisterFragment - checkIsExistEmail() called")
-        lifecycleScope.launch(Dispatchers.IO) {
-            // if : 존재하지 않는 이메일
-            var isExistEmail = false
-            try {
-                isExistEmail = userViewModel.isExistEmail(email)
-            } catch (e: Exception) {
-                Log.w(TAG, "isExistEmail: ", e)
-            }
-
-            withContext(Dispatchers.Main) {
-                val dialog = AlertDialog.Builder(requireContext()).create()
-                if (isExistEmail) {
-                    dialog.setTitle(getString(R.string.toast_is_exist_email))
-                    dialog.setMessage(getString(R.string.dialog_change_email_message))
-                    dialog.setButton(Dialog.BUTTON_NEUTRAL, getString(R.string.yes)) { _, _ -> }
-                } else {
-                    dialog.setTitle(getString(R.string.dialog_is_valid_email_title))
-                    dialog.setMessage(getString(R.string.dialog_is_valid_email_message))
-                    dialog.setButton(Dialog.BUTTON_POSITIVE, getString(R.string.yes)) { _, _ ->
-                        binding.edittextRegisterEmailinput.isEnabled = false
-                        binding.buttonRegisterDuplicatecheck.isEnabled = false
-                    }
-                    dialog.setButton(Dialog.BUTTON_NEGATIVE, getString(R.string.no)) { _, _ -> }
-                }
-                dialog.show()
-            }
-        }
+        userViewModel.isExistEmail(email)
     }
 
     private fun isUserInfoRegexMatch(
@@ -161,7 +166,6 @@ class RegisterFragment : Fragment() {
         name: String,
         password: String,
         rePassword: String,
-        phone: String
     ): Boolean {
         Log.d(TAG,"RegisterFragment - isUserInfoRegexMatch() called")
         binding.apply {
