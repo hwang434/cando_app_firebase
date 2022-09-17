@@ -13,18 +13,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentRegisterBinding
 import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.util.RegexChecker
+import com.goodee.cando_app.util.Resource
 import com.goodee.cando_app.viewmodel.UserViewModel
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class RegisterFragment : Fragment() {
     companion object {
@@ -45,8 +40,13 @@ class RegisterFragment : Fragment() {
         Log.d(TAG,"registerFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
         setEvent()
-
+        setObserver()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d(TAG,"RegisterFragment - onViewCreated() called")
+        setObserver()
     }
 
     private fun setEvent() {
@@ -76,6 +76,73 @@ class RegisterFragment : Fragment() {
         }
     }
 
+    private fun setObserver() {
+        userViewModel.isRegisterEmailSent.observe(viewLifecycleOwner) {
+            when (it) {
+                is Resource.Success -> {
+                    showEmailSentDialog()
+                }
+
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                    binding.buttonRegisterDuplicatecheck.isEnabled = true
+                    binding.edittextRegisterEmailinput.isEnabled = true
+                }
+                else -> {
+
+                }
+            }
+
+            binding.buttonRegisterRegisterButton.isEnabled = true
+        }
+
+        userViewModel.isExistEmail.observe(viewLifecycleOwner) {
+            binding.progressbarRegisterLoading.visibility = View.GONE
+
+            when (it) {
+                is Resource.Success -> {
+                    val dialog = AlertDialog.Builder(requireContext()).create()
+                    dialog.apply {
+                        if (it.data == true) {
+                            setTitle(getString(R.string.toast_is_exist_email))
+                            setMessage(getString(R.string.dialog_change_email_message))
+                            setButton(Dialog.BUTTON_NEUTRAL, getString(R.string.yes)) { _, _ -> }
+                        } else {
+                            setTitle(getString(R.string.dialog_is_valid_email_title))
+                            setMessage(getString(R.string.dialog_is_valid_email_message))
+                            setButton(Dialog.BUTTON_POSITIVE, getString(R.string.yes)) { _, _ ->
+                                binding.edittextRegisterEmailinput.isEnabled = false
+                                binding.buttonRegisterDuplicatecheck.isEnabled = false
+                            }
+                            setButton(Dialog.BUTTON_NEGATIVE, getString(R.string.no)) { _, _ -> }
+                        }
+
+                        show()
+                    }
+                }
+
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is Resource.Loading -> {
+                    binding.progressbarRegisterLoading.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
+    private fun showEmailSentDialog() {
+        val alertDialog = AlertDialog.Builder(requireContext()).create()
+        alertDialog.setTitle("회원가입 이메일 전송")
+        alertDialog.setMessage("회원 가입 메일을 ${binding.edittextRegisterEmailinput.text} 로 전송하였습니다.\n해당 계정으로 접속하여 받은 이메일 링크를 클릭해주세요.")
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.yes))  { _, _ ->
+            findNavController().navigateUp()
+        }
+
+        alertDialog.show()
+    }
+
     private fun isEmailRegexMatch(email: String): Boolean {
         Log.d(TAG,"RegisterFragment - isEmailRegexMatch() called")
         if (!RegexChecker.isValidEmail(email)) {
@@ -91,33 +158,7 @@ class RegisterFragment : Fragment() {
 
     private fun checkIsExistEmail(email: String) {
         Log.d(TAG,"RegisterFragment - checkIsExistEmail() called")
-        lifecycleScope.launch(Dispatchers.IO) {
-            // if : 존재하지 않는 이메일
-            var isExistEmail = false
-            try {
-                isExistEmail = userViewModel.isExistEmail(email)
-            } catch (e: Exception) {
-                Log.w(TAG, "isExistEmail: ", e)
-            }
-
-            withContext(Dispatchers.Main) {
-                val dialog = AlertDialog.Builder(requireContext()).create()
-                if (isExistEmail) {
-                    dialog.setTitle(getString(R.string.toast_is_exist_email))
-                    dialog.setMessage(getString(R.string.dialog_change_email_message))
-                    dialog.setButton(Dialog.BUTTON_NEUTRAL, getString(R.string.yes)) { _, _ -> }
-                } else {
-                    dialog.setTitle(getString(R.string.dialog_is_valid_email_title))
-                    dialog.setMessage(getString(R.string.dialog_is_valid_email_message))
-                    dialog.setButton(Dialog.BUTTON_POSITIVE, getString(R.string.yes)) { _, _ ->
-                        binding.edittextRegisterEmailinput.isEnabled = false
-                        binding.buttonRegisterDuplicatecheck.isEnabled = false
-                    }
-                    dialog.setButton(Dialog.BUTTON_NEGATIVE, getString(R.string.no)) { _, _ -> }
-                }
-                dialog.show()
-            }
-        }
+        userViewModel.isExistEmail(email)
     }
 
     private fun isUserInfoRegexMatch(
@@ -125,7 +166,6 @@ class RegisterFragment : Fragment() {
         name: String,
         password: String,
         rePassword: String,
-        phone: String
     ): Boolean {
         Log.d(TAG,"RegisterFragment - isUserInfoRegexMatch() called")
         binding.apply {
@@ -166,41 +206,6 @@ class RegisterFragment : Fragment() {
     private fun register(email: String, name: String, phone: String, password: String) {
         Log.d(TAG,"RegisterFragment - register() called")
         val userDto = UserDto(email = email, name = name, phone = phone)
-        lifecycleScope.launch(Dispatchers.IO) {
-            // if : 회원 가입 성공 -> 다이어리 화면으로 이동
-            try {
-                val isSendEmailSuccess = userViewModel.sendRegisterEmail(email, userDto, password)
-                withContext(Dispatchers.Main) {
-                    val alertDialog = AlertDialog.Builder(requireContext()).create()
-                    if (isSendEmailSuccess) {
-                        alertDialog.setTitle("회원가입 이메일 전송")
-                        alertDialog.setMessage("회원 가입 메일을 $email 로 전송하였습니다.\n해당 계정으로 접속하여 받은 이메일 링크를 클릭해주세요.")
-                    } else {
-                        alertDialog.setTitle("회원가입 실패")
-                        alertDialog.setMessage("오류가 발생했습니다.\n다시 시도해주세요")
-                    }
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "확인")  { _, _ ->
-                        findNavController().navigateUp()
-                    }
-                    alertDialog.show()
-                }
-            } catch (e: FirebaseAuthUserCollisionException) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), getString(R.string.toast_is_exist_email), Toast.LENGTH_SHORT).show()
-                    binding.buttonRegisterDuplicatecheck.isEnabled = true
-                    binding.edittextRegisterEmailinput.isEnabled = true
-                }
-            } catch (e: FirebaseAuthWeakPasswordException) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), getString(R.string.toast_password_too_easy), Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Log.w(TAG, "setEvent: register Exception", e)
-            }
-
-            withContext(Dispatchers.Main) {
-                binding.buttonRegisterRegisterButton.isEnabled = true
-            }
-        }
+        userViewModel.sendRegisterEmail(email, userDto, password)
     }
 }
