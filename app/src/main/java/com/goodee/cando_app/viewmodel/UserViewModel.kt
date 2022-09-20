@@ -38,6 +38,15 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     val listOfUserEmail: LiveData<Resource<List<DocumentSnapshot>>>
         get() = _listOfUserEmail
 
+    // Resources data is for Email.
+    private val _isExistNameAndEmail: MutableLiveData<Resource<String>> = MutableLiveData()
+    val isExistNameAndEmail: LiveData<Resource<String>>
+        get() = _isExistNameAndEmail
+
+    private val _isPasswordResetEmailSent: MutableLiveData<Resource<String>> = MutableLiveData()
+    val isPasswordResetEmailSent: LiveData<Resource<String>>
+        get() = _isPasswordResetEmailSent
+
     init {
         userRepository = UserRepository(application)
     }
@@ -108,11 +117,22 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
             }
         }
     }
-    
-    // 비밀번호 찾기
-    suspend fun isExistNameAndEmail(name: String, email: String): Boolean {
+
+    fun isExistNameAndEmail(name: String, email: String) {
         Log.d(TAG,"UserViewModel - isExistNameAndEmail() called")
-        return userRepository.isExistNameAndEmail(name, email)
+        _isExistNameAndEmail.postValue(Resource.Loading())
+        val handler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "isExistNameAndEmail: ", error)
+        }
+
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            if (!userRepository.isExistNameAndEmail(name, email)) {
+                _isExistNameAndEmail.postValue(Resource.Error(null, "There is no user matched to name and email."))
+                return@launch
+            }
+
+            _isExistNameAndEmail.postValue(Resource.Success(email))
+        }
     }
     
     // 중복 회원 찾기
@@ -174,8 +194,20 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
         userRepository.signOut()
     }
 
-    suspend fun sendPasswordResetEmail(email: String) : Boolean {
+    fun sendPasswordResetEmail(email: String) {
         Log.d(TAG,"UserViewModel - sendPasswordResetEmail() called")
-        return userRepository.sendPasswordResetEmail(email)
+        _isPasswordResetEmailSent.postValue(Resource.Loading())
+        val handler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "sendPasswordResetEmail: ", error)
+        }
+
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            if (!userRepository.sendPasswordResetEmail(email)) {
+                _isPasswordResetEmailSent.postValue(Resource.Error(null, "Fail to send the password reset email."))
+                return@launch
+            }
+            _isPasswordResetEmailSent.postValue(Resource.Success(email))
+        }
+
     }
 }
