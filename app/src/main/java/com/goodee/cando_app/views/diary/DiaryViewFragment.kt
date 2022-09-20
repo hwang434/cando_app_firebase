@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -163,9 +164,11 @@ class DiaryViewFragment : Fragment() {
 
                 // if : 좋아요를 눌렀으면 -> 좋아요 버튼이 색칠되어 있음
                 if (diaryDto.favorites.contains(FirebaseAuth.getInstance().currentUser!!.uid)) {
-                    buttonDiaryViewLikeButton.setImageResource(R.drawable.like_button)
+                    buttonDiaryViewLikeButton.setMinAndMaxFrame(50, 100)
+                    buttonDiaryViewLikeButton.playAnimation()
                 } else {
-                    buttonDiaryViewLikeButton.setImageResource(R.drawable.unlike_button)
+                    buttonDiaryViewLikeButton.setMinAndMaxFrame(130, 150)
+                    buttonDiaryViewLikeButton.playAnimation()
                 }
             }
         }
