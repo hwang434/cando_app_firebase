@@ -8,7 +8,7 @@ import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.model.UserRepository
 import com.goodee.cando_app.util.Resource
 import com.google.firebase.auth.*
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,6 +33,19 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     private val _isExistEmail: MutableLiveData<Resource<Boolean>> = MutableLiveData()
     val isExistEmail: LiveData<Resource<Boolean>>
         get() = _isExistEmail
+
+    private val _listOfUserEmail: MutableLiveData<Resource<List<DocumentSnapshot>>> = MutableLiveData()
+    val listOfUserEmail: LiveData<Resource<List<DocumentSnapshot>>>
+        get() = _listOfUserEmail
+
+    // Resources data is for Email.
+    private val _isExistNameAndEmail: MutableLiveData<Resource<String>> = MutableLiveData()
+    val isExistNameAndEmail: LiveData<Resource<String>>
+        get() = _isExistNameAndEmail
+
+    private val _isPasswordResetEmailSent: MutableLiveData<Resource<String>> = MutableLiveData()
+    val isPasswordResetEmailSent: LiveData<Resource<String>>
+        get() = _isPasswordResetEmailSent
 
     init {
         userRepository = UserRepository(application)
@@ -85,15 +98,41 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     }
 
     // 아이디 찾기
-    suspend fun findUserEmail(name: String, phone: String): QuerySnapshot {
+    fun findUserEmail(name: String, phone: String) {
         Log.d(TAG,"UserViewModel - findUserId() called")
-        return userRepository.findUserEmail(name, phone)
+        _listOfUserEmail.postValue(Resource.Loading())
+
+        val handler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "findUserEmail: ", error)
+        }
+
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            val result = userRepository.findUserEmail(name, phone)
+            if (result.isEmpty()) {
+                _listOfUserEmail.postValue(Resource.Error(null, "There is no user matched to name and phone."))
+            } else if (result.size > 1) {
+                _listOfUserEmail.postValue(Resource.Error(result, "There are too many members matched to info."))
+            } else {
+                _listOfUserEmail.postValue(Resource.Success(result))
+            }
+        }
     }
-    
-    // 비밀번호 찾기
-    suspend fun isExistNameAndEmail(name: String, email: String): Boolean {
+
+    fun isExistNameAndEmail(name: String, email: String) {
         Log.d(TAG,"UserViewModel - isExistNameAndEmail() called")
-        return userRepository.isExistNameAndEmail(name, email)
+        _isExistNameAndEmail.postValue(Resource.Loading())
+        val handler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "isExistNameAndEmail: ", error)
+        }
+
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            if (!userRepository.isExistNameAndEmail(name, email)) {
+                _isExistNameAndEmail.postValue(Resource.Error(null, "There is no user matched to name and email."))
+                return@launch
+            }
+
+            _isExistNameAndEmail.postValue(Resource.Success(email))
+        }
     }
     
     // 중복 회원 찾기
@@ -155,8 +194,20 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
         userRepository.signOut()
     }
 
-    suspend fun sendPasswordResetEmail(email: String) : Boolean {
+    fun sendPasswordResetEmail(email: String) {
         Log.d(TAG,"UserViewModel - sendPasswordResetEmail() called")
-        return userRepository.sendPasswordResetEmail(email)
+        _isPasswordResetEmailSent.postValue(Resource.Loading())
+        val handler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "sendPasswordResetEmail: ", error)
+        }
+
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            if (!userRepository.sendPasswordResetEmail(email)) {
+                _isPasswordResetEmailSent.postValue(Resource.Error(null, "Fail to send the password reset email."))
+                return@launch
+            }
+            _isPasswordResetEmailSent.postValue(Resource.Success(email))
+        }
+
     }
 }
