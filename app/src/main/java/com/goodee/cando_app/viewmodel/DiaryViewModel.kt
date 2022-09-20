@@ -5,8 +5,13 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.model.DiaryRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
@@ -33,54 +38,55 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 게시글 1개 가져오기
-    suspend fun refreshDiaryLiveData(dno: String): Boolean {
+    fun refreshDiaryLiveData(dno: String) {
         Log.d(TAG,"DiaryViewModel - refreshDiaryLiveData() called")
-        return diaryRepository.refreshDiaryLiveData(dno)
+        viewModelScope.launch(Dispatchers.IO) { diaryRepository.refreshDiaryLiveData(dno) }
     }
 
     // 글 작성하기
-    suspend fun writeDiary(diaryDto: DiaryDto): Boolean {
+    suspend fun writeDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"DiaryViewModel - writeDiary() called")
-        return diaryRepository.writeDiary(diaryDto)
+        delay(3000)
+        diaryRepository.writeDiary(diaryDto)
     }
 
     // 글 수정하기
-    suspend fun editDiary(diaryDto: DiaryDto): Boolean {
-        Log.d(TAG,"DiaryViewModel - editDiary() called")
-        return diaryRepository.editDiary(diaryDto)
+    suspend fun editDiary(diaryDto: DiaryDto) {
+        Log.d(TAG,"DiaryViewModel - editDiary(${diaryDto.dno}) called")
+        delay(3000)
+        diaryRepository.editDiary(diaryDto)
     }
 
     // 글 삭제하기
-    suspend fun deleteDiary(dno: String): Boolean {
+    fun deleteDiary(dno: String) {
         Log.d(TAG,"DiaryViewModel - deleteDiary() called")
-        return diaryRepository.deleteDiary(dno)
+        viewModelScope.launch(Dispatchers.IO) { diaryRepository.deleteDiary(dno) }
     }
 
     // refresh Diary List live data from Firestore.
-    suspend fun refreshDiaryList(): Boolean {
+    fun refreshDiaryList() {
         Log.d(TAG,"DiaryViewModel - refreshDiaryList() called")
-        return diaryRepository.refreshDiaryList()
+        viewModelScope.launch(Dispatchers.IO){ diaryRepository.refreshDiaryList() }
     }
 
     // 좋아요 기능
-    suspend fun like(dno: String, uid: String): Boolean {
+    fun like(dno: String, uid: String) {
         Log.d(TAG,"DiaryViewModel - like() called")
         // if : 좋아요 성공하면
-        if (diaryRepository.like(dno, uid)) {
-            return true
-        }
-
-        return false
+        viewModelScope.launch(Dispatchers.IO) { diaryRepository.like(dno, uid) }
     }
 
     // 좋아요 취소
-    suspend fun unlike(dno: String, uid: String): Boolean {
+    fun unlike(dno: String, uid: String) {
         Log.d(TAG,"DiaryViewModel - unlike() called")
         // if : 좋아요 취소 성공하면
-        if (diaryRepository.unlike(dno, uid)) {
-            return true
-        }
+        viewModelScope.launch(Dispatchers.IO) { diaryRepository.unlike(dno, uid) }
+    }
 
-        return false
+    fun deleteAllDiary(email: String, password: String) {
+        Log.d(TAG,"DiaryViewModel - deleteAllDiary() called")
+        viewModelScope.launch(Dispatchers.IO) {
+            diaryRepository.deleteAllDiary(email, password)
+        }
     }
 }

@@ -8,17 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryViewBinding
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.lang.Exception
+import kotlin.Exception
 
 class DiaryViewFragment : Fragment() {
     companion object {
@@ -27,7 +23,7 @@ class DiaryViewFragment : Fragment() {
 
     private lateinit var binding: FragmentDiaryViewBinding
     private lateinit var dno: String
-    private val diaryViewModel: DiaryViewModel by activityViewModels()
+    private val diaryViewModel: DiaryViewModel by lazy { ViewModelProvider(this).get(DiaryViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,21 +38,15 @@ class DiaryViewFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary_view, container, false)
         observeDiaryLiveData()
 
-        // if : dno is received Successfully, read the diary that has a dno given from preview fragment.
+        // if : dno is Empty. then navigate up to DiaryFragment.
         dno = arguments?.get("dno").toString()
-        if (!dno.isEmpty()) {
-            readDiary(dno)
+        if (dno.isEmpty()) {
+            findNavController().navigateUp()
         }
 
+        readDiary(dno)
         setEvent()
         return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        // When you leave fragment or navigate to next fragment.
-        // It will clear ViewModel.
-        activity?.viewModelStore?.clear()
     }
 
     private fun setEvent() {
@@ -87,30 +77,22 @@ class DiaryViewFragment : Fragment() {
     private fun deleteDiary() {
         Log.d(TAG,"DiaryViewFragment - deleteDiary() called")
         val aBuilder = AlertDialog.Builder(requireContext())
+
         aBuilder.run {
             setTitle(getString(R.string.alert_diary_view_title))
             setMessage(getString(R.string.alert_diary_view_message))
             setPositiveButton(getString(R.string.alert_diary_view_postive_button)) { _, _ ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    try {
-                        if (diaryViewModel.deleteDiary(dno)) {
-                            withContext(Dispatchers.Main) {
-                                findNavController().navigateUp()
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.w(TAG, "setEvent: delete diary fail.", e)
-                        withContext(Dispatchers.Main) {
-                            AlertDialog.Builder(requireContext()).setTitle(getString(R.string.alert_diary_view_fail_title))
-                                .setMessage(getString(R.string.alert_diary_view_fail_message)).create().show()
-                        }
-                    }
+                try {
+                    diaryViewModel.deleteDiary(dno)
+                    findNavController().navigateUp()
+                } catch (e: Exception) {
+                    Log.w(TAG, "setEvent: delete diary fail.", e)
+                    AlertDialog.Builder(requireContext()).setTitle(getString(R.string.alert_diary_view_fail_title)).setMessage(getString(R.string.alert_diary_view_fail_message)).create().show()
                 }
             }
-            setNegativeButton("취소") { _, _ ->
-                Log.d(TAG,"DiaryDeleteDialogFragment - Dialog Negative Button is clicked")
-            }
+            setNegativeButton("취소") { _, _ -> }
         }
+
         aBuilder.create().show()
     }
 
@@ -124,20 +106,17 @@ class DiaryViewFragment : Fragment() {
                 return
             }
 
-            lifecycleScope.launch(Dispatchers.IO) {
-                val isSuccess = diaryViewModel.like(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
-                withContext(Dispatchers.Main) {
-                    // if : like is fail
-                    if (!isSuccess) {
-                        val alertDialog = AlertDialog.Builder(requireContext()).create()
-                        alertDialog.apply {
-                            setTitle(getString(R.string.alert_diary_view_like_fail_title))
-                            setMessage(getString(R.string.alert_diary_view_error_message))
-                        }
-                    }
-                    binding.progressbarDiaryviewLoading.visibility = View.GONE
+            try {
+                diaryViewModel.like(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
+            } catch (e: Exception) {
+                Log.w(TAG, "like: ", e)
+                val alertDialog = AlertDialog.Builder(requireContext()).create()
+                alertDialog.apply {
+                    setTitle(getString(R.string.alert_diary_view_like_fail_title))
+                    setMessage(getString(R.string.alert_diary_view_error_message))
                 }
             }
+            binding.progressbarDiaryviewLoading.visibility = View.GONE
         }
     }
 
@@ -151,20 +130,18 @@ class DiaryViewFragment : Fragment() {
                 return
             }
 
-            lifecycleScope.launch(Dispatchers.IO) {
-                val isSuccess = diaryViewModel.unlike(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
-                withContext(Dispatchers.Main) {
-                    // if : like is fail
-                    if (!isSuccess) {
-                        val alertDialog = AlertDialog.Builder(requireContext()).create()
-                        alertDialog.apply {
-                            setTitle("좋아요 취소에 실패했습니다.")
-                            setMessage(getString(R.string.alert_diary_view_fail_message))
-                        }
-                    }
-                    binding.progressbarDiaryviewLoading.visibility = View.GONE
+            try {
+                diaryViewModel.unlike(dno = dno, uid = FirebaseAuth.getInstance().currentUser!!.uid)
+            } catch (e: Exception) {
+                Log.w(TAG, "unlike: ", e)
+                val alertDialog = AlertDialog.Builder(requireContext()).create()
+                alertDialog.apply {
+                    setTitle("좋아요 취소에 실패했습니다.")
+                    setMessage(getString(R.string.alert_diary_view_fail_message))
                 }
             }
+
+            binding.progressbarDiaryviewLoading.visibility = View.GONE
         }
     }
 
@@ -196,18 +173,18 @@ class DiaryViewFragment : Fragment() {
 
     // 글을 조회하여 현재 페이지를 최신화
     private fun readDiary(dno: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val isSuccess = diaryViewModel.refreshDiaryLiveData(dno)
-            withContext(Dispatchers.Main) {
-                if (!isSuccess) {
-                    val alertDialog = AlertDialog.Builder(requireContext()).create()
-                    alertDialog.setTitle("오류")
-                    alertDialog.setMessage("이미 삭제 된 글입니다.")
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "확인") { _, _ ->
-                        findNavController().navigateUp()
-                    }
-                    alertDialog.show()
+        try {
+            diaryViewModel.refreshDiaryLiveData(dno)
+        } catch (e: Exception) {
+            Log.w(TAG, "readDiary: ", e)
+            val alertDialog = AlertDialog.Builder(requireContext()).create()
+            alertDialog.apply {
+                setTitle("오류")
+                setMessage("이미 삭제 된 글입니다.")
+                setButton(AlertDialog.BUTTON_NEUTRAL, "확인") { _, _ ->
+                    findNavController().navigateUp()
                 }
+                show()
             }
         }
     }

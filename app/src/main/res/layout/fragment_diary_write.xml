@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <ProgressBar
-            android:id="@+id/progressbar_diarywrite_loading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,7 +22,7 @@
                     android:layout_marginHorizontal="130dp"
                     android:autofillHints="name"
                     android:background="@drawable/box_border"
-                    android:hint="제목을 입력해주세요."
+                    android:hint="@string/edittext_diary_write_title_input"
                     android:inputType="text"
                     android:minHeight="48dp"
                     android:textColor="@color/black"
@@ -43,7 +38,7 @@
                     android:autofillHints="name"
                     android:background="@drawable/box_border"
                     android:gravity="start"
-                    android:hint="내용을 입력해주세요."
+                    android:hint="@string/edittext_diary_write_content_input"
                     android:inputType="textMultiLine"
                     android:minLines="25"
                     android:textColor="@color/black"
@@ -58,7 +53,7 @@
                     android:layout_width="250dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="작성"
+                    android:text="@string/button_diary_write_write_button"
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
                     app:layout_constraintTop_toBottomOf="@id/edittext_diarywrite_contentinput"
@@ -67,5 +62,10 @@
                     android:layout_marginTop="10dp"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
+        <ProgressBar
+            android:id="@+id/progressbar_diarywrite_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
     </FrameLayout>
 </layout>
