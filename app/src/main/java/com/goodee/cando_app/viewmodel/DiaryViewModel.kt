@@ -8,22 +8,26 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.model.DiaryRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.goodee.cando_app.util.Resource
+import kotlinx.coroutines.*
 
 class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
         private const val TAG: String = "로그"
     }
     private var diaryRepository: DiaryRepository
+
     private val _diaryListLiveData: MutableLiveData<List<DiaryDto>>
     val diaryListLiveData: LiveData<List<DiaryDto>>
         get() = _diaryListLiveData
+
     private val _diaryLiveData: MutableLiveData<DiaryDto>
     val diaryLiveData: LiveData<DiaryDto>
         get() = _diaryLiveData
+
+    private val _isWriteDone: MutableLiveData<Resource<Boolean>> = MutableLiveData()
+    val isWriteDone: LiveData<Resource<Boolean>>
+        get() = _isWriteDone
 
     init {
         Log.d(TAG,"DiaryViewModel - init called")
@@ -44,17 +48,37 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 글 작성하기
-    suspend fun writeDiary(diaryDto: DiaryDto) {
+    fun writeDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"DiaryViewModel - writeDiary() called")
-        delay(3000)
-        diaryRepository.writeDiary(diaryDto)
+        val handler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "writeDiary: ", error)
+            _isWriteDone.postValue(Resource.Error(null, "System has a Error"))
+        }
+
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            if (diaryRepository.writeDiary(diaryDto)) {
+                _isWriteDone.postValue(Resource.Success(true))
+            } else {
+                _isWriteDone.postValue(Resource.Error(false, "Fail to write Diary."))
+            }
+        }
     }
 
     // 글 수정하기
-    suspend fun editDiary(diaryDto: DiaryDto) {
+    fun editDiary(diaryDto: DiaryDto) {
         Log.d(TAG,"DiaryViewModel - editDiary(${diaryDto.dno}) called")
-        delay(3000)
-        diaryRepository.editDiary(diaryDto)
+        val handler = CoroutineExceptionHandler { _, error ->
+            Log.w(TAG, "writeDiary: ", error)
+            _isWriteDone.postValue(Resource.Error(null, "System has a Error"))
+        }
+
+        viewModelScope.launch(Dispatchers.IO + handler) {
+            if (diaryRepository.editDiary(diaryDto)) {
+                _isWriteDone.postValue(Resource.Success(true))
+            } else {
+                _isWriteDone.postValue(Resource.Error(false, "Fail to edit Diary."))
+            }
+        }
     }
 
     // 글 삭제하기

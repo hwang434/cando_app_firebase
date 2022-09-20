@@ -54,19 +54,17 @@ class DiaryRepository(val application: Application) {
     }
 
     // 게시글 작성
-    suspend fun writeDiary(diaryDto: DiaryDto) {
+    suspend fun writeDiary(diaryDto: DiaryDto): Boolean {
         Log.d(TAG,"AppRepository - writeDiary(diaryDto : $diaryDto) called")
         diaryDto.dno = fireStore.collection(DIARY_COLLECTION).document().id
         val task = fireStore.collection(DIARY_COLLECTION).document(diaryDto.dno).set(diaryDto)
 
         task.await()
-        if (!task.isSuccessful) {
-            throw Exception("글 작성 실패")
-        }
+        return task.isSuccessful
     }
 
     // 게시글 수정하기
-    suspend fun editDiary(diaryDto: DiaryDto) {
+    suspend fun editDiary(diaryDto: DiaryDto): Boolean {
         Log.d(TAG,"AppRepository - editDiary(diaryDto : $diaryDto) called")
         val map = mutableMapOf<String, Any>()
         map["title"] = diaryDto.title
@@ -76,9 +74,7 @@ class DiaryRepository(val application: Application) {
         val task = fireStore.collection("diary").document(diaryDto.dno).update(map)
 
         task.await()
-        if (!task.isSuccessful) {
-            throw Exception("글 수정 실패")
-        }
+        return task.isSuccessful
     }
 
     suspend fun deleteDiary(dno: String) {
