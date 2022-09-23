@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.goodee.cando_app"
-        minSdk 24
+        minSdk 21
         targetSdk 30
         versionCode 1
         versionName "1.0"
@@ -56,14 +56,14 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     // Retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation "com.squareup.retrofit2:converter-scalars:2.9.0"
-    implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
+    implementation 'com.squareup.retrofit2:retrofit:2.7.1'
+    implementation "com.squareup.retrofit2:converter-scalars:2.7.1"
+    implementation "com.squareup.retrofit2:converter-moshi:2.7.1"
     // Moshi(JsonParser)
     implementation "com.squareup.moshi:moshi-kotlin:1.12.0"
     // okhttp
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
-    implementation "io.grpc:grpc-okhttp:1.48.1"
+    implementation "io.grpc:grpc-okhttp:1.32.2"
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.0"
     // kapt
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
@@ -91,13 +91,11 @@ dependencies {
     /* coroutines support for firebase operations */
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
     // Gson
-    implementation 'com.google.code.gson:gson:2.9.1'
+    implementation 'com.google.code.gson:gson:2.8.8'
     // Socket io: for like Notification
     implementation ('io.socket:socket.io-client:2.0.0') {
         exclude group: 'org.json', module: 'json'
     }
     // To Send data by Json Form
     implementation 'com.google.code.gson:gson:2.9.1'
-    // lottie animation
-    implementation 'com.airbnb.android:lottie:5.2.0'
 }
