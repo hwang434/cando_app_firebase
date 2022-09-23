@@ -8,19 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindPasswordBinding
 import com.goodee.cando_app.util.RegexChecker
 import com.goodee.cando_app.util.Resource
-import com.goodee.cando_app.viewmodel.UserViewModel
+import com.goodee.cando_app.viewmodel.FindPasswordViewModel
 
 class FindPasswordFragment : Fragment() {
     companion object {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentFindPasswordBinding
-    private val userViewModel: UserViewModel by activityViewModels()
+    private val userViewModel: FindPasswordViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,19 +30,45 @@ class FindPasswordFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_find_password, container, false)
         setEvent()
         setObserver()
+        initView()
 
         return binding.root
     }
 
+    private fun initView() {
+        Log.d(TAG,"FindPasswordFragment - initView() called")
+        binding.apply {
+            edittextFindpasswordNameInput.setText(userViewModel.userName.value ?: "")
+            edittextFindpasswordEmailinput.setText(userViewModel.userEmail.value ?: "")
+            edittextFindpasswordEmailcheckinput.setText(userViewModel.userEmail.value ?: "")
+        }
+    }
+
     private fun setEvent() {
+        Log.d(TAG,"FindPasswordFragment - setEvent() called")
         binding.apply {
             buttonFindpasswordEmailbutton.setOnClickListener {
+                val name = binding.edittextFindpasswordNameInput.text.toString()
+                setViewModelName(name)
+                val email = binding.edittextFindpasswordEmailinput.text.toString()
+                setViewModelEmail(email)
                 findPasswordByEmail()
             }
         }
     }
 
+    private fun setViewModelName(name: String) {
+        Log.d(TAG,"FindPasswordFragment - setViewModelName() called")
+        userViewModel.setUserName(name)
+    }
+
+    private fun setViewModelEmail(email: String) {
+        Log.d(TAG,"FindPasswordFragment - setViewModelEmail() called")
+        userViewModel.setUserEmail(email)
+    }
+
     private fun setObserver() {
+        Log.d(TAG,"FindPasswordFragment - setObserver() called")
         userViewModel.isExistNameAndEmail.observe(viewLifecycleOwner) {
             when (it) {
                 is Resource.Success -> {
