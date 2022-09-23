@@ -12,11 +12,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
-class UserRepository(val application: Application) {
-    companion object {
-        private const val TAG: String = "로그"
-        private const val USER_COLLECTION = "user"
-    }
+object UserRepository {
+    private const val TAG: String = "로그"
+    private const val USER_COLLECTION = "user"
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
     // 회원가입
