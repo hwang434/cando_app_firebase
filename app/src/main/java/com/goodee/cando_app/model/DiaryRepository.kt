@@ -84,7 +84,7 @@ object DiaryRepository {
         }
     }
 
-    suspend fun like(dno: String, uid: String) {
+    suspend fun like(dno: String, uid: String): DiaryDto? {
         Log.d(TAG,"DiaryRepository - like($dno, $uid) called")
         val diaryRef = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document(dno)
         var diaryDto: DiaryDto? = null
@@ -113,10 +113,10 @@ object DiaryRepository {
         map["receiver"] = diaryDto!!.author
         SocketLike.emitData("like", map)
 
-        _diaryLiveData.postValue(diaryDto)
+        return diaryDto
     }
 
-    suspend fun unlike(dno: String, uid: String) {
+    suspend fun unlike(dno: String, uid: String): DiaryDto? {
         Log.d(TAG,"DiaryRepository - unlike() called")
         val diaryRef = FirebaseFirestore.getInstance().collection(DIARY_COLLECTION).document(dno)
         var diaryDto: DiaryDto? = null
@@ -136,7 +136,7 @@ object DiaryRepository {
             throw Exception("좋아요 취소 실패")
         }
 
-        _diaryLiveData.postValue(diaryDto)
+        return diaryDto
     }
 
     suspend fun deleteAllDiary(): Boolean {

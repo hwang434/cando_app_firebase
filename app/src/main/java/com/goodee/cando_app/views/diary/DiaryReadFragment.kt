@@ -29,7 +29,7 @@ class DiaryReadFragment : Fragment() {
     private lateinit var dno: String
     private val diaryReadViewModel: DiaryReadViewModel by viewModels()
     private val userViewModel: UserViewModel by activityViewModels()
-    private val userUid by lazy { userViewModel.userLiveData.value?.data }
+    private val userUid by lazy { userViewModel.userLiveData.value?.data?.uid }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +37,8 @@ class DiaryReadFragment : Fragment() {
 
         if (!isSignIn()) {
             Toast.makeText(requireContext(), "User is not signed in.", Toast.LENGTH_SHORT).show()
-            requireActivity().finish()
+            finishApp()
         }
-    }
-
-    private fun isSignIn(): Boolean {
-        return userUid != null
     }
 
     override fun onCreateView(
@@ -63,6 +59,14 @@ class DiaryReadFragment : Fragment() {
         readDiary(dno)
 
         return binding.root
+    }
+
+    private fun isSignIn(): Boolean {
+        return userUid != null
+    }
+
+    private fun finishApp() {
+        requireActivity().finish()
     }
 
     private fun setEvent() {
@@ -89,45 +93,6 @@ class DiaryReadFragment : Fragment() {
         }
     }
 
-    // 글 삭제
-    private fun deleteDiary() {
-        Log.d(TAG,"DiaryViewFragment - deleteDiary() called")
-        val aBuilder = AlertDialog.Builder(requireContext())
-
-        aBuilder.run {
-            setTitle(getString(R.string.alert_diary_view_title))
-            setMessage(getString(R.string.alert_diary_view_message))
-            setPositiveButton(getString(R.string.alert_diary_view_postive_button)) { _, _ ->
-                try {
-                    diaryReadViewModel.deleteDiary(dno)
-                    findNavController().navigateUp()
-                } catch (e: Exception) {
-                    Log.w(TAG, "setEvent: delete diary fail.", e)
-                    AlertDialog.Builder(requireContext()).setTitle(getString(R.string.alert_diary_view_fail_title)).setMessage(getString(R.string.alert_diary_view_fail_message)).create().show()
-                }
-            }
-            setNegativeButton("취소") { _, _ -> }
-        }
-
-        aBuilder.create().show()
-    }
-
-    // 좋아요 기능
-    private fun like(uid: String) {
-        binding.progressbarDiaryviewLoading.visibility = View.VISIBLE
-        diaryReadViewModel.diaryLiveData.value?.apply {
-            diaryReadViewModel.like(dno, uid)
-        }
-    }
-
-    // 좋아요 취소
-    private fun unlike(uid: String) {
-        binding.progressbarDiaryviewLoading.visibility = View.VISIBLE
-        diaryReadViewModel.diaryLiveData.value?.apply {
-            diaryReadViewModel.unlike(dno = dno, uid = uid)
-        }
-    }
-
     // 라이브 데이터르 게시글 최신화
     private fun setObserver() {
         diaryReadViewModel.diaryLiveData.observe(viewLifecycleOwner) { resource ->
@@ -149,13 +114,10 @@ class DiaryReadFragment : Fragment() {
                             buttonDiaryviewDeletebutton.visibility = View.VISIBLE
                         }
 
-                        // if : 좋아요를 눌렀으면 -> 좋아요 버튼이 색칠되어 있음
-                        if (diaryDto.favorites.contains(FirebaseAuth.getInstance().currentUser!!.uid)) {
-                            buttonDiaryViewLikeButton.setMinAndMaxFrame(50, 100)
-                            buttonDiaryViewLikeButton.playAnimation()
+                        if (diaryDto.favorites.contains(userUid)) {
+                            playLikeAnimation()
                         } else {
-                            buttonDiaryViewLikeButton.setMinAndMaxFrame(130, 150)
-                            buttonDiaryViewLikeButton.playAnimation()
+                            playUnlikeAnimation()
                         }
                     }
                 }
@@ -180,8 +142,61 @@ class DiaryReadFragment : Fragment() {
         binding.progressbarDiaryviewLoading.visibility = View.GONE
     }
 
+    private fun playLikeAnimation() {
+        binding.apply {
+            buttonDiaryViewLikeButton.setMinAndMaxFrame(50, 100)
+            buttonDiaryViewLikeButton.playAnimation()
+        }
+    }
+
+    private fun playUnlikeAnimation() {
+        binding.apply {
+            buttonDiaryViewLikeButton.setMinAndMaxFrame(130, 150)
+            buttonDiaryViewLikeButton.playAnimation()
+        }
+    }
+
     // 글을 조회하여 현재 페이지를 최신화
     private fun readDiary(dno: String) {
         diaryReadViewModel.refreshDiaryLiveData(dno)
+    }
+
+    // 좋아요 기능
+    private fun like(uid: String) {
+        Log.d(TAG,"DiaryReadFragment - like() called")
+        diaryReadViewModel.diaryLiveData.value?.apply {
+            diaryReadViewModel.like(dno, uid)
+        }
+    }
+
+    // 좋아요 취소
+    private fun unlike(uid: String) {
+        Log.d(TAG,"DiaryReadFragment - unlike() called")
+        diaryReadViewModel.diaryLiveData.value?.apply {
+            diaryReadViewModel.unlike(dno = dno, uid = uid)
+        }
+    }
+
+    // 글 삭제
+    private fun deleteDiary() {
+        Log.d(TAG,"DiaryViewFragment - deleteDiary() called")
+        val aBuilder = AlertDialog.Builder(requireContext())
+
+        aBuilder.run {
+            setTitle(getString(R.string.alert_diary_view_title))
+            setMessage(getString(R.string.alert_diary_view_message))
+            setPositiveButton(getString(R.string.alert_diary_view_postive_button)) { _, _ ->
+                try {
+                    diaryReadViewModel.deleteDiary(dno)
+                    findNavController().navigateUp()
+                } catch (e: Exception) {
+                    Log.w(TAG, "setEvent: delete diary fail.", e)
+                    AlertDialog.Builder(requireContext()).setTitle(getString(R.string.alert_diary_view_fail_title)).setMessage(getString(R.string.alert_diary_view_fail_message)).create().show()
+                }
+            }
+            setNegativeButton("취소") { _, _ -> }
+        }
+
+        aBuilder.create().show()
     }
 }

@@ -32,6 +32,7 @@ class DiaryReadViewModel: ViewModel() {
 
         viewModelScope.launch(Dispatchers.IO + handler) {
             val diaryDto = DiaryRepository.refreshDiaryLiveData(dno)
+            Log.d(TAG,"DiaryReadViewModel - diaryDto.favorite : ${diaryDto?.favorites}() called")
             when (diaryDto) {
                 null -> {
                     _diaryLiveData.postValue(Resource.Error(null, "There is No Diary."))
@@ -45,21 +46,33 @@ class DiaryReadViewModel: ViewModel() {
 
     // 좋아요 기능
     fun like(dno: String, uid: String) {
-        Log.d(TAG,"DiaryViewModel - like() called")
+        Log.d(TAG,"DiaryReadViewModel - like() called")
         // if : 좋아요 성공하면
-        viewModelScope.launch(Dispatchers.IO) { DiaryRepository.like(dno, uid) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val diaryDto = DiaryRepository.like(dno, uid)
+            Log.d(TAG,"DiaryReadViewModel - diaryDto.favorite : ${diaryDto?.favorites}() called")
+            diaryDto?.let {
+                _diaryLiveData.postValue(Resource.Success(it))
+            }
+        }
     }
 
     // 좋아요 취소
     fun unlike(dno: String, uid: String) {
-        Log.d(TAG,"DiaryViewModel - unlike() called")
+        Log.d(TAG,"DiaryReadViewModel - unlike() called")
         // if : 좋아요 취소 성공하면
-        viewModelScope.launch(Dispatchers.IO) { DiaryRepository.unlike(dno, uid) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val diaryDto = DiaryRepository.unlike(dno, uid)
+            Log.d(TAG,"DiaryReadViewModel - diaryDto : ${diaryDto?.favorites}() called")
+            diaryDto?.let {
+                _diaryLiveData.postValue(Resource.Success(it))
+            }
+        }
     }
 
     // 글 삭제하기
     fun deleteDiary(dno: String) {
-        Log.d(TAG,"DiaryViewModel - deleteDiary() called")
+        Log.d(TAG,"DiaryReadViewModel - deleteDiary() called")
         viewModelScope.launch(Dispatchers.IO) { DiaryRepository.deleteDiary(dno) }
     }
 }
