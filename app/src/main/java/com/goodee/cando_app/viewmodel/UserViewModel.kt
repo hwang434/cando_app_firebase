@@ -8,8 +8,6 @@ import com.goodee.cando_app.dto.UserDto
 import com.goodee.cando_app.model.UserRepository
 import com.goodee.cando_app.util.Resource
 import com.google.firebase.auth.*
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,15 +32,6 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     private val _isExistEmail: MutableLiveData<Resource<Boolean>> = MutableLiveData()
     val isExistEmail: LiveData<Resource<Boolean>>
         get() = _isExistEmail
-
-    // Resources data is for Email.
-    private val _isExistNameAndEmail: MutableLiveData<Resource<String>> = MutableLiveData()
-    val isExistNameAndEmail: LiveData<Resource<String>>
-        get() = _isExistNameAndEmail
-
-    private val _isPasswordResetEmailSent: MutableLiveData<Resource<String>> = MutableLiveData()
-    val isPasswordResetEmailSent: LiveData<Resource<String>>
-        get() = _isPasswordResetEmailSent
 
     override fun onCleared() {
         super.onCleared()
@@ -87,23 +76,6 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO + handler) {
             val result = userRepository.login(email, password)
             _userLiveData.postValue(result)
-        }
-    }
-
-    fun isExistNameAndEmail(name: String, email: String) {
-        Log.d(TAG,"UserViewModel - isExistNameAndEmail() called")
-        _isExistNameAndEmail.postValue(Resource.Loading())
-        val handler = CoroutineExceptionHandler { _, error ->
-            Log.w(TAG, "isExistNameAndEmail: ", error)
-        }
-
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            if (!userRepository.isExistNameAndEmail(name, email)) {
-                _isExistNameAndEmail.postValue(Resource.Error(null, "There is no user matched to name and email."))
-                return@launch
-            }
-
-            _isExistNameAndEmail.postValue(Resource.Success(email))
         }
     }
     
@@ -164,22 +136,5 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
         Log.d(TAG,"UserViewModel - signOut() called")
         _userLiveData.postValue(null)
         userRepository.signOut()
-    }
-
-    fun sendPasswordResetEmail(email: String) {
-        Log.d(TAG,"UserViewModel - sendPasswordResetEmail() called")
-        _isPasswordResetEmailSent.postValue(Resource.Loading())
-        val handler = CoroutineExceptionHandler { _, error ->
-            Log.w(TAG, "sendPasswordResetEmail: ", error)
-        }
-
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            if (!userRepository.sendPasswordResetEmail(email)) {
-                _isPasswordResetEmailSent.postValue(Resource.Error(null, "Fail to send the password reset email."))
-                return@launch
-            }
-            _isPasswordResetEmailSent.postValue(Resource.Success(email))
-        }
-
     }
 }
