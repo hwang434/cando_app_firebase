@@ -9,7 +9,7 @@ import io.socket.client.Socket
 import java.net.URISyntaxException
 
 object SocketLike {
-    private const val ADDRESS = BuildConfig.SOCKET_ADDRESS
+    private const val ADDRESS = "https://serene-eyrie-33508.herokuapp.com/"
     private const val TAG: String = "로그"
     private lateinit var socket: Socket
 
