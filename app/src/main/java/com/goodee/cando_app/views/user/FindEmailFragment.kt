@@ -9,19 +9,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindIdBinding
 import com.goodee.cando_app.util.RegexChecker
 import com.goodee.cando_app.util.Resource
-import com.goodee.cando_app.viewmodel.UserViewModel
+import com.goodee.cando_app.viewmodel.FindEmailViewModel
 
 class FindEmailFragment : Fragment() {
+
     companion object {
         private const val TAG: String = "로그"
     }
     private lateinit var binding: FragmentFindIdBinding
-    private val userViewModel: UserViewModel by activityViewModels()
+    private val findEmailViewModel: FindEmailViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,6 +30,10 @@ class FindEmailFragment : Fragment() {
     ): View {
         Log.d(TAG,"FindIdFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_find_id, container, false)
+        binding.apply {
+            edittextFindidNameinput.setText(findEmailViewModel.userName.value ?: "")
+            edittextFindidPhoneinput.setText(findEmailViewModel.userPhoneNumber.value ?: "")
+        }
         setEvent()
         setObserver()
 
@@ -38,19 +43,36 @@ class FindEmailFragment : Fragment() {
     private fun setEvent() {
         Log.d(TAG,"FindEmailFragment - setEvent() called")
         binding.buttonFindidSubmit.setOnClickListener {
+            val name = binding.edittextFindidNameinput.text.toString()
+            setViewModelName(name)
+            val phone = binding.edittextFindidPhoneinput.text.toString()
+            setViewModelPhone(phone)
             findId()
         }
     }
 
+    private fun setViewModelName(name: String) {
+        Log.d(TAG,"FindEmailFragment - setViewModelName() called")
+        findEmailViewModel.setName(name)
+    }
+
+    private fun setViewModelPhone(phone: String) {
+        Log.d(TAG,"FindEmailFragment - setViewModelPhone() called")
+        findEmailViewModel.setPhone(phone)
+    }
+
     private fun setObserver() {
         Log.d(TAG,"FindEmailFragment - setObserver() called")
-        userViewModel.listOfUserEmail.observe(viewLifecycleOwner) {
+        findEmailViewModel.listOfUserEmail.observe(viewLifecycleOwner) {
             when (it) {
                 is Resource.Success -> {
                     val alertDialog = AlertDialog.Builder(requireContext()).create()
                     alertDialog.apply {
                         setTitle(getString(R.string.alert_find_email_title))
                         setMessage(it.data?.get(0)?.get("email").toString())
+                        setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes)) { _, _ ->
+                            // Just Close the alertDialog. So don't have to type some logic.
+                        }
                     }
                     alertDialog.show()
                 }
@@ -76,7 +98,7 @@ class FindEmailFragment : Fragment() {
         } else if (phone.isEmpty() || !RegexChecker.isValidPhone(phone)) {
             Toast.makeText(requireActivity(), getString(R.string.toast_find_id_check_phone), Toast.LENGTH_SHORT).show()
         } else {
-            userViewModel.findUserEmail(phone = phone, name = name)
+            findEmailViewModel.findUserEmail(phone = phone, name = name)
         }
     }
 }

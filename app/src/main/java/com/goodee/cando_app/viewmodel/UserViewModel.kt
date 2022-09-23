@@ -9,6 +9,7 @@ import com.goodee.cando_app.model.UserRepository
 import com.goodee.cando_app.util.Resource
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     companion object {
         private const val TAG: String = "로그"
     }
-    private var userRepository: UserRepository
+    private val userRepository = UserRepository
     private val _userLiveData: MutableLiveData<Resource<FirebaseUser>> = MutableLiveData()
     val userLiveData: LiveData<Resource<FirebaseUser>>
         get() = _userLiveData
@@ -34,10 +35,6 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     val isExistEmail: LiveData<Resource<Boolean>>
         get() = _isExistEmail
 
-    private val _listOfUserEmail: MutableLiveData<Resource<List<DocumentSnapshot>>> = MutableLiveData()
-    val listOfUserEmail: LiveData<Resource<List<DocumentSnapshot>>>
-        get() = _listOfUserEmail
-
     // Resources data is for Email.
     private val _isExistNameAndEmail: MutableLiveData<Resource<String>> = MutableLiveData()
     val isExistNameAndEmail: LiveData<Resource<String>>
@@ -46,10 +43,6 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     private val _isPasswordResetEmailSent: MutableLiveData<Resource<String>> = MutableLiveData()
     val isPasswordResetEmailSent: LiveData<Resource<String>>
         get() = _isPasswordResetEmailSent
-
-    init {
-        userRepository = UserRepository(application)
-    }
 
     override fun onCleared() {
         super.onCleared()
@@ -94,27 +87,6 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO + handler) {
             val result = userRepository.login(email, password)
             _userLiveData.postValue(result)
-        }
-    }
-
-    // 아이디 찾기
-    fun findUserEmail(name: String, phone: String) {
-        Log.d(TAG,"UserViewModel - findUserId() called")
-        _listOfUserEmail.postValue(Resource.Loading())
-
-        val handler = CoroutineExceptionHandler { _, error ->
-            Log.w(TAG, "findUserEmail: ", error)
-        }
-
-        viewModelScope.launch(Dispatchers.IO + handler) {
-            val result = userRepository.findUserEmail(name, phone)
-            if (result.isEmpty()) {
-                _listOfUserEmail.postValue(Resource.Error(null, "There is no user matched to name and phone."))
-            } else if (result.size > 1) {
-                _listOfUserEmail.postValue(Resource.Error(result, "There are too many members matched to info."))
-            } else {
-                _listOfUserEmail.postValue(Resource.Success(result))
-            }
         }
     }
 
