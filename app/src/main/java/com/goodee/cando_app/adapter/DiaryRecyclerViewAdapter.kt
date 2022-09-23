@@ -10,10 +10,11 @@ import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentDiaryListBinding
 import com.goodee.cando_app.dto.DiaryDto
 import com.goodee.cando_app.views.diary.DiaryFragmentDirections
+import com.goodee.cando_app.views.diary.DiaryReadFragmentDirections
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DiaryRecyclerViewAdapter(private val list: LiveData<List<DiaryDto>>) : RecyclerView.Adapter<DiaryRecyclerViewAdapter.ViewHolder>() {
+class DiaryRecyclerViewAdapter(private val list: List<DiaryDto>) : RecyclerView.Adapter<DiaryRecyclerViewAdapter.ViewHolder>() {
     private val sdf = SimpleDateFormat("MM-dd a HH:mm", Locale.KOREA)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = DataBindingUtil.inflate<FragmentDiaryListBinding>(LayoutInflater.from(parent.context), R.layout.fragment_diary_list, parent, false)
@@ -21,12 +22,12 @@ class DiaryRecyclerViewAdapter(private val list: LiveData<List<DiaryDto>>) : Rec
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val diary = list.value?.get(position)
-        holder.setDiary(diary!!)
+        val diary = list[position]
+        holder.setDiary(diary)
     }
 
     override fun getItemCount(): Int {
-        return list.value!!.size
+        return list.size
     }
 
     inner class ViewHolder(val binding: FragmentDiaryListBinding) : RecyclerView.ViewHolder(binding.root) {

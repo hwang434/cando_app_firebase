@@ -1,6 +1,5 @@
 package com.goodee.cando_app.views.diary
 
-import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -11,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +17,7 @@ import com.goodee.cando_app.R
 import com.goodee.cando_app.adapter.DiaryRecyclerViewAdapter
 import com.goodee.cando_app.databinding.FragmentDiaryBinding
 import com.goodee.cando_app.dto.DiaryDto
+import com.goodee.cando_app.util.Resource
 import com.goodee.cando_app.viewmodel.DiaryViewModel
 import com.goodee.cando_app.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
@@ -66,10 +65,10 @@ class DiaryFragment : Fragment() {
     ): View {
         Log.d(TAG,"DiaryFragment - onCreateView() called")
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary, container, false)
-        observeDiaryList()
-        refreshDiaryList()
         setEvent()
-
+        setObserver()
+        refreshDiaryList()
+        
         return binding.root
     }
 
@@ -112,32 +111,41 @@ class DiaryFragment : Fragment() {
         }
     }
 
-    private fun observeDiaryList() {
+    private fun setObserver() {
         Log.d(TAG,"DiaryFragment - observeDiaryList() called")
-        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner) { listOfDiaryDto ->
-            if (listOfDiaryDto != null) {
-                setRecyclerView(diaryViewModel.diaryListLiveData)
-                binding.progressbarDiaryLoading.visibility = View.GONE
+        diaryViewModel.diaryListLiveData.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    hideProgressBar()
+                    resource.data?.let { setRecyclerView(it) }
+                }
+
+                is Resource.Error -> {
+                    hideProgressBar()
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is Resource.Loading -> {
+                    showProgressBar()
+                }
             }
         }
+    }
+
+    private fun showProgressBar() {
+        binding.progressbarDiaryLoading.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        binding.progressbarDiaryLoading.visibility = View.GONE
     }
 
     private fun refreshDiaryList() {
-        try {
-            diaryViewModel.refreshDiaryList()
-        } catch (e: Exception) {
-            Log.w(TAG, "refreshDiaryList: ", e)
-            val alertDialog = AlertDialog.Builder(requireContext()).create()
-            alertDialog.setTitle("서버 상태가 좋지 않습니다.")
-            alertDialog.setMessage("나중에 다시 접속해주세요.")
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "확인") { _, _ ->
-                findNavController().navigateUp()
-            }
-            alertDialog.show()
-        }
+        Log.d(TAG,"DiaryFragment - refreshDiaryList() called")
+        diaryViewModel.refreshDiaryList()
     }
 
-    private fun setRecyclerView(diaryLiveData: LiveData<List<DiaryDto>>) {
+    private fun setRecyclerView(diaryLiveData: List<DiaryDto>) {
         Log.d(TAG,"DiaryFragment - setRecyclerView() called")
         val adapter = DiaryRecyclerViewAdapter(diaryLiveData)
         binding.recyclerviewDiaryDiarylist.adapter = adapter

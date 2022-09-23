@@ -60,7 +60,7 @@
             app:popUpToInclusive="true"/>
         <action
             android:id="@+id/action_diaryFragment_to_diaryViewFragment"
-            app:destination="@id/diaryViewFragment" />
+            app:destination="@id/diaryReadFragment" />
         <action
             android:id="@+id/action_diaryFragment_to_memberWithdrawFragment"
             app:destination="@id/memberWithdrawFragment" />
@@ -84,12 +84,12 @@
             app:nullable="true" />
         <action
             android:id="@+id/action_diaryWriteFragment_to_diaryViewFragment"
-            app:destination="@id/diaryViewFragment"
+            app:destination="@id/diaryReadFragment"
             app:popUpTo="@id/diaryFragment"/>
     </fragment>
     <fragment
-        android:id="@+id/diaryViewFragment"
-        android:name="com.goodee.cando_app.views.diary.DiaryViewFragment"
+        android:id="@+id/diaryReadFragment"
+        android:name="com.goodee.cando_app.views.diary.DiaryReadFragment"
         android:label="fragment_diary_view"
         tools:layout="@layout/fragment_diary_view">
         <argument
