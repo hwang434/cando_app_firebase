@@ -8,19 +8,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.goodee.cando_app.R
 import com.goodee.cando_app.databinding.FragmentFindPasswordBinding
 import com.goodee.cando_app.util.RegexChecker
 import com.goodee.cando_app.util.Resource
-import com.goodee.cando_app.viewmodel.UserViewModel
+import com.goodee.cando_app.viewmodel.FindPasswordViewModel
 
 class FindPasswordFragment : Fragment() {
+
     companion object {
         private const val TAG: String = "로그"
     }
+
     private lateinit var binding: FragmentFindPasswordBinding
-    private val userViewModel: UserViewModel by activityViewModels()
+    private val userViewModel: FindPasswordViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +37,7 @@ class FindPasswordFragment : Fragment() {
     }
 
     private fun setEvent() {
+        Log.d(TAG,"FindPasswordFragment - setEvent() called")
         binding.apply {
             buttonFindpasswordEmailbutton.setOnClickListener {
                 findPasswordByEmail()
@@ -43,6 +46,7 @@ class FindPasswordFragment : Fragment() {
     }
 
     private fun setObserver() {
+        Log.d(TAG,"FindPasswordFragment - setObserver() called")
         userViewModel.isExistNameAndEmail.observe(viewLifecycleOwner) {
             when (it) {
                 is Resource.Success -> {
